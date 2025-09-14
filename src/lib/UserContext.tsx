@@ -47,25 +47,52 @@ const UserContext = createContext<UserContextType | undefined>(undefined)
 
 export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
-  const [isLoading, setIsLoading] = useState(false) // Changed to false
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // AUTHENTICATION DISABLED FOR THIS PHASE
-    // Authentication is temporarily disabled - user will be set to null
-    setIsLoading(false)
-    setUser(null)
+    // Check for existing session on app load
+    const initializeAuth = async () => {
+      const token = localStorage.getItem('makemyknot_token')
+      const savedUser = localStorage.getItem('makemyknot_user')
+      
+      if (token && savedUser) {
+        try {
+          // Parse saved user
+          const parsedUser = JSON.parse(savedUser)
+          
+          // For demo or local tokens, just use saved user
+          if (token === 'demo-token' || token.startsWith('local-')) {
+            setUser(parsedUser)
+          } else {
+            // Try to verify token with API
+            try {
+              const response = await apiService.getMe()
+              if (response.status === 'success' && response.user) {
+                setUser(response.user)
+                localStorage.setItem('makemyknot_user', JSON.stringify(response.user))
+              } else {
+                // Token invalid, but keep local user for offline mode
+                setUser(parsedUser)
+              }
+            } catch (apiError) {
+              // API unavailable, use saved user
+              console.log('API unavailable, using cached user')
+              setUser(parsedUser)
+            }
+          }
+        } catch (parseError) {
+          console.error('Error parsing saved user:', parseError)
+          localStorage.removeItem('makemyknot_token')
+          localStorage.removeItem('makemyknot_user')
+        }
+      }
+      setIsLoading(false)
+    }
     
-    // Optional: Clear any existing auth data
-    localStorage.removeItem('makemyknot_token')
-    localStorage.removeItem('makemyknot_user')
+    initializeAuth()
   }, [])
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    // AUTHENTICATION DISABLED FOR THIS PHASE
-    console.log('Login disabled for this phase')
-    return false
-    
-    /* Original login code disabled
     setIsLoading(true)
     try {
       // Check for demo account
@@ -179,15 +206,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoading(false)
     }
-    */ // End disabled login code
   }
 
   const signup = async (userData: Partial<User> & { password: string }): Promise<boolean> => {
-    // AUTHENTICATION DISABLED FOR THIS PHASE
-    console.log('Signup disabled for this phase')
-    return false
-    
-    /* Original signup code disabled
     setIsLoading(true)
     try {
       // Check if user already exists locally
@@ -380,7 +401,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoading(false)
     }
-    */ // End disabled signup code
   }
 
   const logout = async () => {

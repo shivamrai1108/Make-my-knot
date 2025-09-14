@@ -44,7 +44,7 @@ async function migrateLeads(): Promise<number> {
     
     for (const lead of leadsData) {
       try {
-        await mongoApiCall('/leads/migrate', {
+        await mongoApiCall('/migration/leads', {
           ...lead,
           source: lead.source || 'website',
           migratedFromLocalStorage: true
@@ -70,7 +70,7 @@ async function migrateQuestionnaires(): Promise<number> {
     
     for (const questionnaire of questionnaireData) {
       try {
-        await mongoApiCall('/questionnaires/migrate', {
+        await mongoApiCall('/migration/questionnaires', {
           ...questionnaire,
           migratedFromLocalStorage: true
         })
@@ -97,7 +97,7 @@ async function migrateUsers(): Promise<number> {
       try {
         // Don't migrate passwords in plain text - this is for demo data only
         const { password, ...userWithoutPassword } = user
-        await mongoApiCall('/users/migrate', {
+        await mongoApiCall('/migration/users', {
           ...userWithoutPassword,
           migratedFromLocalStorage: true,
           // Set a demo password hash for testing
@@ -133,7 +133,7 @@ async function migrateAdminData(): Promise<number> {
       const data = localStorage.getItem(key)
       if (data) {
         try {
-          await mongoApiCall('/admin/migrate', {
+          await mongoApiCall('/migration/admin', {
             key,
             data: JSON.parse(data),
             migratedFromLocalStorage: true

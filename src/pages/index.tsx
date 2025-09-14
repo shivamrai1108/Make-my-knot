@@ -677,10 +677,10 @@ export default function Home() {
               </motion.p>
               
               <div className="flex flex-col sm:flex-row gap-4 mb-12 justify-center">
-                <div className="btn-primary text-lg px-8 py-4 inline-flex items-center justify-center opacity-50 cursor-not-allowed">
-                  Coming Soon
+                <Link href="/signup" className="btn-primary text-lg px-8 py-4 inline-flex items-center justify-center">
+                  Start Your Journey
                   <ArrowRight className="ml-2 h-5 w-5" />
-                </div>
+                </Link>
                 <Link href="/about" className="btn-secondary text-lg px-8 py-4 inline-flex items-center justify-center">
                   Our Story
                 </Link>
@@ -1016,10 +1016,13 @@ export default function Home() {
             <p className="text-xl text-slate-200 mb-8">
               Join thousands of people who have found meaningful relationships through our premium matchmaking platform.
             </p>
-            <div className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-2xl text-white bg-gradient-to-r from-gray-500 via-gray-600 to-gray-700 opacity-50 cursor-not-allowed shadow-2xl">
-              Coming Soon - Stay Tuned!
+            <Link 
+              href="/signup" 
+              className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-2xl text-white bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:from-pink-600 hover:via-purple-600 hover:to-indigo-600 transform hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-purple-500/25"
+            >
+              Start Your Journey Today
               <ArrowRight className="ml-2 h-5 w-5" />
-            </div>
+            </Link>
           </div>
         </section>
       </main>

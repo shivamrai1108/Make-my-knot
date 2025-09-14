@@ -57,11 +57,14 @@ export default function Navigation({ variant = 'transparent', className = '' }: 
               Pricing
             </Link>
             
-            {/* Auth buttons disabled for this phase */}
+            {/* Auth buttons */}
             <div className="flex items-center space-x-3 ml-6">
-              <div className="btn-secondary text-sm px-6 py-3 font-semibold opacity-50 cursor-not-allowed">
-                Coming Soon
-              </div>
+              <Link href="/login" className="btn-secondary text-sm px-6 py-3 font-semibold transition-all duration-200 hover:scale-105 active:scale-95 transform hover:shadow-lg block text-center">
+                Sign In
+              </Link>
+              <Link href="/signup" className="btn-primary text-sm px-6 py-3 font-semibold transition-all duration-200 hover:scale-105 active:scale-95 transform shadow-lg hover:shadow-xl block text-center">
+                Get Started
+              </Link>
             </div>
           </div>
 
@@ -124,9 +127,20 @@ export default function Navigation({ variant = 'transparent', className = '' }: 
               </Link>
               
               <div className="flex flex-col space-y-3 pt-4 border-t border-white/20 mt-4">
-                <div className="btn-secondary text-center py-4 px-6 text-base font-semibold opacity-50 cursor-not-allowed">
-                  Coming Soon
-                </div>
+                <Link 
+                  href="/login" 
+                  className="btn-secondary text-center py-4 px-6 text-base font-semibold block touch-manipulation"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Sign In
+                </Link>
+                <Link 
+                  href="/signup" 
+                  className="btn-primary text-center py-4 px-6 text-base font-semibold shadow-lg block touch-manipulation"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Get Started
+                </Link>
               </div>
             </div>
           </div>
