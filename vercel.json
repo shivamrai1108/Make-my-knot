@@ -1,26 +1,4 @@
 {
-  "version": 2,
-  "name": "make-my-knot",
-  "alias": ["makemyknot.com", "www.makemyknot.com"],
-  "builds": [
-    {
-      "src": "next.config.js",
-      "use": "@vercel/next"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  },
   "functions": {
     "src/pages/api/**/*.{js,ts}": {
       "maxDuration": 30
