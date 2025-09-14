@@ -1,5 +1,4 @@
 import React from 'react'
-import Image from 'next/image'
 
 interface BrandLogoProps {
   className?: string
@@ -16,13 +15,11 @@ const BrandLogo: React.FC<BrandLogoProps> = ({ className = '', size = 'md' }) =>
 
   return (
     <div className={`${sizeClasses[size]} ${className}`}>
-      <Image
+      <img
         src="/images/logo.png"
         alt="Make My Knot Logo"
-        width={200}
-        height={200}
         className="w-full h-full object-contain"
-        priority
+        loading="eager"
       />
     </div>
   )

@@ -354,8 +354,11 @@ export default function EnhancedAdminDashboard() {
       }
     }
     
+    const colorConfig = colors[type] as Record<string, string>
+    const statusColor = colorConfig[status] || 'bg-gray-100 text-gray-800'
+    
     return (
-      <span className={`px-2 py-1 text-xs font-medium rounded-full ${colors[type][status] || 'bg-gray-100 text-gray-800'}`}>
+      <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusColor}`}>
         {status.charAt(0).toUpperCase() + status.slice(1)}
       </span>
     )
@@ -540,7 +543,7 @@ export default function EnhancedAdminDashboard() {
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600">API Response</span>
-                      <span className="text-sm text-gray-700">< 200ms</span>
+                      <span className="text-sm text-gray-700">&lt; 200ms</span>
                     </div>
                   </div>
                 </div>

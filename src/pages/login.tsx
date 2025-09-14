@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { Heart, Mail, Lock, Eye, EyeOff, Loader } from 'lucide-react'
 import { useUser } from '@/lib/UserContext'
+import Navigation from '@/components/Navigation'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -69,14 +70,12 @@ export default function Login() {
         <meta name="description" content="Sign in to your Make My Knot account to find your perfect life partner." />
       </Head>
 
+      <Navigation variant="white" />
+      
       <main className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full">
           {/* Header */}
           <div className="text-center mb-8">
-            <Link href="/" className="flex items-center justify-center mb-6 group">
-              <Heart className="h-10 w-10 text-primary-600 group-hover:scale-110 transition-transform duration-200" />
-              <span className="ml-2 text-3xl font-bold text-gray-900">Make My Knot</span>
-            </Link>
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome back</h1>
             <p className="text-gray-600">Sign in to continue your journey to finding love</p>
           </div>

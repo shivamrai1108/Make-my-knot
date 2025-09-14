@@ -1,0 +1,137 @@
+import Link from 'next/link'
+import BrandLogo from '@/components/BrandLogo'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+import { Menu, X } from 'lucide-react'
+
+interface NavigationProps {
+  variant?: 'transparent' | 'white' | 'dark'
+  className?: string
+}
+
+export default function Navigation({ variant = 'transparent', className = '' }: NavigationProps) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const router = useRouter()
+
+  const baseClasses = variant === 'transparent' 
+    ? 'fixed w-full z-[100] top-0' 
+    : variant === 'dark'
+    ? 'bg-gray-900 border-b border-gray-800 relative z-[100]'
+    : 'bg-white shadow-sm border-b border-gray-100 relative z-[100]'
+
+  const textColor = variant === 'dark' ? 'text-white' : variant === 'transparent' ? 'text-white' : 'text-gray-900'
+  const linkColor = variant === 'dark' 
+    ? 'text-gray-300 hover:text-white' 
+    : variant === 'transparent'
+    ? 'text-gray-100 hover:text-white'
+    : 'text-gray-700 hover:text-primary-600'
+
+  return (
+    <nav className={`${baseClasses} ${className}`}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center py-6">
+          {/* Logo */}
+          <Link href="/" className="flex items-center">
+            <BrandLogo size="md" className="mr-2" />
+            <span className={`text-2xl font-bold ${textColor}`}>Make My Knot</span>
+          </Link>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-1">
+            <Link href="/" className={`${linkColor} transition-colors duration-200 px-4 py-3 rounded-lg hover:bg-white/20 active:bg-white/30 font-medium cursor-pointer pointer-events-auto`}>
+              Home
+            </Link>
+            <Link href="/#how-it-works" className={`${linkColor} transition-colors duration-200 px-4 py-3 rounded-lg hover:bg-white/20 active:bg-white/30 font-medium cursor-pointer pointer-events-auto whitespace-nowrap`}>
+              How It Works
+            </Link>
+            <Link href="/about" className={`${linkColor} transition-colors duration-200 px-4 py-3 rounded-lg hover:bg-white/20 active:bg-white/30 font-medium cursor-pointer pointer-events-auto`}>
+              Our Story
+            </Link>
+            <Link href="/#testimonials" className={`${linkColor} transition-colors duration-200 px-4 py-3 rounded-lg hover:bg-white/20 active:bg-white/30 font-medium cursor-pointer pointer-events-auto whitespace-nowrap`}>
+              Success Stories
+            </Link>
+            <Link href="/webinars" className={`${linkColor} transition-colors duration-200 px-4 py-3 rounded-lg hover:bg-white/20 active:bg-white/30 font-medium cursor-pointer pointer-events-auto`}>
+              Webinars
+            </Link>
+            <Link href="/pricing" className={`${linkColor} transition-colors duration-200 px-4 py-3 rounded-lg hover:bg-white/20 active:bg-white/30 font-medium cursor-pointer pointer-events-auto`}>
+              Pricing
+            </Link>
+            
+            {/* Auth buttons disabled for this phase */}
+            <div className="flex items-center space-x-3 ml-6">
+              <div className="btn-secondary text-sm px-6 py-3 font-semibold opacity-50 cursor-not-allowed">
+                Coming Soon
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="md:hidden">
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className={`${textColor} hover:text-primary-600 transition-all duration-200 p-3 rounded-lg hover:bg-white/20 active:bg-white/30 transform hover:scale-110 active:scale-95 touch-manipulation`}
+            >
+              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Navigation */}
+        {isMenuOpen && (
+          <div className="md:hidden py-4 border-t border-white/20 relative z-[110]">
+            <div className="flex flex-col space-y-1">
+              <Link 
+                href="/" 
+                className={`${linkColor} transition-all duration-200 px-4 py-4 rounded-lg hover:bg-white/10 active:bg-white/20 font-medium text-base block touch-manipulation`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Home
+              </Link>
+              <Link 
+                href="/#how-it-works" 
+                className={`${linkColor} transition-all duration-200 px-4 py-4 rounded-lg hover:bg-white/10 active:bg-white/20 font-medium text-base block touch-manipulation`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                How It Works
+              </Link>
+              <Link 
+                href="/about" 
+                className={`${linkColor} transition-all duration-200 px-4 py-4 rounded-lg hover:bg-white/10 active:bg-white/20 font-medium text-base block touch-manipulation`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Our Story
+              </Link>
+              <Link 
+                href="/#testimonials" 
+                className={`${linkColor} transition-all duration-200 px-4 py-4 rounded-lg hover:bg-white/10 active:bg-white/20 font-medium text-base block touch-manipulation`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Success Stories
+              </Link>
+              <Link 
+                href="/webinars" 
+                className={`${linkColor} transition-all duration-200 px-4 py-4 rounded-lg hover:bg-white/10 active:bg-white/20 font-medium text-base block touch-manipulation`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Webinars
+              </Link>
+              <Link 
+                href="/pricing" 
+                className={`${linkColor} transition-all duration-200 px-4 py-4 rounded-lg hover:bg-white/10 active:bg-white/20 font-medium text-base block touch-manipulation`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Pricing
+              </Link>
+              
+              <div className="flex flex-col space-y-3 pt-4 border-t border-white/20 mt-4">
+                <div className="btn-secondary text-center py-4 px-6 text-base font-semibold opacity-50 cursor-not-allowed">
+                  Coming Soon
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </nav>
+  )
+}

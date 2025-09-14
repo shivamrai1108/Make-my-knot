@@ -2,10 +2,13 @@ import Head from 'next/head'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { 
-  Shield, Trash2, CheckCircle2, Mail, Phone, User, Lock, LogOut, Users, BarChart3, MessageSquare, CreditCard, Eye, EyeOff, Settings, Zap, AlertTriangle, DollarSign, TrendingUp, Activity, UserPlus, Video, Calendar, Gift, Edit, XCircle, MapPin, Briefcase, GraduationCap, Search, Wifi, MessageCircle
+  Shield, Trash2, CheckCircle2, Mail, Phone, User, Lock, LogOut, Users, BarChart3, MessageSquare, CreditCard, Eye, EyeOff, Settings, Zap, AlertTriangle, DollarSign, TrendingUp, Activity, UserPlus, Video, Calendar, Gift, Edit, XCircle, MapPin, Briefcase, GraduationCap, Search, Wifi, MessageCircle, FileText, Brain, Download
 } from 'lucide-react'
 import { useOnlineStatus } from '@/lib/OnlineStatusContext'
 import { OnlineUsersList, OnlineStatusBadge, OnlineStatusIndicator } from '@/components/OnlineStatusIndicator'
+import { getQuestionnaireResponses, comprehensiveQuestions, calculateCompatibilityScore, QuestionnaireResponse } from '@/lib/questionnaireStore'
+import jsPDF from 'jspdf'
+import * as XLSX from 'xlsx'
 
 // Enhanced interfaces for admin management
 interface UserProfile {
@@ -28,7 +31,7 @@ interface UserProfile {
   questionnaire: {
     completed: boolean
     completedAt?: string
-    responses?: QuestionnaireResponse[]
+    responses?: AdminQuestionnaireResponse[]
   }
   lastActive: string
   status: 'active' | 'inactive' | 'suspended' | 'banned'
@@ -39,7 +42,7 @@ interface UserProfile {
   messages: Message[]
 }
 
-interface QuestionnaireResponse {
+interface AdminQuestionnaireResponse {
   questionId: string
   question: string
   answer: string
@@ -104,6 +107,13 @@ interface Lead {
   syncedAt?: string
 }
 
+// Enhanced lead interface with questionnaire data
+interface EnhancedLead extends Lead {
+  questionnaire: QuestionnaireResponse | null
+  hasQuestionnaire: boolean
+  questionnaireComplete: boolean
+}
+
 // Mock lead management functions
 function getLeads(): Lead[] {
   return JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
@@ -135,7 +145,7 @@ function syncLeadToCRM(lead: Lead) {
 // Import LogIn icon
 import { LogIn } from 'lucide-react'
 
-type AdminTab = 'dashboard' | 'users' | 'leads' | 'webinars' | 'matchmaking' | 'moderation' | 'payments' | 'analytics' | 'communication' | 'offers' | 'online-status'
+type AdminTab = 'dashboard' | 'users' | 'leads' | 'nominations' | 'questionnaires' | 'assessments' | 'webinars' | 'matchmaking' | 'moderation' | 'payments' | 'analytics' | 'communication' | 'offers' | 'online-status'
 
 // Enhanced webinar interface
 interface Webinar {
@@ -333,6 +343,9 @@ export default function Admin() {
     { id: 'users', label: 'User Management', icon: Users },
     { id: 'online-status', label: 'Online Status', icon: Wifi },
     { id: 'leads', label: 'CRM & Leads', icon: Mail },
+    { id: 'nominations', label: 'Nominations', icon: UserPlus },
+    { id: 'questionnaires', label: 'AI Questionnaires', icon: Brain },
+    { id: 'assessments', label: 'Assessments', icon: FileText },
     { id: 'webinars', label: 'Webinars', icon: Video },
     { id: 'offers', label: 'Offers', icon: Gift },
     { id: 'matchmaking', label: 'Matchmaking', icon: Shield },
@@ -523,6 +536,9 @@ export default function Admin() {
           {activeTab === 'users' && <UserManagementTab />}
           {activeTab === 'online-status' && <OnlineStatusTab />}
           {activeTab === 'leads' && <CRMLeadsTab />}
+          {activeTab === 'nominations' && <NominationsTab />}
+          {activeTab === 'questionnaires' && <QuestionnairesTab />}
+          {activeTab === 'assessments' && <AssessmentsTab />}
           {activeTab === 'webinars' && <WebinarsTab />}
           {activeTab === 'offers' && <OffersTab />}
           {activeTab === 'matchmaking' && <MatchmakingTab />}
@@ -535,6 +551,862 @@ export default function Admin() {
         </div>
       </div>
     </>
+  )
+}
+
+// Assessments Management Tab with PDF Download
+function AssessmentsTab() {
+  const [assessments, setAssessments] = useState<any[]>([])
+  const [selectedAssessment, setSelectedAssessment] = useState<any>(null)
+  const [filterStatus, setFilterStatus] = useState<'all' | 'complete' | 'incomplete'>('all')
+  const [searchTerm, setSearchTerm] = useState('')
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false)
+
+  useEffect(() => {
+    // Get questionnaire responses
+    const questionnaires = getQuestionnaireResponses()
+    
+    // Get leads with their details
+    const leads = getLeads()
+    
+    // Combine questionnaires with lead/user information
+    const assessmentsData = questionnaires.map(q => {
+      let userInfo = null
+      
+      if (q.leadId) {
+        const lead = leads.find(l => l.id === q.leadId)
+        if (lead) {
+          userInfo = {
+            name: lead.name,
+            email: lead.email,
+            phone: lead.phone,
+            type: 'lead'
+          }
+        }
+      } else if (q.userId) {
+        // Try to get user info from users storage
+        try {
+          const users = JSON.parse(localStorage.getItem('makemyknot_users') || '[]')
+          const user = users.find((u: any) => u.id === q.userId)
+          if (user) {
+            userInfo = {
+              name: user.name,
+              email: user.email,
+              phone: user.phone,
+              type: 'user'
+            }
+          }
+        } catch (e) {
+          console.error('Error getting user info:', e)
+        }
+      }
+      
+      return {
+        ...q,
+        userInfo: userInfo || {
+          name: 'Unknown User',
+          email: 'unknown@email.com',
+          phone: 'N/A',
+          type: 'unknown'
+        }
+      }
+    })
+    
+    setAssessments(assessmentsData)
+  }, [])
+
+  const filteredAssessments = assessments.filter(assessment => {
+    const matchesSearch = !searchTerm || 
+      assessment.userInfo.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      assessment.userInfo.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (assessment.userId && assessment.userId.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (assessment.leadId && assessment.leadId.toLowerCase().includes(searchTerm.toLowerCase()))
+    
+    const matchesFilter = filterStatus === 'all' || 
+      (filterStatus === 'complete' && assessment.isComplete) ||
+      (filterStatus === 'incomplete' && !assessment.isComplete)
+    
+    return matchesSearch && matchesFilter
+  })
+
+  const exportAssessmentToExcel = (assessment: any) => {
+    try {
+      // Gather user info (attempt to enrich with age if present for users)
+      let age: number | string = ''
+      try {
+        if (assessment.userId) {
+          const users = JSON.parse(localStorage.getItem('makemyknot_users') || '[]')
+          const user = users.find((u: any) => u.id === assessment.userId)
+          if (user && (typeof user.age === 'number' || typeof user.age === 'string')) {
+            age = user.age
+          }
+        }
+      } catch {}
+
+      const summaryRows = [
+        { Field: 'Name', Value: assessment.userInfo.name || '' },
+        { Field: 'Email', Value: assessment.userInfo.email || '' },
+        { Field: 'Phone', Value: assessment.userInfo.phone || '' },
+        { Field: 'Age', Value: age },
+        { Field: 'Type', Value: assessment.userInfo.type || '' },
+        { Field: 'Assessment ID', Value: assessment.id },
+        { Field: 'Status', Value: assessment.isComplete ? 'Complete' : 'In Progress' },
+        { Field: 'Created At', Value: new Date(assessment.createdAt).toLocaleString() },
+        { Field: 'Completed At', Value: assessment.completedAt ? new Date(assessment.completedAt).toLocaleString() : '' },
+      ]
+
+      // Build detailed responses (only include questions that exist in comprehensiveQuestions to keep ordering)
+      const responseRows = comprehensiveQuestions.map((q, idx) => {
+        const ans = assessment.responses[q.id]
+        const normalized = Array.isArray(ans) ? ans.join(', ') : (ans ?? '')
+        return {
+          '#': idx + 1,
+          Category: q.category,
+          Question: q.question,
+          Answer: normalized,
+        }
+      })
+
+      const wb = XLSX.utils.book_new()
+      const wsSummary = XLSX.utils.json_to_sheet(summaryRows)
+      const wsResponses = XLSX.utils.json_to_sheet(responseRows)
+
+      XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary')
+      XLSX.utils.book_append_sheet(wb, wsResponses, 'Responses')
+
+      const cleanName = (assessment.userInfo.name || 'User').replace(/[^a-zA-Z0-9]/g, '-')
+      const timestamp = new Date().toISOString().split('T')[0]
+      const fileName = `MakeMyKnot_Assessment_${cleanName}_${timestamp}_${assessment.id.substring(0, 8)}.xlsx`
+      XLSX.writeFile(wb, fileName)
+    } catch (e) {
+      console.error('Error exporting assessment to Excel', e)
+      alert('Error exporting assessment to Excel. Please try again.')
+    }
+  }
+
+  const generatePDF = async (assessment: any) => {
+    setIsGeneratingPdf(true)
+    
+    try {
+      // Create new PDF document with A4 format for better quality
+      const pdf = new jsPDF('portrait', 'pt', 'a4')
+      const pageWidth = pdf.internal.pageSize.getWidth()
+      const pageHeight = pdf.internal.pageSize.getHeight()
+      let currentY = 60
+      const margin = 50
+      const contentWidth = pageWidth - (2 * margin)
+      
+      // Color palette for professional design
+      const colors = {
+        primary: [99, 102, 241], // Indigo
+        secondary: [139, 92, 246], // Purple  
+        accent: [245, 158, 11], // Amber
+        success: [16, 185, 129], // Emerald
+        text: [31, 41, 55], // Gray-800
+        lightGray: [249, 250, 251], // Gray-50
+        mediumGray: [156, 163, 175], // Gray-400
+        darkGray: [75, 85, 99] // Gray-600
+      }
+      
+      // Helper function to add text with better formatting
+      const addText = (text: string, x: number, y: number, options: any = {}) => {
+        const { 
+          fontSize = 12, 
+          fontStyle = 'normal', 
+          color = colors.text, 
+          align = 'left',
+          maxWidth = contentWidth,
+          lineHeight = 1.4
+        } = options
+        
+        pdf.setFontSize(fontSize)
+        pdf.setFont('helvetica', fontStyle)
+        pdf.setTextColor(color[0], color[1], color[2])
+        
+        if (maxWidth && text.length > 0) {
+          const lines = pdf.splitTextToSize(text, maxWidth)
+          if (align === 'center') {
+            lines.forEach((line: string, index: number) => {
+              pdf.text(line, x, y + (index * fontSize * lineHeight), { align: 'center' })
+            })
+          } else {
+            pdf.text(lines, x, y)
+          }
+          return y + (lines.length * fontSize * lineHeight)
+        } else {
+          pdf.text(text, x, y, { align })
+          return y + (fontSize * lineHeight)
+        }
+      }
+      
+      // Helper to add section divider
+      const addSectionDivider = (y: number) => {
+        pdf.setDrawColor(colors.mediumGray[0], colors.mediumGray[1], colors.mediumGray[2])
+        pdf.setLineWidth(0.5)
+        pdf.line(margin, y, pageWidth - margin, y)
+        return y + 20
+      }
+      
+      // Header with gradient-like design
+      pdf.setFillColor(colors.primary[0], colors.primary[1], colors.primary[2])
+      pdf.rect(0, 0, pageWidth, 120, 'F')
+      
+      // Add subtle pattern overlay (decorative lines)
+      pdf.setDrawColor(255, 255, 255, 0.1)
+      pdf.setLineWidth(1)
+      for (let i = 0; i < pageWidth; i += 30) {
+        pdf.line(i, 0, i + 60, 120)
+      }
+      
+      // Company logo placeholder and title
+      pdf.setFillColor(255, 255, 255)
+      pdf.circle(margin + 25, 45, 20, 'F')
+      pdf.setTextColor(colors.primary[0], colors.primary[1], colors.primary[2])
+      pdf.setFontSize(14)
+      pdf.setFont('helvetica', 'bold')
+      pdf.text('MMK', margin + 18, 50)
+      
+      // Main title
+      pdf.setTextColor(255, 255, 255)
+      pdf.setFontSize(28)
+      pdf.setFont('helvetica', 'bold')
+      pdf.text('COMPATIBILITY ASSESSMENT REPORT', margin + 70, 55)
+      
+      // Subtitle
+      pdf.setFontSize(14)
+      pdf.setFont('helvetica', 'normal')
+      pdf.text('Professional Psychological & Compatibility Analysis', margin + 70, 75)
+      
+      // Report metadata in header
+      pdf.setFontSize(10)
+      const reportDate = new Date().toLocaleDateString('en-US', { 
+        year: 'numeric', month: 'long', day: 'numeric' 
+      })
+      const reportTime = new Date().toLocaleTimeString('en-US', { 
+        hour: '2-digit', minute: '2-digit' 
+      })
+      pdf.text(`Generated: ${reportDate} at ${reportTime}`, pageWidth - margin, 50, { align: 'right' })
+      pdf.text(`Report ID: ${assessment.id.substring(0, 8).toUpperCase()}`, pageWidth - margin, 65, { align: 'right' })
+      
+      currentY = 160
+      
+      // User Profile Section with enhanced design
+      pdf.setFillColor(colors.lightGray[0], colors.lightGray[1], colors.lightGray[2])
+      pdf.roundedRect(margin, currentY - 15, contentWidth, 120, 8, 8, 'F')
+      
+      // Try to add profile picture if available
+      const userData = JSON.parse(localStorage.getItem('makemyknot_user') || '{}')
+      if (userData.profilePicture) {
+        try {
+          // Add profile picture (placeholder for now - would need actual image processing)
+          pdf.setFillColor(colors.primary[0], colors.primary[1], colors.primary[2])
+          pdf.circle(margin + 40, currentY + 25, 25, 'F')
+          pdf.setTextColor(255, 255, 255)
+          pdf.setFontSize(20)
+          pdf.text(assessment.userInfo.name.charAt(0), margin + 35, currentY + 30)
+        } catch (e) {
+          console.log('Could not add profile picture')
+        }
+      } else {
+        // Profile placeholder
+        pdf.setFillColor(colors.accent[0], colors.accent[1], colors.accent[2])
+        pdf.circle(margin + 40, currentY + 25, 25, 'F')
+        pdf.setTextColor(255, 255, 255)
+        pdf.setFontSize(24)
+        pdf.setFont('helvetica', 'bold')
+        pdf.text(assessment.userInfo.name.charAt(0), margin + 35, currentY + 32)
+      }
+      
+      // User information with better typography
+      addText('USER PROFILE', margin + 90, currentY + 5, { fontSize: 16, fontStyle: 'bold', color: colors.primary })
+      
+      const userDetails = [
+        { label: 'Full Name:', value: assessment.userInfo.name || 'Not specified' },
+        { label: 'Email Address:', value: assessment.userInfo.email || 'Not provided' },
+        { label: 'Phone Number:', value: assessment.userInfo.phone || 'Not provided' },
+        { label: 'User Category:', value: (assessment.userInfo.type || 'standard').charAt(0).toUpperCase() + (assessment.userInfo.type || 'standard').slice(1) }
+      ]
+      
+      let detailY = currentY + 25
+      userDetails.forEach(detail => {
+        addText(detail.label, margin + 90, detailY, { fontSize: 10, fontStyle: 'bold', color: colors.darkGray })
+        addText(detail.value, margin + 180, detailY, { fontSize: 10, color: colors.text })
+        detailY += 20
+      })
+      
+      currentY += 140
+      currentY = addSectionDivider(currentY)
+      
+      // Assessment Status with progress visualization
+      addText('ASSESSMENT STATUS & PROGRESS', margin, currentY, { fontSize: 18, fontStyle: 'bold', color: colors.primary })
+      currentY += 30
+      
+      const totalQuestions = comprehensiveQuestions.length
+      const answeredQuestions = Object.keys(assessment.responses).length
+      const completionRate = ((answeredQuestions / totalQuestions) * 100).toFixed(1)
+      
+      // Progress bar
+      const progressBarWidth = 300
+      const progressBarHeight = 20
+      const progressFill = (answeredQuestions / totalQuestions) * progressBarWidth
+      
+      pdf.setFillColor(colors.mediumGray[0], colors.mediumGray[1], colors.mediumGray[2])
+      pdf.roundedRect(margin, currentY, progressBarWidth, progressBarHeight, 5, 5, 'F')
+      
+      if (progressFill > 0) {
+        pdf.setFillColor(colors.success[0], colors.success[1], colors.success[2])
+        pdf.roundedRect(margin, currentY, progressFill, progressBarHeight, 5, 5, 'F')
+      }
+      
+      // Progress text
+      addText(`${completionRate}%`, margin + progressBarWidth + 15, currentY + 15, { fontSize: 14, fontStyle: 'bold', color: colors.success })
+      addText('Complete', margin + progressBarWidth + 60, currentY + 15, { fontSize: 10, color: colors.darkGray })
+      
+      currentY += 50
+      
+      // Status details in a grid
+      const statusDetails = [
+        { label: 'Completion Status:', value: assessment.isComplete ? '✓ Fully Complete' : '◯ In Progress', color: assessment.isComplete ? colors.success : colors.accent },
+        { label: 'Questions Answered:', value: `${answeredQuestions} of ${totalQuestions}`, color: colors.text },
+        { label: 'Assessment Started:', value: new Date(assessment.createdAt).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }), color: colors.text },
+        { label: 'Last Updated:', value: assessment.completedAt ? new Date(assessment.completedAt).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'In Progress', color: colors.text }
+      ]
+      
+      statusDetails.forEach((detail, index) => {
+        const xPos = margin + (index % 2) * (contentWidth / 2)
+        const yPos = currentY + Math.floor(index / 2) * 25
+        
+        addText(detail.label, xPos, yPos, { fontSize: 10, fontStyle: 'bold', color: colors.darkGray })
+        addText(detail.value, xPos, yPos + 15, { fontSize: 10, color: detail.color })
+      })
+      
+      currentY += 80
+      currentY = addSectionDivider(currentY)
+      
+      // Personality & Compatibility Insights
+      addText('PERSONALITY & COMPATIBILITY INSIGHTS', margin, currentY, { fontSize: 18, fontStyle: 'bold', color: colors.primary })
+      currentY += 35
+      
+      const insights = getCompatibilityInsights(assessment)
+      const keyInsights = [
+        { icon: '👤', label: 'Personality Type', value: assessment.responses.personality_type || 'Not assessed', category: 'personality' },
+        { icon: '👨‍👩‍👧‍👦', label: 'Family Values', value: assessment.responses.family_values || 'Not specified', category: 'family' },
+        { icon: '👶', label: 'Children Preference', value: assessment.responses.children_desire || 'Not specified', category: 'family' },
+        { icon: '🎯', label: 'Life Goals', value: assessment.responses.career_ambitions || 'Not specified', category: 'goals' },
+        { icon: '💖', label: 'Relationship Timeline', value: assessment.responses.relationship_timeline || 'Not specified', category: 'relationship' },
+        { icon: '🙏', label: 'Religious Importance', value: assessment.responses.religious_importance || 'Not specified', category: 'values' }
+      ].filter(insight => insight.value && insight.value !== 'Not assessed' && insight.value !== 'Not specified')
+      
+      keyInsights.forEach((insight, index) => {
+        if (currentY > pageHeight - 100) {
+          pdf.addPage()
+          currentY = 60
+        }
+        
+        // Insight card background
+        pdf.setFillColor(colors.lightGray[0], colors.lightGray[1], colors.lightGray[2])
+        pdf.roundedRect(margin, currentY - 10, contentWidth, 45, 5, 5, 'F')
+        
+        // Icon (using text for now)
+        addText(insight.icon, margin + 15, currentY + 8, { fontSize: 16 })
+        
+        // Label and value
+        addText(insight.label.toUpperCase(), margin + 50, currentY, { fontSize: 12, fontStyle: 'bold', color: colors.primary })
+        
+        const valueText = Array.isArray(insight.value) ? insight.value.join(', ') : insight.value
+        addText(valueText, margin + 50, currentY + 18, { fontSize: 10, color: colors.text, maxWidth: contentWidth - 80 })
+        
+        currentY += 60
+      })
+      
+      // Add new page for detailed responses
+      pdf.addPage()
+      currentY = 60
+      
+      addText('DETAILED ASSESSMENT RESPONSES', margin, currentY, { fontSize: 18, fontStyle: 'bold', color: colors.primary })
+      currentY += 35
+      
+      // Group responses by category with enhanced presentation
+      const categorizedResponses: Record<string, any[]> = {}
+      comprehensiveQuestions.forEach(question => {
+        if (!categorizedResponses[question.category]) {
+          categorizedResponses[question.category] = []
+        }
+        const answer = assessment.responses[question.id]
+        if (answer) {
+          categorizedResponses[question.category].push({
+            question: question.question,
+            answer: Array.isArray(answer) ? answer.join(', ') : answer,
+            type: question.type
+          })
+        }
+      })
+      
+      Object.entries(categorizedResponses).forEach(([category, responses], categoryIndex) => {
+        if (currentY > pageHeight - 150) {
+          pdf.addPage()
+          currentY = 60
+        }
+        
+        // Category header with background
+        pdf.setFillColor(colors.primary[0], colors.primary[1], colors.primary[2])
+        pdf.roundedRect(margin, currentY - 10, contentWidth, 30, 5, 5, 'F')
+        
+        addText(category.toUpperCase().replace('_', ' '), margin + 15, currentY + 5, { 
+          fontSize: 14, 
+          fontStyle: 'bold', 
+          color: [255, 255, 255] 
+        })
+        
+        currentY += 40
+        
+        responses.forEach((response, index) => {
+          if (currentY > pageHeight - 80) {
+            pdf.addPage()
+            currentY = 60
+          }
+          
+          // Question number and question
+          addText(`${index + 1}.`, margin, currentY, { fontSize: 11, fontStyle: 'bold', color: colors.accent })
+          
+          currentY = addText(response.question, margin + 20, currentY, { 
+            fontSize: 11, 
+            fontStyle: 'bold', 
+            color: colors.text,
+            maxWidth: contentWidth - 30,
+            lineHeight: 1.3
+          })
+          
+          currentY += 5
+          
+          // Answer with background
+          pdf.setFillColor(colors.lightGray[0], colors.lightGray[1], colors.lightGray[2])
+          const answerHeight = Math.ceil(pdf.splitTextToSize(response.answer, contentWidth - 50).length * 12 * 1.2) + 20
+          pdf.roundedRect(margin + 20, currentY - 10, contentWidth - 40, answerHeight, 3, 3, 'F')
+          
+          currentY = addText(response.answer, margin + 30, currentY, { 
+            fontSize: 10, 
+            color: colors.text,
+            maxWidth: contentWidth - 60,
+            lineHeight: 1.2
+          })
+          
+          currentY += 25
+        })
+        
+        currentY += 15
+      })
+      
+      // Professional footer on each page
+      const totalPages = pdf.getNumberOfPages()
+      for (let i = 1; i <= totalPages; i++) {
+        pdf.setPage(i)
+        
+        // Footer background
+        pdf.setFillColor(colors.darkGray[0], colors.darkGray[1], colors.darkGray[2])
+        pdf.rect(0, pageHeight - 40, pageWidth, 40, 'F')
+        
+        // Footer content
+        pdf.setTextColor(255, 255, 255)
+        pdf.setFontSize(10)
+        pdf.setFont('helvetica', 'normal')
+        pdf.text('Make My Knot - Confidential Psychological Assessment Report', pageWidth / 2, pageHeight - 20, { align: 'center' })
+        
+        pdf.setFontSize(8)
+        pdf.text('This report contains sensitive personal information and should be handled confidentially', pageWidth / 2, pageHeight - 8, { align: 'center' })
+        pdf.text(`Page ${i} of ${totalPages}`, pageWidth - margin, pageHeight - 15, { align: 'right' })
+        pdf.text(`© ${new Date().getFullYear()} Make My Knot`, margin, pageHeight - 15)
+      }
+      
+      // Save with enhanced filename
+      const cleanName = assessment.userInfo.name.replace(/[^a-zA-Z0-9]/g, '-')
+      const timestamp = new Date().toISOString().split('T')[0]
+      const fileName = `MakeMyKnot_Assessment_${cleanName}_${timestamp}_${assessment.id.substring(0, 8)}.pdf`
+      
+      pdf.save(fileName)
+      
+      alert('✓ Professional assessment report generated successfully! The PDF has been downloaded with enhanced design and detailed analysis.')
+    } catch (error) {
+      console.error('Error generating PDF:', error)
+      alert('❌ Error generating PDF report. Please try again. If the issue persists, contact support.')
+    }
+    
+    setIsGeneratingPdf(false)
+  }
+
+  const getFormattedResponses = (responses: Record<string, any>) => {
+    const categories: Record<string, any[]> = {}
+    comprehensiveQuestions.forEach(question => {
+      if (!categories[question.category]) {
+        categories[question.category] = []
+      }
+      const answer = responses[question.id] || 'Not answered'
+      categories[question.category].push({
+        question: question.question,
+        answer: Array.isArray(answer) ? answer.join(', ') : answer
+      })
+    })
+    
+    let formatted = ''
+    Object.entries(categories).forEach(([category, categoryResponses]) => {
+      formatted += `\n${category.toUpperCase()}:\n`
+      categoryResponses.forEach(response => {
+        formatted += `Q: ${response.question}\nA: ${response.answer}\n\n`
+      })
+    })
+    
+    return formatted
+  }
+
+  const getCompatibilityInsights = (assessment: any) => {
+    const responses = assessment.responses
+    let insights = ''
+    
+    if (responses.personality_type) {
+      insights += `Personality Type: ${responses.personality_type}\n`
+    }
+    if (responses.family_values) {
+      insights += `Family Values: ${responses.family_values}\n`
+    }
+    if (responses.children_desire) {
+      insights += `Children Desire: ${responses.children_desire}\n`
+    }
+    if (responses.ideal_weekend) {
+      insights += `Lifestyle Preference: ${responses.ideal_weekend}\n`
+    }
+    if (responses.religious_importance) {
+      insights += `Religious Importance: ${responses.religious_importance}\n`
+    }
+    
+    return insights || 'No specific insights available.'
+  }
+
+  const handleDeleteAssessment = (id: string) => {
+    if (confirm('Are you sure you want to delete this assessment?')) {
+      const updated = assessments.filter(a => a.id !== id)
+      setAssessments(updated)
+      // Update localStorage
+      const questionnaires = updated.map(a => ({ ...a, userInfo: undefined }))
+      localStorage.setItem('questionnaire_responses', JSON.stringify(questionnaires))
+      alert('Assessment deleted successfully')
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="bg-white rounded-xl shadow-sm border p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+              <FileText className="h-8 w-8 text-primary-600" />
+              User Assessment Reports
+            </h2>
+            <p className="text-gray-600 mt-2">View detailed assessment reports and download PDF summaries for individual users</p>
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-blue-50 rounded-lg p-4">
+            <div className="flex items-center">
+              <FileText className="h-8 w-8 text-blue-600" />
+              <div className="ml-3">
+                <div className="text-2xl font-bold text-blue-900">{assessments.length}</div>
+                <div className="text-sm text-blue-700">Total Assessments</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-green-50 rounded-lg p-4">
+            <div className="flex items-center">
+              <CheckCircle2 className="h-8 w-8 text-green-600" />
+              <div className="ml-3">
+                <div className="text-2xl font-bold text-green-900">
+                  {assessments.filter(a => a.isComplete).length}
+                </div>
+                <div className="text-sm text-green-700">Completed</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-orange-50 rounded-lg p-4">
+            <div className="flex items-center">
+              <User className="h-8 w-8 text-orange-600" />
+              <div className="ml-3">
+                <div className="text-2xl font-bold text-orange-900">
+                  {assessments.filter(a => a.userInfo.type === 'lead').length}
+                </div>
+                <div className="text-sm text-orange-700">Lead Assessments</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-purple-50 rounded-lg p-4">
+            <div className="flex items-center">
+              <Users className="h-8 w-8 text-purple-600" />
+              <div className="ml-3">
+                <div className="text-2xl font-bold text-purple-900">
+                  {assessments.filter(a => a.userInfo.type === 'user').length}
+                </div>
+                <div className="text-sm text-purple-700">User Assessments</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Filters */}
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1">
+            <div className="relative">
+              <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search by name, email, or ID..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value as any)}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          >
+            <option value="all">All Assessments</option>
+            <option value="complete">Complete</option>
+            <option value="incomplete">In Progress</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Assessments List */}
+      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Completed</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredAssessments.map((assessment) => (
+                <tr key={assessment.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
+                          <span className="text-sm font-medium text-primary-700">
+                            {assessment.userInfo.name.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="ml-4">
+                        <div className="text-sm font-medium text-gray-900">
+                          {assessment.userInfo.name}
+                        </div>
+                        <div className="text-sm text-gray-500 capitalize">
+                          {assessment.userInfo.type} • ID: {assessment.id.slice(-6)}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{assessment.userInfo.email}</div>
+                    <div className="text-sm text-gray-500">{assessment.userInfo.phone}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      assessment.isComplete
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {assessment.isComplete ? 'Complete' : 'In Progress'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="bg-primary-600 h-2 rounded-full" 
+                        style={{ 
+                          width: `${(Object.keys(assessment.responses).length / comprehensiveQuestions.length) * 100}%` 
+                        }}
+                      />
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      {Object.keys(assessment.responses).length}/{comprehensiveQuestions.length} questions
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {assessment.completedAt ? new Date(assessment.completedAt).toLocaleDateString() : '—'}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => setSelectedAssessment(assessment)}
+                        className="text-primary-600 hover:text-primary-900 flex items-center gap-1 px-3 py-1 rounded border border-primary-200 hover:bg-primary-50"
+                        title="View Assessment"
+                      >
+                        <Eye className="h-4 w-4" />
+                        View
+                      </button>
+                      <button
+                        onClick={() => exportAssessmentToExcel(assessment)}
+                        className="text-green-700 hover:text-green-900 flex items-center gap-1 px-3 py-1 rounded border border-green-200 hover:bg-green-50"
+                        title="Download Excel Report"
+                      >
+                        <Download className="h-4 w-4" />
+                        Excel
+                      </button>
+                      <button
+                        onClick={() => handleDeleteAssessment(assessment.id)}
+                        className="text-red-600 hover:text-red-900 flex items-center gap-1 px-3 py-1 rounded border border-red-200 hover:bg-red-50"
+                        title="Delete Assessment"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        
+        {filteredAssessments.length === 0 && (
+          <div className="text-center py-12">
+            <FileText className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+            <h3 className="text-sm font-medium text-gray-900 mb-2">No assessments found</h3>
+            <p className="text-sm text-gray-500">
+              {searchTerm ? 'No assessments match your search criteria.' : 'No assessment reports are available yet.'}
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Assessment Detail Modal */}
+      {selectedAssessment && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Assessment Report - {selectedAssessment.userInfo.name}
+                  </h3>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {selectedAssessment.userInfo.email} • Assessment ID: {selectedAssessment.id}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => exportAssessmentToExcel(selectedAssessment)}
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
+                  >
+                    <Download className="h-4 w-4" />
+                    Download Excel
+                  </button>
+                  <button
+                    onClick={() => setSelectedAssessment(null)}
+                    className="text-gray-400 hover:text-gray-600 p-2"
+                  >
+                    <XCircle className="h-6 w-6" />
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div className="p-6">
+              {/* User Info */}
+              <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h4 className="font-semibold text-gray-900 mb-3">User Information</h4>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div>
+                    <span className="text-gray-500">Name:</span>
+                    <div className="font-medium text-gray-900">{selectedAssessment.userInfo.name}</div>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Email:</span>
+                    <div className="font-medium text-gray-900">{selectedAssessment.userInfo.email}</div>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Phone:</span>
+                    <div className="font-medium text-gray-900">{selectedAssessment.userInfo.phone}</div>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Type:</span>
+                    <div className="font-medium text-gray-900 capitalize">{selectedAssessment.userInfo.type}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Assessment Progress */}
+              <div className="mb-6 p-4 bg-primary-50 rounded-lg">
+                <h4 className="font-semibold text-primary-900 mb-3">Assessment Progress</h4>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div>
+                    <span className="text-primary-700">Status:</span>
+                    <div className={`font-medium ${
+                      selectedAssessment.isComplete ? 'text-green-600' : 'text-yellow-600'
+                    }`}>
+                      {selectedAssessment.isComplete ? 'Complete' : 'In Progress'}
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-primary-700">Progress:</span>
+                    <div className="font-medium text-primary-900">
+                      {Object.keys(selectedAssessment.responses).length}/{comprehensiveQuestions.length} questions
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-primary-700">Started:</span>
+                    <div className="font-medium text-primary-900">
+                      {new Date(selectedAssessment.createdAt).toLocaleDateString()}
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-primary-700">Completed:</span>
+                    <div className="font-medium text-primary-900">
+                      {selectedAssessment.completedAt 
+                        ? new Date(selectedAssessment.completedAt).toLocaleDateString()
+                        : '—'
+                      }
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Responses Summary */}
+              <div className="space-y-4">
+                <h4 className="font-semibold text-gray-900">Assessment Responses Summary</h4>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {Object.entries({
+                    'Personality': selectedAssessment.responses.personality_type,
+                    'Family Values': selectedAssessment.responses.family_values,
+                    'Children Desire': selectedAssessment.responses.children_desire,
+                    'Lifestyle': selectedAssessment.responses.ideal_weekend,
+                    'Religious Views': selectedAssessment.responses.religious_importance,
+                    'Career Priority': selectedAssessment.responses.career_ambitions
+                  }).filter(([_, value]) => value).map(([key, value]) => (
+                    <div key={key} className="p-3 border border-gray-200 rounded-lg">
+                      <div className="text-xs font-medium text-gray-500 uppercase">{key}</div>
+                      <div className="text-sm text-gray-900 mt-1">{value}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -1017,20 +1889,70 @@ function UserManagementTab() {
   )
 }
 
-// CRM & Leads Tab
+// CRM & Leads Tab - Enhanced with questionnaire data
 function CRMLeadsTab() {
-  const [leads, setLeads] = useState<Lead[]>([])
+  const [leads, setLeads] = useState<EnhancedLead[]>([])
+  const [leadQuestionnaires, setLeadQuestionnaires] = useState<QuestionnaireResponse[]>([])
+  const [selectedLead, setSelectedLead] = useState<any>(null)
   const [filter, setFilter] = useState('all')
+  const [showQuestionnaireData, setShowQuestionnaireData] = useState(false)
   
   useEffect(() => {
-    setLeads(getLeads())
+    const refresh = () => {
+      const allLeads = getLeads()
+      const allQuestionnaires = getQuestionnaireResponses()
+      
+      // Get questionnaires specifically from leads
+      const leadQuestionnaires = allQuestionnaires.filter(q => q.leadId)
+      
+      // Enhance leads with questionnaire data
+      const enhancedLeads = allLeads.map(lead => {
+        const questionnaire = leadQuestionnaires.find(q => q.leadId === lead.id)
+        return {
+          ...lead,
+          questionnaire: questionnaire || null,
+          hasQuestionnaire: !!questionnaire,
+          questionnaireComplete: questionnaire?.isComplete || false
+        }
+      })
+      
+      setLeads(enhancedLeads)
+      setLeadQuestionnaires(leadQuestionnaires)
+    }
+    
+    refresh()
   }, [])
 
-  const refresh = () => setLeads(getLeads())
+  const refresh = () => {
+    const allLeads = getLeads()
+    const allQuestionnaires = getQuestionnaireResponses()
+    
+    const leadQuestionnaires = allQuestionnaires.filter(q => q.leadId)
+    
+    const enhancedLeads = allLeads.map(lead => {
+      const questionnaire = leadQuestionnaires.find(q => q.leadId === lead.id)
+      return {
+        ...lead,
+        questionnaire: questionnaire || null,
+        hasQuestionnaire: !!questionnaire,
+        questionnaireComplete: questionnaire?.isComplete || false
+      }
+    })
+    
+    setLeads(enhancedLeads)
+    setLeadQuestionnaires(leadQuestionnaires)
+  }
 
   const handleDelete = (id: string) => {
-    if (confirm('Delete this lead?')) {
+    if (confirm('Delete this lead? This will also delete their questionnaire data if any.')) {
       deleteLead(id)
+      // Also delete questionnaire if exists
+      const questionnaire = leadQuestionnaires.find(q => q.leadId === id)
+      if (questionnaire) {
+        const allQuestionnaires = getQuestionnaireResponses()
+        const filtered = allQuestionnaires.filter(q => q.id !== questionnaire.id)
+        localStorage.setItem('questionnaire_responses', JSON.stringify(filtered))
+      }
       refresh()
     }
   }
@@ -1050,77 +1972,470 @@ function CRMLeadsTab() {
     }
   }
 
-  const filteredLeads = leads.filter(l => filter==='all' ? true : l.status === filter)
+  const handleViewLead = (lead: any) => {
+    setSelectedLead(lead)
+  }
+
+  const getLeadInsights = (questionnaire: QuestionnaireResponse | null) => {
+    if (!questionnaire) return []
+    
+    const insights = []
+    const responses = questionnaire.responses
+    
+    if (responses.personality_type) {
+      insights.push(`Personality: ${responses.personality_type.slice(0, 20)}...`)
+    }
+    if (responses.children_desire) {
+      insights.push(`Children: ${responses.children_desire}`)
+    }
+    if (responses.religious_importance) {
+      insights.push(`Faith: ${responses.religious_importance}`)
+    }
+    
+    return insights.slice(0, 2)
+  }
+
+  const filteredLeads = leads.filter(l => {
+    if (filter === 'all') return true
+    if (filter === 'new') return l.status === 'new'
+    if (filter === 'verified') return l.status === 'verified'
+    if (filter === 'with_questionnaire') return l.hasQuestionnaire
+    if (filter === 'without_questionnaire') return !l.hasQuestionnaire
+    return true
+  })
 
   return (
-    <div className="bg-white rounded-xl shadow-sm p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-gray-900">CRM & Lead Management</h2>
-        <div className="flex items-center gap-2">
-          <select value={filter} onChange={(e)=>setFilter(e.target.value)} className="px-3 py-2 border border-gray-300 rounded-lg text-sm">
-            <option value="all">All</option>
-            <option value="new">New</option>
-            <option value="verified">Verified</option>
-          </select>
-          <button onClick={refresh} className="text-sm px-3 py-2 border rounded-lg">Refresh</button>
+    <div className="space-y-6">
+      {/* Header & Stats */}
+      <div className="bg-white rounded-xl shadow-sm border p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+              <Mail className="h-8 w-8 text-primary-600" />
+              Lead & CRM Management
+            </h2>
+            <p className="text-gray-600 mt-2">Manage leads, view questionnaire data, and sync to CRM systems</p>
+          </div>
+          <button
+            onClick={() => setShowQuestionnaireData(!showQuestionnaireData)}
+            className="btn-secondary flex items-center gap-2"
+          >
+            <Brain className="h-4 w-4" />
+            {showQuestionnaireData ? 'Hide' : 'Show'} Questionnaire Data
+          </button>
+        </div>
+
+        {/* Enhanced Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+          <div className="bg-blue-50 rounded-lg p-4">
+            <div className="flex items-center">
+              <Users className="h-8 w-8 text-blue-600" />
+              <div className="ml-3">
+                <div className="text-2xl font-bold text-blue-900">{leads.length}</div>
+                <div className="text-sm text-blue-700">Total Leads</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-green-50 rounded-lg p-4">
+            <div className="flex items-center">
+              <CheckCircle2 className="h-8 w-8 text-green-600" />
+              <div className="ml-3">
+                <div className="text-2xl font-bold text-green-900">
+                  {leads.filter(l => l.status === 'verified').length}
+                </div>
+                <div className="text-sm text-green-700">Verified</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-purple-50 rounded-lg p-4">
+            <div className="flex items-center">
+              <Brain className="h-8 w-8 text-purple-600" />
+              <div className="ml-3">
+                <div className="text-2xl font-bold text-purple-900">
+                  {leads.filter(l => l.hasQuestionnaire).length}
+                </div>
+                <div className="text-sm text-purple-700">With Assessments</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-orange-50 rounded-lg p-4">
+            <div className="flex items-center">
+              <Activity className="h-8 w-8 text-orange-600" />
+              <div className="ml-3">
+                <div className="text-2xl font-bold text-orange-900">
+                  {leads.filter(l => l.questionnaireComplete).length}
+                </div>
+                <div className="text-sm text-orange-700">Complete Profiles</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-indigo-50 rounded-lg p-4">
+            <div className="flex items-center">
+              <Zap className="h-8 w-8 text-indigo-600" />
+              <div className="ml-3">
+                <div className="text-2xl font-bold text-indigo-900">
+                  {leads.filter(l => l.syncedAt).length}
+                </div>
+                <div className="text-sm text-indigo-700">CRM Synced</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Filters */}
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1">
+            <select 
+              value={filter} 
+              onChange={(e)=>setFilter(e.target.value)} 
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            >
+              <option value="all">All Leads ({leads.length})</option>
+              <option value="new">New Leads ({leads.filter(l => l.status === 'new').length})</option>
+              <option value="verified">Verified ({leads.filter(l => l.status === 'verified').length})</option>
+              <option value="with_questionnaire">With Assessments ({leads.filter(l => l.hasQuestionnaire).length})</option>
+              <option value="without_questionnaire">No Assessments ({leads.filter(l => !l.hasQuestionnaire).length})</option>
+            </select>
+          </div>
+          <button onClick={refresh} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center gap-2">
+            <Activity className="h-4 w-4" />
+            Refresh
+          </button>
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full text-sm">
-          <thead>
-            <tr className="text-left text-gray-600 border-b">
-              <th className="py-2 pr-4">Name</th>
-              <th className="py-2 pr-4">Contact</th>
-              <th className="py-2 pr-4">Status</th>
-              <th className="py-2 pr-4">CRM Sync</th>
-              <th className="py-2 pr-4">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredLeads.map(lead => (
-              <tr key={lead.id} className="border-b last:border-0">
-                <td className="py-3 pr-4 font-medium text-gray-900 flex items-center gap-2">
-                  <User className="h-4 w-4 text-gray-500"/>
-                  {lead.name}
-                </td>
-                <td className="py-3 pr-4 text-gray-700">
-                  <div className="flex items-center gap-2"><Mail className="h-4 w-4 text-gray-400"/>{lead.email}</div>
-                  <div className="flex items-center gap-2"><Phone className="h-4 w-4 text-gray-400"/>{lead.phone}</div>
-                </td>
-                <td className="py-3 pr-4">
-                  <span className={`px-2 py-1 rounded text-xs ${lead.status==='verified'?'bg-green-100 text-green-700':'bg-yellow-100 text-yellow-800'}`}>{lead.status}</span>
-                </td>
-                <td className="py-3 pr-4">
-                  {lead.syncedAt ? (
-                    <span className="text-xs text-green-600">Synced {new Date(lead.syncedAt).toLocaleDateString()}</span>
-                  ) : (
-                    <span className="text-xs text-gray-500">Not synced</span>
-                  )}
-                </td>
-                <td className="py-3 pr-4">
-                  <div className="flex items-center gap-2">
-                    {!lead.syncedAt && (
-                      <button onClick={() => handleSyncToCRM(lead)} className="px-3 py-1 bg-blue-600 text-white text-xs rounded flex items-center gap-1">
-                        <Zap className="h-3 w-3" />Sync CRM
-                      </button>
-                    )}
-                    {lead.status !== 'verified' && (
-                      <button onClick={()=>handleVerify(lead.id)} className="px-3 py-1 rounded bg-green-600 text-white text-xs flex items-center gap-1"><CheckCircle2 className="h-3 w-3"/>Verify</button>
-                    )}
-                    <button onClick={()=>handleDelete(lead.id)} className="px-3 py-1 rounded bg-red-600 text-white text-xs flex items-center gap-1"><Trash2 className="h-3 w-3"/>Delete</button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-            {filteredLeads.length === 0 && (
+      {/* Enhanced Leads Table */}
+      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
               <tr>
-                <td colSpan={5} className="py-6 text-center text-gray-500">No leads found.</td>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lead</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                {showQuestionnaireData && (
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assessment</th>
+                )}
+                {showQuestionnaireData && (
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Insights</th>
+                )}
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CRM Sync</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredLeads.map(lead => {
+                const insights = getLeadInsights(lead.questionnaire)
+                return (
+                  <tr key={lead.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0">
+                          <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
+                            <span className="text-sm font-medium text-primary-700">
+                              {lead.name.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900">{lead.name}</div>
+                          <div className="text-sm text-gray-500">ID: {lead.id.slice(-6)}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900 flex items-center gap-2">
+                        <Mail className="h-4 w-4 text-gray-400"/>
+                        {lead.email}
+                      </div>
+                      <div className="text-sm text-gray-500 flex items-center gap-2">
+                        <Phone className="h-4 w-4 text-gray-400"/>
+                        {lead.phone}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        lead.status === 'verified' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {lead.status}
+                      </span>
+                      {lead.hasQuestionnaire && (
+                        <div className="mt-1">
+                          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
+                            Assessment Available
+                          </span>
+                        </div>
+                      )}
+                    </td>
+                    {showQuestionnaireData && (
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {lead.questionnaire ? (
+                          <div>
+                            <div className={`text-sm font-medium ${
+                              lead.questionnaireComplete ? 'text-green-600' : 'text-yellow-600'
+                            }`}>
+                              {lead.questionnaireComplete ? '✓ Complete' : '○ In Progress'}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {Object.keys(lead.questionnaire.responses).length}/{comprehensiveQuestions.length} answered
+                            </div>
+                            {lead.questionnaire.completedAt && (
+                              <div className="text-xs text-gray-500">
+                                {new Date(lead.questionnaire.completedAt).toLocaleDateString()}
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-sm text-gray-400">No assessment</span>
+                        )}
+                      </td>
+                    )}
+                    {showQuestionnaireData && (
+                      <td className="px-6 py-4">
+                        <div className="max-w-xs">
+                          {insights.map((insight, idx) => (
+                            <div key={idx} className="text-xs text-gray-600 mb-1 truncate">
+                              {insight}
+                            </div>
+                          ))}
+                          {insights.length === 0 && (
+                            <span className="text-xs text-gray-400">No insights yet</span>
+                          )}
+                        </div>
+                      </td>
+                    )}
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {lead.syncedAt ? (
+                        <div className="text-sm text-green-600 flex items-center gap-1">
+                          <CheckCircle2 className="h-4 w-4" />
+                          Synced {new Date(lead.syncedAt).toLocaleDateString()}
+                        </div>
+                      ) : (
+                        <span className="text-sm text-gray-500">Not synced</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => handleViewLead(lead)}
+                          className="text-primary-600 hover:text-primary-900 flex items-center gap-1 px-3 py-1 rounded border border-primary-200 hover:bg-primary-50"
+                          title="View Lead Details"
+                        >
+                          <Eye className="h-4 w-4" />
+                          View
+                        </button>
+                        {!lead.syncedAt && (
+                          <button 
+                            onClick={() => handleSyncToCRM(lead)} 
+                            className="text-blue-600 hover:text-blue-900 flex items-center gap-1 px-3 py-1 rounded border border-blue-200 hover:bg-blue-50"
+                            title="Sync to CRM"
+                          >
+                            <Zap className="h-4 w-4" />
+                            Sync
+                          </button>
+                        )}
+                        {lead.status !== 'verified' && (
+                          <button 
+                            onClick={()=>handleVerify(lead.id)} 
+                            className="text-green-600 hover:text-green-900 flex items-center gap-1 px-3 py-1 rounded border border-green-200 hover:bg-green-50"
+                            title="Verify Lead"
+                          >
+                            <CheckCircle2 className="h-4 w-4" />
+                            Verify
+                          </button>
+                        )}
+                        <button 
+                          onClick={()=>handleDelete(lead.id)} 
+                          className="text-red-600 hover:text-red-900 flex items-center gap-1 px-3 py-1 rounded border border-red-200 hover:bg-red-50"
+                          title="Delete Lead"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+        
+        {filteredLeads.length === 0 && (
+          <div className="text-center py-12">
+            <Mail className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+            <h3 className="text-sm font-medium text-gray-900 mb-2">No leads found</h3>
+            <p className="text-sm text-gray-500">
+              No leads match the current filter criteria.
+            </p>
+          </div>
+        )}
       </div>
+
+      {/* Lead Detail Modal */}
+      {selectedLead && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Lead Details - {selectedLead.name}
+                  </h3>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {selectedLead.email} • Lead ID: {selectedLead.id}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setSelectedLead(null)}
+                  className="text-gray-400 hover:text-gray-600 p-2"
+                >
+                  <XCircle className="h-6 w-6" />
+                </button>
+              </div>
+            </div>
+            
+            <div className="p-6">
+              {/* Lead Info */}
+              <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h4 className="font-semibold text-gray-900 mb-3">Contact Information</h4>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                  <div>
+                    <span className="text-gray-500">Name:</span>
+                    <div className="font-medium text-gray-900">{selectedLead.name}</div>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Email:</span>
+                    <div className="font-medium text-gray-900">{selectedLead.email}</div>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Phone:</span>
+                    <div className="font-medium text-gray-900">{selectedLead.phone}</div>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Status:</span>
+                    <div className="font-medium text-gray-900 capitalize">{selectedLead.status}</div>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">CRM Sync:</span>
+                    <div className={`font-medium ${
+                      selectedLead.syncedAt ? 'text-green-600' : 'text-yellow-600'
+                    }`}>
+                      {selectedLead.syncedAt ? 'Synced' : 'Not Synced'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Assessment Data */}
+              {selectedLead.questionnaire ? (
+                <div className="mb-6 p-4 bg-primary-50 rounded-lg">
+                  <h4 className="font-semibold text-primary-900 mb-3">Assessment Information</h4>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
+                    <div>
+                      <span className="text-primary-700">Status:</span>
+                      <div className={`font-medium ${
+                        selectedLead.questionnaireComplete ? 'text-green-600' : 'text-yellow-600'
+                      }`}>
+                        {selectedLead.questionnaireComplete ? 'Complete' : 'In Progress'}
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-primary-700">Progress:</span>
+                      <div className="font-medium text-primary-900">
+                        {Object.keys(selectedLead.questionnaire.responses).length}/{comprehensiveQuestions.length} questions
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-primary-700">Started:</span>
+                      <div className="font-medium text-primary-900">
+                        {new Date(selectedLead.questionnaire.createdAt).toLocaleDateString()}
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-primary-700">Completed:</span>
+                      <div className="font-medium text-primary-900">
+                        {selectedLead.questionnaire.completedAt 
+                          ? new Date(selectedLead.questionnaire.completedAt).toLocaleDateString()
+                          : '—'
+                        }
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Key Insights */}
+                  <div>
+                    <h5 className="font-medium text-primary-900 mb-2">Key Profile Insights</h5>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {Object.entries({
+                        'Personality': selectedLead.questionnaire.responses.personality_type,
+                        'Family Values': selectedLead.questionnaire.responses.family_values,
+                        'Children Desire': selectedLead.questionnaire.responses.children_desire,
+                        'Lifestyle': selectedLead.questionnaire.responses.ideal_weekend,
+                        'Religious Views': selectedLead.questionnaire.responses.religious_importance,
+                        'Career Priority': selectedLead.questionnaire.responses.career_ambition
+                      }).filter(([_, value]) => value).map(([key, value]) => (
+                        <div key={key} className="p-2 border border-primary-200 rounded-lg bg-white">
+                          <div className="text-xs font-medium text-primary-700 uppercase">{key}</div>
+                          <div className="text-xs text-gray-900 mt-1">{value}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="mb-6 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                  <div className="flex items-center gap-2 text-yellow-800">
+                    <AlertTriangle className="h-5 w-5" />
+                    <h4 className="font-semibold">No Assessment Data Available</h4>
+                  </div>
+                  <p className="text-yellow-700 text-sm mt-1">
+                    This lead has not completed the compatibility assessment yet.
+                  </p>
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex items-center gap-3 pt-4 border-t border-gray-200">
+                {selectedLead.status !== 'verified' && (
+                  <button
+                    onClick={() => {
+                      handleVerify(selectedLead.id)
+                      setSelectedLead(null)
+                    }}
+                    className="btn-primary flex items-center gap-2"
+                  >
+                    <CheckCircle2 className="h-4 w-4" />
+                    Verify Lead
+                  </button>
+                )}
+                {!selectedLead.syncedAt && (
+                  <button
+                    onClick={() => {
+                      handleSyncToCRM(selectedLead)
+                      setSelectedLead(null)
+                    }}
+                    className="btn-secondary flex items-center gap-2"
+                  >
+                    <Zap className="h-4 w-4" />
+                    Sync to CRM
+                  </button>
+                )}
+                <button
+                  onClick={() => setSelectedLead(null)}
+                  className="text-gray-600 hover:text-gray-800 px-4 py-2 border border-gray-300 rounded-lg"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -1132,7 +2447,7 @@ function MatchmakingTab() {
   useEffect(() => {
     const raw = JSON.parse(localStorage.getItem('makemyknot_users')||'[]')
     const sanitized = raw.map((u:any)=>{ const {password, ...rest} = u; return rest })
-    setUsers(sanitized.filter(u => u.questionnaireComplete))
+    setUsers(sanitized.filter((u: any) => u.questionnaireComplete))
   }, [])
 
   const handleManualMatch = (userId: string, targetUserId: string) => {
@@ -1400,6 +2715,492 @@ function AnalyticsTab() {
           </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+// AI Questionnaires Management Tab
+function QuestionnairesTab() {
+  const [questionnaires, setQuestionnaires] = useState<QuestionnaireResponse[]>([])
+  const [selectedQuestionnaire, setSelectedQuestionnaire] = useState<QuestionnaireResponse | null>(null)
+  const [filterStatus, setFilterStatus] = useState<'all' | 'complete' | 'incomplete'>('all')
+  const [searchTerm, setSearchTerm] = useState('')
+  const [showAnalytics, setShowAnalytics] = useState(false)
+  const [isGeneratingExcel, setIsGeneratingExcel] = useState(false)
+
+  useEffect(() => {
+    const responses = getQuestionnaireResponses()
+    setQuestionnaires(responses)
+  }, [])
+
+  const exportQuestionnaireToExcel = (q: QuestionnaireResponse) => {
+    try {
+      // Try to enrich with user details
+      let name = ''
+      let email = ''
+      let phone = ''
+      let age: number | string = ''
+
+      try {
+        if (q.userId) {
+          const users = JSON.parse(localStorage.getItem('makemyknot_users') || '[]')
+          const user = users.find((u: any) => u.id === q.userId)
+          if (user) {
+            name = user.name || ''
+            email = user.email || ''
+            phone = user.phone || ''
+            age = user.age || ''
+          }
+        } else if (q.leadId) {
+          const leads = getLeads()
+          const lead = leads.find((l: any) => l.id === q.leadId)
+          if (lead) {
+            name = lead.name || ''
+            email = lead.email || ''
+            phone = lead.phone || ''
+          }
+        }
+      } catch {}
+
+      const summaryRows = [
+        { Field: 'Name', Value: name || (q.userId ? q.userId : q.leadId) },
+        { Field: 'Email', Value: email },
+        { Field: 'Phone', Value: phone },
+        { Field: 'Age', Value: age },
+        { Field: 'Type', Value: q.userId ? 'user' : 'lead' },
+        { Field: 'Questionnaire ID', Value: q.id },
+        { Field: 'Status', Value: q.isComplete ? 'Complete' : 'In Progress' },
+        { Field: 'Created At', Value: new Date(q.createdAt).toLocaleString() },
+        { Field: 'Completed At', Value: q.completedAt ? new Date(q.completedAt).toLocaleString() : '' },
+      ]
+
+      const responseRows = comprehensiveQuestions.map((question, idx) => {
+        const ans = q.responses[question.id]
+        const normalized = Array.isArray(ans) ? ans.join(', ') : (ans ?? '')
+        return {
+          '#': idx + 1,
+          Category: question.category,
+          Question: question.question,
+          Answer: normalized,
+        }
+      })
+
+      const wb = XLSX.utils.book_new()
+      const wsSummary = XLSX.utils.json_to_sheet(summaryRows)
+      const wsResponses = XLSX.utils.json_to_sheet(responseRows)
+      XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary')
+      XLSX.utils.book_append_sheet(wb, wsResponses, 'Responses')
+
+      const baseName = name || (q.userId ? q.userId : q.leadId) || 'User'
+      const cleanName = baseName.replace(/[^a-zA-Z0-9]/g, '-')
+      const timestamp = new Date().toISOString().split('T')[0]
+      const fileName = `MakeMyKnot_Questionnaire_${cleanName}_${timestamp}_${q.id.substring(0, 8)}.xlsx`
+      XLSX.writeFile(wb, fileName)
+    } catch (e) {
+      console.error('Error exporting questionnaire to Excel', e)
+      alert('Error exporting questionnaire to Excel. Please try again.')
+    }
+  }
+
+  const filteredQuestionnaires = questionnaires.filter(q => {
+    const matchesSearch = !searchTerm || 
+      (q.userId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+       q.leadId?.toLowerCase().includes(searchTerm.toLowerCase()))
+    
+    const matchesFilter = filterStatus === 'all' || 
+      (filterStatus === 'complete' && q.isComplete) ||
+      (filterStatus === 'incomplete' && !q.isComplete)
+    
+    return matchesSearch && matchesFilter
+  })
+
+  const handleDeleteQuestionnaire = (id: string) => {
+    if (confirm('Are you sure you want to delete this questionnaire response?')) {
+      const updated = questionnaires.filter(q => q.id !== id)
+      setQuestionnaires(updated)
+      localStorage.setItem('questionnaire_responses', JSON.stringify(updated))
+    }
+  }
+
+  const getResponsesByCategory = (responses: Record<string, any>) => {
+    const categories: Record<string, any[]> = {}
+    comprehensiveQuestions.forEach(question => {
+      if (!categories[question.category]) {
+        categories[question.category] = []
+      }
+      categories[question.category].push({
+        question: question.question,
+        answer: responses[question.id] || 'Not answered',
+        type: question.type
+      })
+    })
+    return categories
+  }
+
+  const getCompatibilityInsights = (questionnaire: QuestionnaireResponse) => {
+    const responses = questionnaire.responses
+    const insights = []
+    
+    // Analyze personality type
+    if (responses.personality_type) {
+      insights.push(`Personality: ${responses.personality_type}`)
+    }
+    
+    // Analyze relationship goals
+    if (responses.children_desire) {
+      insights.push(`Children: ${responses.children_desire}`)
+    }
+    
+    // Analyze lifestyle
+    if (responses.ideal_weekend) {
+      insights.push(`Lifestyle: ${responses.ideal_weekend}`)
+    }
+    
+    return insights
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="bg-white rounded-xl shadow-sm border p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+              <Brain className="h-8 w-8 text-primary-600" />
+              AI Questionnaire Management
+            </h2>
+            <p className="text-gray-600 mt-2">View and analyze comprehensive questionnaire responses for AI matchmaking</p>
+          </div>
+          <button
+            onClick={() => setShowAnalytics(!showAnalytics)}
+            className="btn-primary flex items-center gap-2"
+          >
+            <BarChart3 className="h-4 w-4" />
+            {showAnalytics ? 'Hide Analytics' : 'Show Analytics'}
+          </button>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-primary-50 rounded-lg p-4">
+            <div className="flex items-center">
+              <FileText className="h-8 w-8 text-primary-600" />
+              <div className="ml-3">
+                <div className="text-2xl font-bold text-primary-900">{questionnaires.length}</div>
+                <div className="text-sm text-primary-700">Total Responses</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-green-50 rounded-lg p-4">
+            <div className="flex items-center">
+              <CheckCircle2 className="h-8 w-8 text-green-600" />
+              <div className="ml-3">
+                <div className="text-2xl font-bold text-green-900">
+                  {questionnaires.filter(q => q.isComplete).length}
+                </div>
+                <div className="text-sm text-green-700">Completed</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-yellow-50 rounded-lg p-4">
+            <div className="flex items-center">
+              <Activity className="h-8 w-8 text-yellow-600" />
+              <div className="ml-3">
+                <div className="text-2xl font-bold text-yellow-900">
+                  {questionnaires.filter(q => !q.isComplete).length}
+                </div>
+                <div className="text-sm text-yellow-700">In Progress</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-blue-50 rounded-lg p-4">
+            <div className="flex items-center">
+              <TrendingUp className="h-8 w-8 text-blue-600" />
+              <div className="ml-3">
+                <div className="text-2xl font-bold text-blue-900">
+                  {questionnaires.length > 0 ? Math.round((questionnaires.filter(q => q.isComplete).length / questionnaires.length) * 100) : 0}%
+                </div>
+                <div className="text-sm text-blue-700">Completion Rate</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Filters */}
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1">
+            <div className="relative">
+              <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search by user ID or lead ID..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value as any)}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          >
+            <option value="all">All Responses</option>
+            <option value="complete">Complete</option>
+            <option value="incomplete">In Progress</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Analytics Panel */}
+      {showAnalytics && (
+        <div className="bg-white rounded-xl shadow-sm border p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Response Analytics</h3>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Most Common Responses */}
+            <div>
+              <h4 className="font-medium text-gray-700 mb-3">Personality Types</h4>
+              <div className="space-y-2">
+                {['Very outgoing and social', 'Balanced - depends on situation', 'More introverted and private'].map(type => {
+                  const count = questionnaires.filter(q => q.responses.personality_type === type).length
+                  return (
+                    <div key={type} className="flex justify-between text-sm">
+                      <span className="text-gray-600">{type}</span>
+                      <span className="font-medium">{count}</span>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+            
+            <div>
+              <h4 className="font-medium text-gray-700 mb-3">Family Importance</h4>
+              <div className="space-y-2">
+                {['Very important', 'Most important thing', 'Important'].map(importance => {
+                  const count = questionnaires.filter(q => q.responses.family_values === importance).length
+                  return (
+                    <div key={importance} className="flex justify-between text-sm">
+                      <span className="text-gray-600">{importance}</span>
+                      <span className="font-medium">{count}</span>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+            
+            <div>
+              <h4 className="font-medium text-gray-700 mb-3">Children Desire</h4>
+              <div className="space-y-2">
+                {['Definitely want children', 'Probably want children', 'Not sure yet'].map(desire => {
+                  const count = questionnaires.filter(q => q.responses.children_desire === desire).length
+                  return (
+                    <div key={desire} className="flex justify-between text-sm">
+                      <span className="text-gray-600">{desire}</span>
+                      <span className="font-medium">{count}</span>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Questionnaires List */}
+      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Completed</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Insights</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredQuestionnaires.map((questionnaire) => {
+                const insights = getCompatibilityInsights(questionnaire)
+                return (
+                  <tr key={questionnaire.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0">
+                          <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
+                            <User className="h-5 w-5 text-primary-600" />
+                          </div>
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900">
+                            {questionnaire.userId ? `User: ${questionnaire.userId}` : `Lead: ${questionnaire.leadId}`}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            ID: {questionnaire.id}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        questionnaire.isComplete
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {questionnaire.isComplete ? 'Complete' : 'In Progress'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {questionnaire.completedAt ? new Date(questionnaire.completedAt).toLocaleDateString() : '—'}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="max-w-xs">
+                        {insights.slice(0, 2).map((insight, idx) => (
+                          <div key={idx} className="text-xs text-gray-600 mb-1">
+                            {insight}
+                          </div>
+                        ))}
+                        {insights.length > 2 && (
+                          <div className="text-xs text-gray-400">+{insights.length - 2} more</div>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => setSelectedQuestionnaire(questionnaire)}
+                          className="text-primary-600 hover:text-primary-900 flex items-center gap-1"
+                        >
+                          <Eye className="h-4 w-4" />
+                          View
+                        </button>
+                        <button
+                          onClick={() => exportQuestionnaireToExcel(questionnaire)}
+                          className="text-green-700 hover:text-green-900 flex items-center gap-1"
+                        >
+                          <Download className="h-4 w-4" />
+                          Excel
+                        </button>
+                        <button
+                          onClick={() => handleDeleteQuestionnaire(questionnaire.id)}
+                          className="text-red-600 hover:text-red-900 flex items-center gap-1"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+        
+        {filteredQuestionnaires.length === 0 && (
+          <div className="text-center py-12">
+            <Brain className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+            <h3 className="text-sm font-medium text-gray-900 mb-2">No questionnaire responses found</h3>
+            <p className="text-sm text-gray-500">
+              {searchTerm ? 'No responses match your search criteria.' : 'No questionnaire responses have been submitted yet.'}
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Questionnaire Detail Modal */}
+      {selectedQuestionnaire && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Questionnaire Response Details
+                  </h3>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {selectedQuestionnaire.userId ? `User: ${selectedQuestionnaire.userId}` : `Lead: ${selectedQuestionnaire.leadId}`}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setSelectedQuestionnaire(null)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <XCircle className="h-6 w-6" />
+                </button>
+              </div>
+            </div>
+            
+            <div className="p-6">
+              {/* Response Info */}
+              <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div>
+                    <span className="text-gray-500">Status:</span>
+                    <div className={`font-medium ${
+                      selectedQuestionnaire.isComplete ? 'text-green-600' : 'text-yellow-600'
+                    }`}>
+                      {selectedQuestionnaire.isComplete ? 'Complete' : 'In Progress'}
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Created:</span>
+                    <div className="font-medium text-gray-900">
+                      {new Date(selectedQuestionnaire.createdAt).toLocaleDateString()}
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Completed:</span>
+                    <div className="font-medium text-gray-900">
+                      {selectedQuestionnaire.completedAt 
+                        ? new Date(selectedQuestionnaire.completedAt).toLocaleDateString()
+                        : '—'
+                      }
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Progress:</span>
+                    <div className="font-medium text-gray-900">
+                      {Object.keys(selectedQuestionnaire.responses).length}/{comprehensiveQuestions.length}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Responses by Category */}
+              <div className="space-y-6">
+                {Object.entries(getResponsesByCategory(selectedQuestionnaire.responses)).map(([category, responses]) => (
+                  <div key={category} className="border border-gray-200 rounded-lg overflow-hidden">
+                    <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+                      <h4 className="font-medium text-gray-900 capitalize">{category}</h4>
+                    </div>
+                    <div className="p-4">
+                      <div className="space-y-3">
+                        {responses.map((response, idx) => (
+                          <div key={idx} className="flex flex-col space-y-1">
+                            <div className="text-sm font-medium text-gray-700">
+                              {response.question}
+                            </div>
+                            <div className="text-sm text-gray-900">
+                              {response.type === 'multiple_choice' && Array.isArray(response.answer)
+                                ? response.answer.join(', ')
+                                : response.answer
+                              }
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -1972,6 +3773,662 @@ function WebinarsTab() {
               >
                 Update Webinar
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// Nominations Management Tab
+function NominationsTab() {
+  const [nominations, setNominations] = useState<any[]>([])
+  const [selectedNomination, setSelectedNomination] = useState<any>(null)
+  const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'contacted' | 'matched' | 'rejected'>('all')
+  const [searchTerm, setSearchTerm] = useState('')
+  const [showExportOptions, setShowExportOptions] = useState(false)
+  const [selectedForExport, setSelectedForExport] = useState<string[]>([])
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'status'>('newest')
+
+  // Load nominations from localStorage on component mount
+  useEffect(() => {
+    const savedNominations = localStorage.getItem('makemyknot_nominations')
+    if (savedNominations) {
+      try {
+        const parsed = JSON.parse(savedNominations)
+        setNominations(Array.isArray(parsed) ? parsed : [])
+      } catch (error) {
+        console.error('Error parsing nominations data:', error)
+        setNominations([])
+      }
+    } else {
+      // Add some mock data for demonstration
+      const mockNominations = [
+        {
+          id: 'nom_001',
+          nominatorName: 'Priya Sharma',
+          nominatorEmail: 'priya.sharma@email.com',
+          nominatorPhone: '+91 98765 43210',
+          nomineeName: 'Rahul Gupta',
+          nomineeAge: 28,
+          nomineeLocation: 'Mumbai',
+          relationship: 'Friend',
+          reasons: 'Great personality, career-focused, family-oriented',
+          nomineeInterests: 'Reading, Traveling, Photography',
+          status: 'pending',
+          submittedAt: new Date('2024-01-15T10:30:00').toISOString(),
+          notes: ''
+        },
+        {
+          id: 'nom_002',
+          nominatorName: 'Anjali Mehta',
+          nominatorEmail: 'anjali.mehta@gmail.com',
+          nominatorPhone: '+91 87654 32109',
+          nomineeName: 'Sneha Patel',
+          nomineeAge: 26,
+          nomineeLocation: 'Delhi',
+          relationship: 'Sister',
+          reasons: 'Looking for a life partner, very caring and understanding',
+          nomineeInterests: 'Cooking, Dancing, Music',
+          status: 'contacted',
+          submittedAt: new Date('2024-01-12T14:45:00').toISOString(),
+          notes: 'Called nominee on Jan 13, interested to join'
+        },
+        {
+          id: 'nom_003',
+          nominatorName: 'Vikram Singh',
+          nominatorEmail: 'vikram.singh@yahoo.com',
+          nominatorPhone: '+91 76543 21098',
+          nomineeName: 'Arjun Kumar',
+          nomineeAge: 30,
+          nomineeLocation: 'Bangalore',
+          relationship: 'Brother',
+          reasons: 'Software engineer, well-settled, looking for marriage',
+          nomineeInterests: 'Cricket, Technology, Movies',
+          status: 'matched',
+          submittedAt: new Date('2024-01-08T09:15:00').toISOString(),
+          notes: 'Successfully matched with user ID: usr_456'
+        }
+      ]
+      localStorage.setItem('makemyknot_nominations', JSON.stringify(mockNominations))
+      setNominations(mockNominations)
+    }
+  }, [])
+
+  // Filter and sort nominations
+  const filteredNominations = nominations
+    .filter(nom => {
+      const matchesSearch = !searchTerm || 
+        nom.nominatorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        nom.nomineeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        nom.nominatorEmail.toLowerCase().includes(searchTerm.toLowerCase())
+      
+      const matchesFilter = filterStatus === 'all' || nom.status === filterStatus
+      
+      return matchesSearch && matchesFilter
+    })
+    .sort((a, b) => {
+      switch (sortBy) {
+        case 'newest':
+          return new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime()
+        case 'oldest':
+          return new Date(a.submittedAt).getTime() - new Date(b.submittedAt).getTime()
+        case 'status':
+          return a.status.localeCompare(b.status)
+        default:
+          return 0
+      }
+    })
+
+  // Update nomination status
+  const updateNominationStatus = (id: string, newStatus: string, notes: string = '') => {
+    const updated = nominations.map(nom => 
+      nom.id === id 
+        ? { ...nom, status: newStatus, notes, updatedAt: new Date().toISOString() }
+        : nom
+    )
+    setNominations(updated)
+    localStorage.setItem('makemyknot_nominations', JSON.stringify(updated))
+  }
+
+  // Delete nomination
+  const deleteNomination = (id: string) => {
+    if (confirm('Are you sure you want to delete this nomination?')) {
+      const filtered = nominations.filter(nom => nom.id !== id)
+      setNominations(filtered)
+      localStorage.setItem('makemyknot_nominations', JSON.stringify(filtered))
+    }
+  }
+
+  // Export nominations to CSV
+  const exportToCSV = () => {
+    const dataToExport = selectedForExport.length > 0 
+      ? nominations.filter(nom => selectedForExport.includes(nom.id))
+      : filteredNominations
+
+    const headers = [
+      'Nomination ID',
+      'Nominator Name',
+      'Nominator Email', 
+      'Nominator Phone',
+      'Nominee Name',
+      'Nominee Age',
+      'Nominee Location',
+      'Relationship',
+      'Reasons',
+      'Nominee Interests',
+      'Status',
+      'Submitted Date',
+      'Notes'
+    ]
+
+    const csvContent = [
+      headers.join(','),
+      ...dataToExport.map(nom => [
+        nom.id,
+        `"${nom.nominatorName}"`,
+        nom.nominatorEmail,
+        nom.nominatorPhone,
+        `"${nom.nomineeName}"`,
+        nom.nomineeAge,
+        `"${nom.nomineeLocation}"`,
+        `"${nom.relationship}"`,
+        `"${nom.reasons}"`,
+        `"${nom.nomineeInterests}"`,
+        nom.status,
+        new Date(nom.submittedAt).toLocaleDateString(),
+        `"${nom.notes || ''}"`
+      ].join(','))
+    ].join('\n')
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    link.setAttribute('href', url)
+    link.setAttribute('download', `makemyknot_nominations_${new Date().toISOString().split('T')[0]}.csv`)
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    
+    setShowExportOptions(false)
+    setSelectedForExport([])
+  }
+
+  // Status color mapping
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending': return 'bg-yellow-100 text-yellow-800'
+      case 'contacted': return 'bg-blue-100 text-blue-800'
+      case 'matched': return 'bg-green-100 text-green-800'
+      case 'rejected': return 'bg-red-100 text-red-800'
+      default: return 'bg-gray-100 text-gray-800'
+    }
+  }
+
+  // Statistics
+  const stats = {
+    total: nominations.length,
+    pending: nominations.filter(n => n.status === 'pending').length,
+    contacted: nominations.filter(n => n.status === 'contacted').length,
+    matched: nominations.filter(n => n.status === 'matched').length,
+    rejected: nominations.filter(n => n.status === 'rejected').length
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="bg-white rounded-xl shadow-sm border p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+              <UserPlus className="h-8 w-8 text-primary-600" />
+              Nominations Management
+            </h2>
+            <p className="text-gray-600 mt-2">Manage user nominations and referrals for potential matches</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowExportOptions(!showExportOptions)}
+              className="btn-secondary flex items-center gap-2"
+            >
+              <Download className="h-4 w-4" />
+              Export CSV
+            </button>
+            <button
+              onClick={() => window.location.reload()}
+              className="btn-primary flex items-center gap-2"
+            >
+              <Activity className="h-4 w-4" />
+              Refresh
+            </button>
+          </div>
+        </div>
+
+        {/* Statistics */}
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+          <div className="bg-blue-50 rounded-lg p-4">
+            <div className="flex items-center">
+              <UserPlus className="h-8 w-8 text-blue-600" />
+              <div className="ml-3">
+                <div className="text-2xl font-bold text-blue-900">{stats.total}</div>
+                <div className="text-sm text-blue-700">Total Nominations</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-yellow-50 rounded-lg p-4">
+            <div className="flex items-center">
+              <Activity className="h-8 w-8 text-yellow-600" />
+              <div className="ml-3">
+                <div className="text-2xl font-bold text-yellow-900">{stats.pending}</div>
+                <div className="text-sm text-yellow-700">Pending Review</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-blue-50 rounded-lg p-4">
+            <div className="flex items-center">
+              <Phone className="h-8 w-8 text-blue-600" />
+              <div className="ml-3">
+                <div className="text-2xl font-bold text-blue-900">{stats.contacted}</div>
+                <div className="text-sm text-blue-700">Contacted</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-green-50 rounded-lg p-4">
+            <div className="flex items-center">
+              <CheckCircle2 className="h-8 w-8 text-green-600" />
+              <div className="ml-3">
+                <div className="text-2xl font-bold text-green-900">{stats.matched}</div>
+                <div className="text-sm text-green-700">Successfully Matched</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-red-50 rounded-lg p-4">
+            <div className="flex items-center">
+              <XCircle className="h-8 w-8 text-red-600" />
+              <div className="ml-3">
+                <div className="text-2xl font-bold text-red-900">{stats.rejected}</div>
+                <div className="text-sm text-red-700">Not Suitable</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Filters */}
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1">
+            <div className="relative">
+              <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search by nominator or nominee name, email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value as any)}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          >
+            <option value="all">All Status ({stats.total})</option>
+            <option value="pending">Pending ({stats.pending})</option>
+            <option value="contacted">Contacted ({stats.contacted})</option>
+            <option value="matched">Matched ({stats.matched})</option>
+            <option value="rejected">Rejected ({stats.rejected})</option>
+          </select>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as any)}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          >
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="status">Sort by Status</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Export Options Panel */}
+      {showExportOptions && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-medium text-blue-900">Export Options</h3>
+            <button
+              onClick={() => setShowExportOptions(false)}
+              className="text-blue-600 hover:text-blue-800"
+            >
+              <XCircle className="h-5 w-5" />
+            </button>
+          </div>
+          <div className="flex items-center gap-4">
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setSelectedForExport(filteredNominations.map(n => n.id))
+                  } else {
+                    setSelectedForExport([])
+                  }
+                }}
+                className="rounded border-gray-300"
+              />
+              <span className="ml-2 text-sm text-blue-800">
+                Export all filtered nominations ({filteredNominations.length})
+              </span>
+            </label>
+            <button
+              onClick={exportToCSV}
+              className="btn-primary flex items-center gap-2"
+            >
+              <Download className="h-4 w-4" />
+              Download CSV
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Nominations Table */}
+      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {showExportOptions && (
+                    <input
+                      type="checkbox"
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedForExport(filteredNominations.map(n => n.id))
+                        } else {
+                          setSelectedForExport([])
+                        }
+                      }}
+                      className="rounded border-gray-300 mr-2"
+                    />
+                  )}
+                  Nominator
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nominee Details</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Relationship</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Submitted</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredNominations.map((nomination) => (
+                <tr key={nomination.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      {showExportOptions && (
+                        <input
+                          type="checkbox"
+                          checked={selectedForExport.includes(nomination.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedForExport([...selectedForExport, nomination.id])
+                            } else {
+                              setSelectedForExport(selectedForExport.filter(id => id !== nomination.id))
+                            }
+                          }}
+                          className="rounded border-gray-300 mr-3"
+                        />
+                      )}
+                      <div className="flex-shrink-0">
+                        <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
+                          <span className="text-sm font-medium text-primary-700">
+                            {nomination.nominatorName.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="ml-4">
+                        <div className="text-sm font-medium text-gray-900">{nomination.nominatorName}</div>
+                        <div className="text-sm text-gray-500">{nomination.nominatorEmail}</div>
+                        <div className="text-sm text-gray-500">{nomination.nominatorPhone}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="text-sm font-medium text-gray-900">{nomination.nomineeName}</div>
+                    <div className="text-sm text-gray-500">Age: {nomination.nomineeAge} • {nomination.nomineeLocation}</div>
+                    <div className="text-sm text-gray-500 truncate max-w-xs" title={nomination.nomineeInterests}>
+                      Interests: {nomination.nomineeInterests}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{nomination.relationship}</div>
+                    <div className="text-sm text-gray-500 max-w-xs truncate" title={nomination.reasons}>
+                      {nomination.reasons}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(nomination.status)}`}>
+                      {nomination.status.charAt(0).toUpperCase() + nomination.status.slice(1)}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {new Date(nomination.submittedAt).toLocaleDateString()}
+                    <div className="text-xs text-gray-400">
+                      {new Date(nomination.submittedAt).toLocaleTimeString()}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => setSelectedNomination(nomination)}
+                        className="text-primary-600 hover:text-primary-900 flex items-center gap-1 px-3 py-1 rounded border border-primary-200 hover:bg-primary-50"
+                        title="View Details"
+                      >
+                        <Eye className="h-4 w-4" />
+                        View
+                      </button>
+                      <button
+                        onClick={() => deleteNomination(nomination.id)}
+                        className="text-red-600 hover:text-red-900 flex items-center gap-1 px-3 py-1 rounded border border-red-200 hover:bg-red-50"
+                        title="Delete Nomination"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        
+        {filteredNominations.length === 0 && (
+          <div className="text-center py-12">
+            <UserPlus className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+            <h3 className="text-sm font-medium text-gray-900 mb-2">No nominations found</h3>
+            <p className="text-sm text-gray-500">
+              {searchTerm || filterStatus !== 'all' 
+                ? 'No nominations match your search criteria.' 
+                : 'No nominations have been submitted yet.'}
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Nomination Detail Modal */}
+      {selectedNomination && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Nomination Details
+                  </h3>
+                  <p className="text-sm text-gray-600 mt-1">
+                    ID: {selectedNomination.id} • Submitted: {new Date(selectedNomination.submittedAt).toLocaleDateString()}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setSelectedNomination(null)}
+                  className="text-gray-400 hover:text-gray-600 p-2"
+                >
+                  <XCircle className="h-6 w-6" />
+                </button>
+              </div>
+            </div>
+            
+            <div className="p-6">
+              {/* Nominator Information */}
+              <div className="mb-6 p-4 bg-blue-50 rounded-lg">
+                <h4 className="font-semibold text-blue-900 mb-3">Nominator Information</h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                  <div>
+                    <span className="text-blue-700">Name:</span>
+                    <div className="font-medium text-blue-900">{selectedNomination.nominatorName}</div>
+                  </div>
+                  <div>
+                    <span className="text-blue-700">Email:</span>
+                    <div className="font-medium text-blue-900">{selectedNomination.nominatorEmail}</div>
+                  </div>
+                  <div>
+                    <span className="text-blue-700">Phone:</span>
+                    <div className="font-medium text-blue-900">{selectedNomination.nominatorPhone}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Nominee Information */}
+              <div className="mb-6 p-4 bg-green-50 rounded-lg">
+                <h4 className="font-semibold text-green-900 mb-3">Nominee Information</h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm mb-4">
+                  <div>
+                    <span className="text-green-700">Name:</span>
+                    <div className="font-medium text-green-900">{selectedNomination.nomineeName}</div>
+                  </div>
+                  <div>
+                    <span className="text-green-700">Age:</span>
+                    <div className="font-medium text-green-900">{selectedNomination.nomineeAge} years</div>
+                  </div>
+                  <div>
+                    <span className="text-green-700">Location:</span>
+                    <div className="font-medium text-green-900">{selectedNomination.nomineeLocation}</div>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div>
+                    <span className="text-green-700 text-sm">Interests & Hobbies:</span>
+                    <div className="font-medium text-green-900">{selectedNomination.nomineeInterests}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Nomination Details */}
+              <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h4 className="font-semibold text-gray-900 mb-3">Nomination Details</h4>
+                <div className="space-y-3">
+                  <div>
+                    <span className="text-gray-700 text-sm">Relationship to Nominee:</span>
+                    <div className="font-medium text-gray-900">{selectedNomination.relationship}</div>
+                  </div>
+                  <div>
+                    <span className="text-gray-700 text-sm">Reasons for Nomination:</span>
+                    <div className="font-medium text-gray-900">{selectedNomination.reasons}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Status Management */}
+              <div className="mb-6 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                <h4 className="font-semibold text-yellow-900 mb-3">Status Management</h4>
+                <div className="flex items-center gap-4 mb-3">
+                  <span className="text-sm text-yellow-700">Current Status:</span>
+                  <span className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(selectedNomination.status)}`}>
+                    {selectedNomination.status.charAt(0).toUpperCase() + selectedNomination.status.slice(1)}
+                  </span>
+                </div>
+                
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {['pending', 'contacted', 'matched', 'rejected'].map(status => (
+                    <button
+                      key={status}
+                      onClick={() => {
+                        const notes = prompt(`Update status to "${status}"? Add notes (optional):`)
+                        if (notes !== null) {
+                          updateNominationStatus(selectedNomination.id, status, notes)
+                          setSelectedNomination({...selectedNomination, status, notes})
+                        }
+                      }}
+                      className={`px-3 py-1 text-sm rounded-lg border transition-colors ${
+                        selectedNomination.status === status
+                          ? 'bg-primary-100 text-primary-800 border-primary-300'
+                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      Mark as {status.charAt(0).toUpperCase() + status.slice(1)}
+                    </button>
+                  ))}
+                </div>
+                
+                {selectedNomination.notes && (
+                  <div>
+                    <span className="text-sm text-yellow-700">Admin Notes:</span>
+                    <div className="font-medium text-yellow-900 bg-white p-2 rounded border mt-1">
+                      {selectedNomination.notes}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center gap-3 pt-4 border-t border-gray-200">
+                <button
+                  onClick={() => {
+                    // Generate mailto link with pre-filled content
+                    const subject = encodeURIComponent('Regarding your nomination to Make My Knot')
+                    const body = encodeURIComponent(
+                      `Dear ${selectedNomination.nominatorName},\n\nThank you for nominating ${selectedNomination.nomineeName} to Make My Knot.\n\nWe have reviewed your nomination and...\n\nBest regards,\nMake My Knot Team`
+                    )
+                    window.open(`mailto:${selectedNomination.nominatorEmail}?subject=${subject}&body=${body}`)
+                  }}
+                  className="btn-primary flex items-center gap-2"
+                >
+                  <Mail className="h-4 w-4" />
+                  Email Nominator
+                </button>
+                <button
+                  onClick={() => {
+                    // Generate telephone link
+                    window.open(`tel:${selectedNomination.nominatorPhone}`)
+                  }}
+                  className="btn-secondary flex items-center gap-2"
+                >
+                  <Phone className="h-4 w-4" />
+                  Call Nominator
+                </button>
+                <button
+                  onClick={() => {
+                    deleteNomination(selectedNomination.id)
+                    setSelectedNomination(null)
+                  }}
+                  className="text-red-600 hover:text-red-800 px-4 py-2 border border-red-300 rounded-lg hover:bg-red-50 flex items-center gap-2"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Delete
+                </button>
+                <button
+                  onClick={() => setSelectedNomination(null)}
+                  className="text-gray-600 hover:text-gray-800 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         </div>

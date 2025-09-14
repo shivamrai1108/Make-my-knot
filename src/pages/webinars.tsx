@@ -85,6 +85,7 @@ const webinars: Webinar[] = [
     id: '3',
     title: 'Healing After Heartbreak: Moving Forward with Hope',
     description: 'A compassionate guide through relationship endings, helping you process emotions healthily and prepare for future meaningful connections.',
+    image: '/api/placeholder/400/200?text=Healing+Heartbreak',
     speaker: {
       name: 'Dr. Anita Gupta',
       credentials: 'Relationship Therapist, Trauma Specialist',
@@ -110,6 +111,7 @@ const webinars: Webinar[] = [
     id: '4',
     title: 'Love Languages: Speaking Your Partner\'s Heart',
     description: 'Discover how to express and receive love in ways that truly resonate. Transform your relationship by understanding love languages deeply.',
+    image: '/api/placeholder/400/200?text=Love+Languages',
     speaker: {
       name: 'Dr. Kavita Patel',
       credentials: 'Certified Love Languages Coach',
@@ -135,6 +137,7 @@ const webinars: Webinar[] = [
     id: '5',
     title: 'Arranged Marriages: Making Modern Connections Work',
     description: 'Navigate the modern arranged marriage process with confidence. Build genuine connections while honoring family traditions.',
+    image: '/api/placeholder/400/200?text=Arranged+Marriage',
     speaker: {
       name: 'Mrs. Sunita Agarwal',
       credentials: 'Senior Matchmaker, Cultural Advisor',
@@ -161,6 +164,7 @@ const webinars: Webinar[] = [
     id: '6',
     title: 'Long Distance Relationships: Staying Connected',
     description: 'Proven strategies for maintaining strong emotional bonds across distances. Perfect for couples separated by work, studies, or circumstances.',
+    image: '/api/placeholder/400/200?text=Long+Distance',
     speaker: {
       name: 'Dr. Amit Kumar',
       credentials: 'Relationship Psychologist',

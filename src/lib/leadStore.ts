@@ -90,21 +90,31 @@ export async function getLeads(params: {
   }
 }
 
-export async function saveLead(lead: Omit<Lead, 'id' | 'createdAt' | 'updatedAt'>): Promise<Lead> {
+export async function saveLead(leadInput: Omit<Lead, 'id' | 'createdAt' | 'updatedAt'> | Lead): Promise<Lead> {
   try {
+    // If lead already has an ID, it's coming from LeadQuestionnaire, use it as-is for localStorage first
+    if ('id' in leadInput && leadInput.id) {
+      console.log('Saving lead with existing ID to localStorage first:', leadInput)
+      const leads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
+      // Remove any existing lead with the same ID
+      const filteredLeads = leads.filter((l: Lead) => l.id !== leadInput.id)
+      filteredLeads.push(leadInput)
+      localStorage.setItem('makemyknot_leads', JSON.stringify(filteredLeads))
+    }
+
     const result = await apiCall('/leads', {
       method: 'POST',
       body: JSON.stringify({
-        name: lead.name,
-        email: lead.email,
-        phone: lead.phone,
-        answers: lead.answers,
-        source: lead.source || 'website'
+        name: leadInput.name,
+        email: leadInput.email,
+        phone: leadInput.phone,
+        answers: leadInput.answers,
+        source: leadInput.source || 'website'
       })
     })
     
     const savedLead = result.data.lead
-    return {
+    const apiLead = {
       id: savedLead._id,
       createdAt: savedLead.createdAt,
       updatedAt: savedLead.updatedAt,
@@ -117,18 +127,36 @@ export async function saveLead(lead: Omit<Lead, 'id' | 'createdAt' | 'updatedAt'
       leadScore: savedLead.leadScore,
       isActive: savedLead.isActive
     }
-  } catch (error) {
-    console.error('Error saving lead:', error)
-    // Fallback to localStorage if API fails
-    const localLead = {
-      ...lead,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    }
+    
+    // Update localStorage with API response
     const leads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
-    leads.push(localLead)
+    const idx = leads.findIndex((l: Lead) => l.email === apiLead.email)
+    if (idx >= 0) {
+      leads[idx] = apiLead
+    } else {
+      leads.push(apiLead)
+    }
     localStorage.setItem('makemyknot_leads', JSON.stringify(leads))
+    
+    return apiLead
+  } catch (error) {
+    console.error('Error saving lead to API, using localStorage fallback:', error)
+    // Fallback to localStorage if API fails
+    const localLead = 'id' in leadInput && leadInput.id ? 
+      leadInput as Lead : 
+      {
+        ...leadInput,
+        id: Date.now().toString(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+    
+    const leads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
+    // Remove any existing lead with the same ID or email
+    const filteredLeads = leads.filter((l: Lead) => l.id !== localLead.id && l.email !== localLead.email)
+    filteredLeads.push(localLead)
+    localStorage.setItem('makemyknot_leads', JSON.stringify(filteredLeads))
+    console.log('Lead saved to localStorage:', localLead)
     return localLead
   }
 }

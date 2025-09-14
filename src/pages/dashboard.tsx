@@ -13,6 +13,7 @@ import {
 import { useUser } from '@/lib/UserContext'
 import MatchCard from '@/components/MatchCard'
 import WebinarCarousel from '@/components/WebinarCarousel'
+import ProfilePictureUpload from '@/components/ProfilePictureUpload'
 
 // Enhanced mock data with more realistic profiles
 const generateMatches = (userProfile: any) => [
@@ -309,7 +310,22 @@ export default function Dashboard() {
   }
 
   const questionnaireResponse = getUserQuestionnaireResponse()
-  const needsQuestionnaire = !user.questionnaireComplete
+  const needsQuestionnaire = !user.questionnaireComplete && (() => {
+    // Double-check in localStorage as a fallback
+    try {
+      const questionnaireData = JSON.parse(localStorage.getItem('questionnaire_responses') || '[]')
+      const userQuestionnaire = questionnaireData.find((q: any) => 
+        (q.userId === user.id || q.userEmail === user.email) && q.isComplete
+      )
+      if (userQuestionnaire) {
+        console.log('Found completed questionnaire in localStorage, user should not need assessment')
+        return false // They have completed questionnaire
+      }
+    } catch (error) {
+      console.error('Error checking localStorage for questionnaire:', error)
+    }
+    return true // Default to needing questionnaire
+  })()
 
   // Subscription helpers
   const now = new Date()
@@ -345,7 +361,22 @@ export default function Dashboard() {
                 <span className="ml-2 text-2xl font-bold text-gray-900">Make My Knot</span>
               </div>
               <div className="flex items-center space-x-4">
-                <span className="text-gray-700">Welcome, {user.name}!</span>
+                <div className="flex items-center space-x-3">
+                  {user.profilePicture ? (
+                    <img
+                      src={user.profilePicture}
+                      alt={user.name}
+                      className="w-8 h-8 rounded-full border-2 border-primary-200 object-cover"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center border-2 border-primary-200">
+                      <span className="text-sm font-medium text-primary-700">
+                        {user.name.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                  )}
+                  <span className="text-gray-700">Welcome, {user.name}!</span>
+                </div>
                 <button
                   onClick={handleLogout}
                   className="flex items-center text-gray-600 hover:text-gray-800 transition-colors"
@@ -819,7 +850,8 @@ export default function Dashboard() {
                                 <button 
                                   onClick={() => {
                                     setNewMessage('Hi! I saw your profile and would love to get to know you better. 😊')
-                                    document.querySelector('input[placeholder="Type your message..."]')?.focus()
+                                    const input = document.querySelector('input[placeholder="Type your message..."]') as HTMLInputElement
+                                    input?.focus()
                                   }}
                                   className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm hover:bg-blue-200 transition-colors"
                                 >
@@ -828,7 +860,8 @@ export default function Dashboard() {
                                 <button 
                                   onClick={() => {
                                     setNewMessage('I noticed we have similar interests! What do you enjoy doing in your free time?')
-                                    document.querySelector('input[placeholder="Type your message..."]')?.focus()
+                                    const input = document.querySelector('input[placeholder="Type your message..."]') as HTMLInputElement
+                                    input?.focus()
                                   }}
                                   className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm hover:bg-purple-200 transition-colors"
                                 >
@@ -837,7 +870,8 @@ export default function Dashboard() {
                                 <button 
                                   onClick={() => {
                                     setNewMessage('Would you like to have a coffee chat sometime?')
-                                    document.querySelector('input[placeholder="Type your message..."]')?.focus()
+                                    const input = document.querySelector('input[placeholder="Type your message..."]') as HTMLInputElement
+                                    input?.focus()
                                   }}
                                   className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm hover:bg-green-200 transition-colors"
                                 >
@@ -981,11 +1015,22 @@ export default function Dashboard() {
             <div className="max-w-2xl mx-auto">
               <div className="bg-white rounded-2xl shadow-lg p-8">
                 <div className="text-center mb-8">
-                  <div className="w-24 h-24 bg-primary-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                    <User className="h-12 w-12 text-primary-600" />
+                  {/* Profile Picture Upload */}
+                  <div className="mb-6">
+                    <ProfilePictureUpload
+                      currentPicture={user.profilePicture}
+                      onUpload={(pictureUrl) => {
+                        updateUser({ profilePicture: pictureUrl })
+                      }}
+                      className="flex justify-center"
+                    />
                   </div>
                   <h2 className="text-2xl font-bold text-gray-900 mb-2">{user.name}</h2>
                   <p className="text-gray-600">{user.email}</p>
+                  <div className="mt-4 inline-flex items-center px-3 py-1 rounded-full text-sm bg-primary-50 text-primary-700">
+                    <Shield className="h-4 w-4 mr-1" />
+                    Profile {user.profilePicture ? '85%' : '60%'} Complete
+                  </div>
                 </div>
 
                 <div className="space-y-6">
