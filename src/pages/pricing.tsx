@@ -3,57 +3,16 @@ import Head from 'next/head'
 import { useState } from 'react'
 import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
-import getStripe from '@/lib/stripe'
-import { useUser } from '@/lib/UserContext'
 import { Check, Star, Crown, Sparkles, Heart, Users, MessageCircle, Calendar, Gift, Shield, Video, Phone, ChevronRight, Clock, Award, Zap, X } from 'lucide-react'
 
 export default function PricingPage() {
-  const { user } = useUser()
-  const [loadingPlan, setLoadingPlan] = useState<string | null>(null)
-
-  const handleSubscribe = async (plan: any) => {
-    if (!user) {
-      // Redirect to signup if not logged in
-      window.location.href = '/signup'
-      return
-    }
-
-    setLoadingPlan(plan.id)
-    
-    try {
-      // Create checkout session
-      const response = await fetch('/api/stripe/create-checkout-session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          priceId: plan.stripePriceId || `price_${plan.id}_monthly`,
-          planName: plan.name,
-          userId: user.id,
-          userEmail: user.email
-        })
-      })
-
-      const { sessionId, url } = await response.json()
-      
-      if (url) {
-        // Redirect to Stripe Checkout
-        window.location.href = url
-      } else {
-        // Fallback: redirect to Stripe Checkout
-        const stripe = await getStripe()
-        await stripe?.redirectToCheckout({ sessionId })
-      }
-    } catch (error) {
-      console.error('Error creating checkout session:', error)
-      alert('Something went wrong. Please try again.')
-    } finally {
-      setLoadingPlan(null)
-    }
+  const handlePlanSelect = (planName: string) => {
+    // Redirect to contact or signup for now
+    window.location.href = '/signup?plan=' + planName.toLowerCase()
   }
   const plans = [
     {
+      id: 'starter',
       name: 'Starter',
       price: '₹299',
       period: '/month',
@@ -85,6 +44,7 @@ export default function PricingPage() {
       cta: 'Start Free Trial'
     },
     {
+      id: 'classic',
       name: 'Classic',
       price: '₹799',
       period: '/month',
@@ -112,6 +72,7 @@ export default function PricingPage() {
       cta: 'Most Popular Choice'
     },
     {
+      id: 'premium',
       name: 'Premium',
       price: '₹1,999',
       period: '/month',
@@ -140,6 +101,7 @@ export default function PricingPage() {
       cta: 'Premium Experience'
     },
     {
+      id: 'platinum',
       name: 'Platinum Elite',
       price: '₹7,999',
       period: '/month',
@@ -348,19 +310,16 @@ export default function PricingPage() {
 
                       {/* CTA Button */}
                       <button
-                        onClick={() => handleSubscribe(plan)}
-                        disabled={loadingPlan === plan.id}
+                        onClick={() => handlePlanSelect(plan.name)}
                         className={`w-full py-3 px-4 rounded-lg font-semibold text-center transition-all duration-200 text-sm ${
-                          loadingPlan === plan.id
-                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                            : plan.popular
+                          plan.popular
                             ? 'bg-gradient-to-r from-primary-600 to-purple-600 text-white hover:from-primary-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105'
                             : plan.isElite
                             ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105'
                             : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
                         }`}
                       >
-                        {loadingPlan === plan.id ? 'Processing...' : (plan.cta || 'Choose Plan')}
+                        {plan.cta || 'Get Started'}
                       </button>
                     </div>
                   </div>

@@ -108,7 +108,7 @@ export default function StatusPage() {
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-gray-900 mb-4">Platform Status</h1>
             <div className={`inline-flex items-center px-4 py-2 rounded-full border ${getStatusColor(overallStatus)}`}>
-              {getStatusIcon({ status: overallStatus } as ServiceStatus)}
+              {getStatusIcon(overallStatus)}
               <span className="ml-2 font-semibold">
                 All Systems {overallStatus === 'operational' ? 'Operational' : 'Experiencing Issues'}
               </span>

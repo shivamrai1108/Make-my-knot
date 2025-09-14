@@ -8,7 +8,7 @@ export default function About() {
   return (
     <>
       <Head>
-        <title>About Us - Make My Knot | 75 Years of Matchmaking Excellence</title>
+        <title>About Us - Make My Knot | 50 Years of Matchmaking Excellence</title>
         <meta name="description" content="Discover our 3-generation legacy of bringing families together since 1950. From traditional matchmaking to AI-powered compatibility and end-to-end wedding services, we honor trust, values, and love." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
@@ -51,7 +51,7 @@ export default function About() {
           <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <div className="flex items-center justify-center mb-6">
               <Clock className="h-12 w-12 text-gold-400 mr-4" />
-              <span className="text-4xl font-bold text-gold-400">75 Years</span>
+              <span className="text-4xl font-bold text-gold-400">50 Years</span>
             </div>
             <h1 className="text-5xl font-bold text-white mb-6">
               A Legacy of <span className="text-gold-400">Love Stories</span>
@@ -248,7 +248,7 @@ export default function About() {
                   <p className="text-gray-600 leading-relaxed mb-6">
                     As the third-generation leader of the Goel family legacy, Maulik brings together traditional matchmaking 
                     wisdom with cutting-edge technology. Armed with an MBA from IIM Ahmedabad and a passion for innovation, 
-                    he has transformed our 75-year-old family business into India's most sophisticated AI-powered matchmaking platform.
+                    he has transformed our 50-year-old family business into India's most sophisticated AI-powered matchmaking platform.
                   </p>
                   <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-600">
                     <div>
@@ -272,7 +272,7 @@ export default function About() {
         <section className="py-20 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">Our Impact Over 75 Years</h2>
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">Our Impact Over 50 Years</h2>
               <p className="text-xl text-gray-600">Numbers that tell our story of success</p>
             </div>
 
@@ -290,7 +290,7 @@ export default function About() {
               </div>
               
               <div className="text-center">
-                <div className="text-5xl font-bold text-primary-600 mb-2">75,000+</div>
+                <div className="text-5xl font-bold text-primary-600 mb-2">50,000+</div>
                 <div className="text-lg text-gray-900 font-semibold mb-2">Children Born</div>
                 <div className="text-gray-600">Next generation from our matches</div>
               </div>
@@ -309,7 +309,7 @@ export default function About() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-bold text-gray-900 mb-4">Our Heritage in Pictures</h2>
-              <p className="text-xl text-gray-600">Celebrating 75 years of love stories and family traditions</p>
+              <p className="text-xl text-gray-600">Celebrating 50 years of love stories and family traditions</p>
             </div>
             
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

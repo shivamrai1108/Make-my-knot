@@ -19,7 +19,7 @@ const quickReplies: QuickReply[] = [
   {
     id: 'services',
     text: 'What services do you offer?',
-    response: 'We offer AI-powered matchmaking, compatibility assessments, personal matchmaker consultations, relationship counseling webinars, and premium membership plans. Our 75-year legacy ensures the highest quality matches.'
+    response: 'We offer AI-powered matchmaking, compatibility assessments, personal matchmaker consultations, relationship counseling webinars, and premium membership plans. Our 50-year legacy ensures the highest quality matches.'
   },
   {
     id: 'pricing',
@@ -34,7 +34,7 @@ const quickReplies: QuickReply[] = [
   {
     id: 'success',
     text: 'What is your success rate?',
-    response: 'We have an 89% success rate with over 75,000 marriages facilitated since 1950. Our AI-enhanced traditional approach ensures meaningful connections that lead to lasting relationships.'
+    response: 'We have an 89% success rate with over 50,000 marriages facilitated since 1975. Our AI-enhanced traditional approach ensures meaningful connections that lead to lasting relationships.'
   },
   {
     id: 'support',
@@ -161,7 +161,7 @@ export default function KnotCounsellor() {
     }
     
     if (message.includes('service') || message.includes('offer') || message.includes('what do you do')) {
-      return `Excellent question! 🎯 We're not just another dating app - we're your personal matchmaking service with 75 years of expertise. For ${user?.name}, specifically, we offer: AI-powered compatibility matching based on your ${user?.values || 'values'}, personal matchmaker consultations, relationship coaching, and verified profiles. Our success rate is 89% - much higher than traditional apps!`
+      return `Excellent question! 🎯 We're not just another dating app - we're your personal matchmaking service with 50 years of expertise. For ${user?.name}, specifically, we offer: AI-powered compatibility matching based on your ${user?.values || 'values'}, personal matchmaker consultations, relationship coaching, and verified profiles. Our success rate is 89% - much higher than traditional apps!`
     }
     
     if (message.includes('how') && (message.includes('work') || message.includes('process') || message.includes('match'))) {
@@ -169,7 +169,7 @@ export default function KnotCounsellor() {
     }
     
     if (message.includes('success') || message.includes('rate') || message.includes('effective')) {
-      return `Our success rate is exceptional! 📈 89% of our members find meaningful relationships, with over 75,000 marriages since 1950. For someone like you in ${user?.location || 'your area'} with interests in ${user?.interests?.[0] || 'genuine connections'}, our AI-enhanced approach typically finds compatible matches within 4-6 weeks. The key is our combination of traditional matchmaking wisdom and modern AI technology!`
+      return `Our success rate is exceptional! 📈 89% of our members find meaningful relationships, with over 50,000 marriages since 1975. For someone like you in ${user?.location || 'your area'} with interests in ${user?.interests?.[0] || 'genuine connections'}, our AI-enhanced approach typically finds compatible matches within 4-6 weeks. The key is our combination of traditional matchmaking wisdom and modern AI technology!`
     }
     
     if (message.includes('contact') || message.includes('support') || message.includes('help') || message.includes('phone')) {

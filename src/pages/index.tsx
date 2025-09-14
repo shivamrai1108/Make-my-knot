@@ -673,7 +673,7 @@ export default function Home() {
                 viewport={{ once: true }}
                 className="text-xl text-gray-200 mb-8 leading-relaxed max-w-4xl mx-auto"
               >
-                75 years of matchmaking expertise now powered by AI. We understand your values, lifestyle, and what truly matters to you.
+                50 years of matchmaking expertise now powered by AI. We understand your values, lifestyle, and what truly matters to you.
               </motion.p>
               
               <div className="flex flex-col sm:flex-row gap-4 mb-12 justify-center">
