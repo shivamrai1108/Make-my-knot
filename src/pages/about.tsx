@@ -247,28 +247,50 @@ export default function About() {
               <p className="text-xl text-gray-600">Three generations of matchmaking expertise driving innovation while preserving tradition</p>
             </div>
 
-            <div className="grid lg:grid-cols-3 gap-8">
-              {/* Maulik Goyal */}
-              <div className="bg-white rounded-2xl shadow-sm p-6">
-                <div className="text-center mb-6">
-                  <div className="w-32 h-32 bg-gradient-to-br from-primary-100 to-primary-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <div className="text-4xl font-bold text-primary-600">MG</div>
+            {/* Maulik Goyal - Featured */}
+            <div className="bg-white rounded-2xl shadow-lg p-8 mb-12">
+              <div className="flex flex-col lg:flex-row items-center gap-8">
+                <div className="flex-shrink-0">
+                  <div className="w-64 h-64 rounded-2xl overflow-hidden shadow-lg">
+                    <Image
+                      src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=faces&auto=format"
+                      alt="Maulik Goyal - Chief Executive Officer"
+                      width={256}
+                      height={256}
+                      className="w-full h-full object-cover"
+                      priority
+                    />
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-1">Maulik Goyal</h3>
-                  <div className="text-primary-600 font-semibold mb-4">Chief Executive Officer</div>
                 </div>
-                <p className="text-gray-600 leading-relaxed mb-6 text-sm">
-                  As the third-generation leader of the Goyal family legacy, Maulik brings together traditional matchmaking 
-                  wisdom with cutting-edge technology. He has transformed our family business into India's most sophisticated 
-                  AI-powered matchmaking platform.
-                </p>
-                <div className="space-y-2 text-xs text-gray-600">
-                  <div><strong className="text-gray-900">Education:</strong> MBA, IIM Ahmedabad | B.Tech, IIT Delhi</div>
-                  <div><strong className="text-gray-900">Experience:</strong> 10+ years in Technology | 5+ years leading Make My Knot</div>
-                  <div><strong className="text-gray-900">Expertise:</strong> AI Matchmaking, Business Strategy, Technology Innovation</div>
+                <div className="flex-1 text-center lg:text-left">
+                  <h3 className="text-3xl font-bold text-gray-900 mb-2">Maulik Goyal</h3>
+                  <div className="text-xl text-primary-600 font-semibold mb-6">Chief Executive Officer</div>
+                  <p className="text-gray-600 leading-relaxed mb-6 text-lg">
+                    As the third-generation leader of the Goyal family legacy, Maulik brings together traditional matchmaking 
+                    wisdom with cutting-edge technology. Armed with an MBA from IIM Ahmedabad and a passion for innovation, 
+                    he has transformed our 50-year-old family business into India's most sophisticated AI-powered matchmaking platform.
+                  </p>
+                  <div className="grid md:grid-cols-2 gap-6 text-sm text-gray-600">
+                    <div>
+                      <strong className="text-gray-900">Education:</strong><br />
+                      MBA, IIM Ahmedabad<br />
+                      B.Tech, IIT Delhi
+                    </div>
+                    <div>
+                      <strong className="text-gray-900">Experience:</strong><br />
+                      10+ years in Technology<br />
+                      5+ years leading Make My Knot
+                    </div>
+                    <div className="md:col-span-2">
+                      <strong className="text-gray-900">Expertise:</strong> AI Matchmaking, Business Strategy, Technology Innovation, Digital Transformation
+                    </div>
+                  </div>
                 </div>
               </div>
+            </div>
 
+            {/* Chaman Prakash Goyal & Anil Goyal - Side by Side */}
+            <div className="grid lg:grid-cols-2 gap-8">
               {/* Chaman Prakash Goyal */}
               <div className="bg-white rounded-2xl shadow-sm p-6">
                 <div className="text-center mb-6">
