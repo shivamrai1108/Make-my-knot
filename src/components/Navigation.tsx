@@ -53,9 +53,6 @@ export default function Navigation({ variant = 'transparent', className = '' }: 
             <Link href="/webinars" className={`${linkColor} transition-colors duration-200 px-4 py-3 rounded-lg hover:bg-white/20 active:bg-white/30 font-medium cursor-pointer pointer-events-auto`}>
               Webinars
             </Link>
-            <Link href="/pricing" className={`${linkColor} transition-colors duration-200 px-4 py-3 rounded-lg hover:bg-white/20 active:bg-white/30 font-medium cursor-pointer pointer-events-auto`}>
-              Pricing
-            </Link>
             
             {/* Auth buttons */}
             <div className="flex items-center space-x-3 ml-6">
@@ -117,13 +114,6 @@ export default function Navigation({ variant = 'transparent', className = '' }: 
                 onClick={() => setIsMenuOpen(false)}
               >
                 Webinars
-              </Link>
-              <Link 
-                href="/pricing" 
-                className={`${linkColor} transition-all duration-200 px-4 py-4 rounded-lg hover:bg-white/10 active:bg-white/20 font-medium text-base block touch-manipulation`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Pricing
               </Link>
               
               <div className="flex flex-col space-y-3 pt-4 border-t border-white/20 mt-4">
