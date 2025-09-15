@@ -251,12 +251,12 @@ export default function About() {
             <div className="bg-white rounded-2xl shadow-lg p-8 mb-12">
               <div className="flex flex-col lg:flex-row items-center gap-8">
                 <div className="flex-shrink-0">
-                  <div className="w-64 h-64 rounded-2xl overflow-hidden shadow-lg">
+                  <div className="w-80 h-96 rounded-2xl overflow-hidden shadow-lg">
                     <Image
                       src="/images/ceo.JPG"
                       alt="Maulik Goyal - Chief Executive Officer"
-                      width={256}
-                      height={256}
+                      width={320}
+                      height={384}
                       className="w-full h-full object-cover"
                       priority
                     />
