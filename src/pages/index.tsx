@@ -14,59 +14,31 @@ import { useState, useEffect, useRef } from 'react'
 function CoupleSlider() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
-  const [imageErrors, setImageErrors] = useState<{ [key: number]: boolean }>({})
   const autoplayRef = useRef<NodeJS.Timeout | null>(null)
   const touchStartX = useRef<number | null>(null)
   const touchEndX = useRef<number | null>(null)
   
   const couples = [
     {
-      image: '/images/1.jpg', // Web-optimized: 397KB vs 5.8MB PNG
-      fallback: 'https://images.unsplash.com/photo-1606800052052-a08af7148866?w=800&h=600&fit=crop&auto=format',
+      image: '/images/1.jpg', // Web-optimized: 397KB
       names: 'Rajesh & Priya',
       story: 'Found love through shared values in Mumbai, celebrated with a grand Indian wedding in 2023',
       quote: "Make My Knot's AI understood what we were truly looking for. We couldn't be happier!",
       alt: 'Happy couple Rajesh and Priya at their Indian wedding'
     },
     {
-      image: '/images/2.jpg', // Web-optimized: 253KB vs 4.0MB PNG
-      fallback: 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?w=800&h=600&fit=crop&auto=format',
+      image: '/images/2.jpg', // Web-optimized: 253KB
       names: 'Arjun & Kavya',
       story: 'Connected across cities, engaged in a beautiful ceremony with both families in 2024',
       quote: 'The compatibility matching was spot-on. We share the same dreams and aspirations!',
       alt: 'Engaged couple Arjun and Kavya at their engagement ceremony'
     },
     {
-      image: '/images/3.jpg', // Web-optimized: 371KB vs 5.3MB PNG
-      fallback: 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=800&h=600&fit=crop&auto=format',
+      image: '/images/3.jpg', // Web-optimized: 371KB
       names: 'Vikram & Sneha',
       story: 'Long-distance match turned into a beautiful partnership, now settled together in Delhi',
       quote: 'Distance meant nothing when we found our perfect match. Thank you Make My Knot!',
       alt: 'Couple Vikram and Sneha celebrating their partnership'
-    },
-    {
-      image: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=800&h=600&fit=crop&auto=format',
-      fallback: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=800&h=600&fit=crop&auto=format',
-      names: 'Rohit & Ananya',
-      story: 'Both medical professionals who found love through compatibility and understanding',
-      quote: 'We connected instantly over our shared passion for helping others. Perfect match!',
-      alt: 'Medical professionals Rohit and Ananya in traditional attire'
-    },
-    {
-      image: 'https://images.unsplash.com/photo-1591604466107-ec97de577aff?w=800&h=600&fit=crop&auto=format',
-      fallback: 'https://images.unsplash.com/photo-1591604466107-ec97de577aff?w=800&h=600&fit=crop&auto=format',
-      names: 'Karan & Meera',
-      story: 'Traditional values met modern love, celebrated with a spectacular Rajasthani wedding',
-      quote: 'Make My Knot respected our traditions while finding us our soulmate. Incredible!',
-      alt: 'Traditional Rajasthani wedding of Karan and Meera'
-    },
-    {
-      image: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=800&h=600&fit=crop&auto=format',
-      fallback: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=800&h=600&fit=crop&auto=format',
-      names: 'Nikhil & Anjali',
-      story: 'Childhood friends of families, matched through AI and realized they were meant to be',
-      quote: 'Sometimes the perfect match is closer than you think. AI helped us see it!',
-      alt: 'Childhood friends Nikhil and Anjali at their wedding'
     }
   ]
 
@@ -160,19 +132,12 @@ function CoupleSlider() {
                 >
                   <div className="relative h-96">
                     <Image
-                      src={imageErrors[index] ? (couple.fallback || couple.image) : couple.image}
+                      src={couple.image}
                       alt={couple.alt || couple.names}
                       fill
                       className="object-cover"
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       priority={index < 3}
-                      onError={() => {
-                        console.log('Web-optimized image failed to load:', couple.image, 'using fallback:', couple.fallback);
-                        setImageErrors(prev => ({ ...prev, [index]: true }));
-                      }}
-                      onLoad={() => {
-                        console.log('✅ Web-optimized image loaded successfully:', couple.image);
-                      }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
