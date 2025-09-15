@@ -246,18 +246,18 @@ const mockWebinars: Webinar[] = [
 const mockOffers: Offer[] = [
   {
     id: '1',
-    title: 'Valentine\'s Day Special',
-    description: 'Get 50% off on Premium subscription - Limited time offer for new users!',
+    title: 'Launch Offer - 15 Days Free',
+    description: '15 days free membership for first 100 customers - Launch special offer!',
     discountType: 'percentage',
-    discountValue: 50,
-    validFrom: '2024-02-01',
-    validUntil: '2024-02-14',
-    targetUsers: ['trial', 'free'],
+    discountValue: 100,
+    validFrom: '2024-03-01',
+    validUntil: '2024-04-30',
+    targetUsers: ['new', 'trial'],
     isActive: true,
     maxUses: 100,
-    currentUses: 45,
-    createdAt: '2024-01-25T00:00:00Z',
-    updatedAt: '2024-02-01T00:00:00Z'
+    currentUses: 23,
+    createdAt: '2024-03-01T00:00:00Z',
+    updatedAt: '2024-03-01T00:00:00Z'
   },
   {
     id: '2',

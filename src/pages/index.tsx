@@ -639,32 +639,32 @@ export default function Home() {
               {/* Left Content */}
               <div className="text-white">
                 <div className="inline-flex items-center bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium mb-6">
-                  <span className="w-2 h-2 bg-yellow-400 rounded-full mr-2 animate-pulse"></span>
-                  Limited Time Offer
+                  <span className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
+                  Launch Offer
                 </div>
                 
                 <h2 className="text-4xl lg:text-5xl font-bold mb-6 leading-tight">
-                  Find Love This
-                  <span className="block">Wedding Season! 💕</span>
+                  15 Days Free
+                  <span className="block">Membership! 🎉</span>
                 </h2>
                 
                 <p className="text-xl text-white/90 mb-8 leading-relaxed">
-                  Join thousands who found their perfect match during wedding season. 
-                  Get 50% off Premium plans and start your love story today.
+                  Be among the first 100 customers to experience our premium matchmaking service. 
+                  Get 15 days of complete access to find your perfect match!
                 </p>
                 
                 <div className="flex flex-col sm:flex-row gap-4 mb-6">
-                  <Link href="/pricing" className="bg-white text-purple-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-all duration-200 transform hover:scale-105 shadow-lg text-center">
-                    Claim 50% Off Now
+                  <Link href="/signup" className="bg-white text-purple-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-all duration-200 transform hover:scale-105 shadow-lg text-center">
+                    Claim Free 15 Days
                   </Link>
                   <div className="flex items-center text-white/90 text-sm">
                     <Users className="h-5 w-5 mr-2" />
-                    <span>2,847 couples matched this month</span>
+                    <span>Only 100 spots available</span>
                   </div>
                 </div>
                 
                 <div className="text-sm text-white/80">
-                  ⏰ Offer expires in 3 days • No commitment required
+                  🚀 Launch Special • First 100 customers only • No payment required
                 </div>
               </div>
               
