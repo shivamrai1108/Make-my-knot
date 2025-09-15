@@ -1,4 +1,4 @@
-import { QuestionnaireResponse, calculateCompatibilityScore, getQuestionnaireResponses, comprehensiveQuestions } from './questionnaireStore'
+import { QuestionnaireResponse, calculateCompatibilityScore, getQuestionnaireResponses, essentialQuestions } from './questionnaireStore'
 
 export interface MatchCandidate {
   id: string
@@ -165,8 +165,8 @@ function analyzeCategoryCompatibility(
   const categoryScores: Record<string, number> = {}
 
   // Group questions by category
-  const questionsByCategory: Record<string, typeof comprehensiveQuestions> = {}
-  comprehensiveQuestions.forEach(q => {
+  const questionsByCategory: Record<string, typeof essentialQuestions> = {}
+  essentialQuestions.forEach(q => {
     if (!questionsByCategory[q.category]) {
       questionsByCategory[q.category] = []
     }

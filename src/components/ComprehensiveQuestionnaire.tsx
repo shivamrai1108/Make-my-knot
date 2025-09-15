@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { 
-  comprehensiveQuestions, 
+  essentialQuestions, 
   saveQuestionnaireResponse, 
   QuestionnaireResponse,
   getQuestionnaireResponseByUser,
   getQuestionnaireResponseByLead
 } from '@/lib/questionnaireStore'
 import { useUser } from '@/lib/UserContext'
-import { ChevronLeft, ChevronRight, CheckCircle, Heart, Brain } from 'lucide-react'
+import { ChevronLeft, ChevronRight, CheckCircle, Heart, Brain, Sparkles } from 'lucide-react'
 
 interface Props {
   userId?: string
@@ -25,44 +25,56 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
   const [responses, setResponses] = useState<Record<string, any>>({})
   const [showWelcome, setShowWelcome] = useState(showIntro)
   const [isComplete, setIsComplete] = useState(false)
+  const [showCongrats, setShowCongrats] = useState(false)
   const [progress, setProgress] = useState(0)
   const [startTime] = useState(Date.now())
+  const [isTransitioning, setIsTransitioning] = useState(false)
 
   useEffect(() => {
-    // Load existing response if available
-    const existingResponse = userId 
-      ? getQuestionnaireResponseByUser(userId)
-      : leadId 
-        ? getQuestionnaireResponseByLead(leadId)
-        : null
+    // Clear any existing incomplete responses to ensure fresh start
+    // Only load if user explicitly chooses to continue a previous session
+    const shouldLoadExisting = localStorage.getItem('continue_previous_questionnaire') === 'true'
+    
+    if (shouldLoadExisting) {
+      const existingResponse = userId 
+        ? getQuestionnaireResponseByUser(userId)
+        : leadId 
+          ? getQuestionnaireResponseByLead(leadId)
+          : null
 
-    if (existingResponse && !existingResponse.isComplete) {
-      setResponses(existingResponse.responses)
-      // Find the first unanswered question
-      const answeredCount = Object.keys(existingResponse.responses).length
-      setCurrentStep(answeredCount)
+      if (existingResponse && !existingResponse.isComplete) {
+        setResponses(existingResponse.responses)
+        const answeredCount = Object.keys(existingResponse.responses).length
+        setCurrentStep(answeredCount)
+      }
+      // Clear the flag after checking
+      localStorage.removeItem('continue_previous_questionnaire')
     }
   }, [userId, leadId])
 
   useEffect(() => {
-    setProgress((currentStep / comprehensiveQuestions.length) * 100)
+    setProgress((currentStep / essentialQuestions.length) * 100)
   }, [currentStep])
 
-  const currentQuestion = comprehensiveQuestions[currentStep]
+  const currentQuestion = essentialQuestions[currentStep]
 
   const handleAnswer = (questionId: string, answer: any, questionType?: string) => {
     setResponses(prev => ({ ...prev, [questionId]: answer }))
     
-    // Auto-advance for single choice and scale questions
+    // Auto-advance for single choice and scale questions with smooth transition
     if (questionType === 'single_choice' || questionType === 'scale') {
       setTimeout(() => {
-        handleNext()
-      }, 300) // Slightly longer delay for comprehensive questionnaire
+        setIsTransitioning(true)
+        setTimeout(() => {
+          handleNext()
+          setIsTransitioning(false)
+        }, 200)
+      }, 400)
     }
   }
 
   const handleNext = () => {
-    if (currentStep < comprehensiveQuestions.length - 1) {
+    if (currentStep < essentialQuestions.length - 1) {
       setCurrentStep(prev => prev + 1)
     } else {
       handleComplete()
@@ -124,8 +136,11 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
       console.log('Using onComplete callback for assessment flow')
       onComplete(response)
     } else {
-      console.log('No onComplete callback - showing completion screen')
-      setIsComplete(true)
+      console.log('No onComplete callback - showing congratulations screen')
+      setShowCongrats(true)
+      setTimeout(() => {
+        setIsComplete(true)
+      }, 3000) // Show congrats for 3 seconds before final screen
     }
   }
 
@@ -139,7 +154,7 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
     return answer !== undefined && answer !== ''
   }
 
-  const renderQuestionInput = (question: typeof comprehensiveQuestions[0]) => {
+  const renderQuestionInput = (question: typeof essentialQuestions[0]) => {
     const answer = responses[question.id]
 
     switch (question.type) {
@@ -258,11 +273,11 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
           </div>
           
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Comprehensive Pre-Marriage Assessment
+            AI Matchmaking Assessment
           </h1>
           
           <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-            Welcome to our detailed compatibility assessment! We&apos;ll ask you 48 comprehensive questions about your personality, values, lifestyle, health, family background, and marriage expectations.
+            Welcome to our streamlined compatibility assessment! We&apos;ll ask you 15 essential questions about your personality, values, lifestyle, and relationship preferences.
           </p>
           
           <div className="bg-primary-50 rounded-2xl p-6 mb-8">
@@ -270,23 +285,23 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
             <div className="text-left space-y-2 text-primary-800">
               <div className="flex items-center">
                 <CheckCircle className="w-5 h-5 text-primary-600 mr-2" />
-                <span>48 detailed compatibility questions</span>
+                <span>15 carefully selected compatibility questions</span>
               </div>
               <div className="flex items-center">
                 <CheckCircle className="w-5 h-5 text-primary-600 mr-2" />
-                <span>Covers personality, health, family, finances & more</span>
+                <span>Covers core personality, values & lifestyle factors</span>
               </div>
               <div className="flex items-center">
                 <CheckCircle className="w-5 h-5 text-primary-600 mr-2" />
-                <span>Takes about 20-25 minutes</span>
+                <span>Takes only 5-7 minutes to complete</span>
               </div>
               <div className="flex items-center">
                 <CheckCircle className="w-5 h-5 text-primary-600 mr-2" />
-                <span>Essential for accurate AI matchmaking</span>
+                <span>Optimized for accurate AI matchmaking</span>
               </div>
               <div className="flex items-center">
                 <CheckCircle className="w-5 h-5 text-primary-600 mr-2" />
-                <span>Includes health & compatibility factors</span>
+                <span>Smooth, animated question flow</span>
               </div>
               <div className="flex items-center">
                 <CheckCircle className="w-5 h-5 text-primary-600 mr-2" />
@@ -307,6 +322,48 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
     )
   }
 
+  // Animated congratulations screen
+  if (showCongrats) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-primary-50 to-gold-50 flex items-center justify-center p-4">
+        <div className="max-w-2xl w-full bg-white rounded-3xl shadow-2xl p-8 text-center relative overflow-hidden">
+          {/* Animated background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-primary-100/20 to-gold-100/20 animate-pulse"></div>
+          
+          <div className="relative z-10">
+            <div className="flex items-center justify-center mb-6 animate-bounce">
+              <div className="w-20 h-20 bg-gradient-to-br from-primary-500 to-gold-500 rounded-full flex items-center justify-center">
+                <Sparkles className="w-10 h-10 text-white animate-spin" />
+              </div>
+            </div>
+            
+            <h2 className="text-5xl font-bold text-gray-900 mb-4 animate-fade-in">
+              Congratulations! 🎉
+            </h2>
+            
+            <p className="text-2xl text-primary-600 mb-8 font-medium animate-fade-in-delay">
+              Your compatibility profile is now complete!
+            </p>
+            
+            <div className="bg-gradient-to-r from-primary-50 to-gold-50 rounded-2xl p-6 mb-8 animate-slide-up">
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">🤖 AI Matchmaker is now working for you!</h3>
+              <p className="text-gray-700 leading-relaxed">
+                Our advanced AI is analyzing your responses and will notify you when compatible matches are found. 
+                Get ready to meet your perfect match!
+              </p>
+            </div>
+            
+            <div className="flex items-center justify-center space-x-2 text-primary-600 animate-pulse">
+              <div className="w-3 h-3 bg-primary-500 rounded-full animate-bounce"></div>
+              <div className="w-3 h-3 bg-primary-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+              <div className="w-3 h-3 bg-primary-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   if (isComplete) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-primary-50 flex items-center justify-center p-4">
@@ -316,24 +373,23 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
           </div>
           
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Assessment Complete! 🎉
+            Assessment Complete!
           </h2>
           
           <p className="text-xl text-gray-600 mb-8">
-            Thank you for completing our comprehensive questionnaire. Your responses will help our AI find the most compatible matches for you.
+            Thank you for completing our questionnaire. Our AI Matchmaker will now handle finding your perfect match.
           </p>
           
           <div className="bg-primary-50 rounded-2xl p-6 mb-8">
             <h3 className="text-lg font-semibold text-primary-900 mb-2">What happens next?</h3>
             <p className="text-primary-800">
-              Our AI is now analyzing your responses to find potential matches. You&apos;ll receive curated matches based on compatibility across all dimensions we assessed.
+              You&apos;ll be notified when our AI finds compatible matches based on your responses. 
+              The matchmaking process runs continuously in the background.
             </p>
           </div>
           
           <button
             onClick={() => {
-              console.log('Completion screen button clicked - this should not appear for leads!')
-              // This should only be reached for direct questionnaire access, not via assessment flow
               router.push(userId ? '/dashboard' : '/signup')
             }}
             className="btn-primary text-lg px-8 py-4"
@@ -357,7 +413,7 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
         <div className="mb-8">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-gray-600">
-              Question {currentStep + 1} of {comprehensiveQuestions.length}
+              Question {currentStep + 1} of {essentialQuestions.length}
             </span>
             <span className="text-sm font-medium text-gray-600">
               {Math.round(progress)}% Complete
@@ -365,13 +421,13 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
           </div>
           <div className="w-full bg-gray-200 rounded-full h-3">
             <div 
-              className="bg-gradient-to-r from-primary-600 to-gold-500 h-3 rounded-full transition-all duration-500"
+              className="bg-gradient-to-r from-primary-600 to-gold-500 h-3 rounded-full transition-all duration-700 ease-out"
               style={{ width: `${progress}%` }}
             />
           </div>
         </div>
 
-        <div className="bg-white rounded-3xl shadow-2xl p-8">
+        <div className={`bg-white rounded-3xl shadow-2xl p-8 transition-all duration-500 ${isTransitioning ? 'opacity-50 transform scale-95' : 'opacity-100 transform scale-100'}`}>
           {/* Question Category */}
           <div className="mb-4">
             <span className="inline-block px-3 py-1 bg-primary-100 text-primary-800 text-sm font-semibold rounded-full">
@@ -402,7 +458,7 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
 
             <div className="text-center">
               <div className="text-sm text-gray-500">
-                {Object.keys(responses).length} of {comprehensiveQuestions.length} answered
+                {Object.keys(responses).length} of {essentialQuestions.length} answered
               </div>
             </div>
 
@@ -413,7 +469,7 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
                 disabled={!canProceed()}
                 className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {currentStep === comprehensiveQuestions.length - 1 ? 'Complete' : 'Next'}
+                {currentStep === essentialQuestions.length - 1 ? 'Complete' : 'Next'}
                 <ChevronRight className="w-5 h-5 ml-2" />
               </button>
             ) : (

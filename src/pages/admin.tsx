@@ -6,7 +6,7 @@ import {
 } from 'lucide-react'
 import { useOnlineStatus } from '@/lib/OnlineStatusContext'
 import { OnlineUsersList, OnlineStatusBadge, OnlineStatusIndicator } from '@/components/OnlineStatusIndicator'
-import { getQuestionnaireResponses, comprehensiveQuestions, calculateCompatibilityScore, QuestionnaireResponse } from '@/lib/questionnaireStore'
+import { getQuestionnaireResponses, essentialQuestions, calculateCompatibilityScore, QuestionnaireResponse } from '@/lib/questionnaireStore'
 import jsPDF from 'jspdf'
 import * as XLSX from 'xlsx'
 
@@ -655,8 +655,8 @@ function AssessmentsTab() {
         { Field: 'Completed At', Value: assessment.completedAt ? new Date(assessment.completedAt).toLocaleString() : '' },
       ]
 
-      // Build detailed responses (only include questions that exist in comprehensiveQuestions to keep ordering)
-      const responseRows = comprehensiveQuestions.map((q, idx) => {
+      // Build detailed responses (only include questions that exist in essentialQuestions to keep ordering)
+      const responseRows = essentialQuestions.map((q, idx) => {
         const ans = assessment.responses[q.id]
         const normalized = Array.isArray(ans) ? ans.join(', ') : (ans ?? '')
         return {
@@ -841,7 +841,7 @@ function AssessmentsTab() {
       addText('ASSESSMENT STATUS & PROGRESS', margin, currentY, { fontSize: 18, fontStyle: 'bold', color: colors.primary })
       currentY += 30
       
-      const totalQuestions = comprehensiveQuestions.length
+      const totalQuestions = essentialQuestions.length
       const answeredQuestions = Object.keys(assessment.responses).length
       const completionRate = ((answeredQuestions / totalQuestions) * 100).toFixed(1)
       
@@ -928,7 +928,7 @@ function AssessmentsTab() {
       
       // Group responses by category with enhanced presentation
       const categorizedResponses: Record<string, any[]> = {}
-      comprehensiveQuestions.forEach(question => {
+      essentialQuestions.forEach(question => {
         if (!categorizedResponses[question.category]) {
           categorizedResponses[question.category] = []
         }
@@ -1036,7 +1036,7 @@ function AssessmentsTab() {
 
   const getFormattedResponses = (responses: Record<string, any>) => {
     const categories: Record<string, any[]> = {}
-    comprehensiveQuestions.forEach(question => {
+    essentialQuestions.forEach(question => {
       if (!categories[question.category]) {
         categories[question.category] = []
       }
@@ -1235,12 +1235,12 @@ function AssessmentsTab() {
                       <div 
                         className="bg-primary-600 h-2 rounded-full" 
                         style={{ 
-                          width: `${(Object.keys(assessment.responses).length / comprehensiveQuestions.length) * 100}%` 
+                          width: `${(Object.keys(assessment.responses).length / essentialQuestions.length) * 100}%` 
                         }}
                       />
                     </div>
                     <div className="text-xs text-gray-500 mt-1">
-                      {Object.keys(assessment.responses).length}/{comprehensiveQuestions.length} questions
+                      {Object.keys(assessment.responses).length}/{essentialQuestions.length} questions
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -1362,7 +1362,7 @@ function AssessmentsTab() {
                   <div>
                     <span className="text-primary-700">Progress:</span>
                     <div className="font-medium text-primary-900">
-                      {Object.keys(selectedAssessment.responses).length}/{comprehensiveQuestions.length} questions
+                      {Object.keys(selectedAssessment.responses).length}/{essentialQuestions.length} questions
                     </div>
                   </div>
                   <div>
@@ -2181,7 +2181,7 @@ function CRMLeadsTab() {
                               {lead.questionnaireComplete ? '✓ Complete' : '○ In Progress'}
                             </div>
                             <div className="text-xs text-gray-500">
-                              {Object.keys(lead.questionnaire.responses).length}/{comprehensiveQuestions.length} answered
+                              {Object.keys(lead.questionnaire.responses).length}/{essentialQuestions.length} answered
                             </div>
                             {lead.questionnaire.completedAt && (
                               <div className="text-xs text-gray-500">
@@ -2347,7 +2347,7 @@ function CRMLeadsTab() {
                     <div>
                       <span className="text-primary-700">Progress:</span>
                       <div className="font-medium text-primary-900">
-                        {Object.keys(selectedLead.questionnaire.responses).length}/{comprehensiveQuestions.length} questions
+                        {Object.keys(selectedLead.questionnaire.responses).length}/{essentialQuestions.length} questions
                       </div>
                     </div>
                     <div>
@@ -2774,7 +2774,7 @@ function QuestionnairesTab() {
         { Field: 'Completed At', Value: q.completedAt ? new Date(q.completedAt).toLocaleString() : '' },
       ]
 
-      const responseRows = comprehensiveQuestions.map((question, idx) => {
+      const responseRows = essentialQuestions.map((question, idx) => {
         const ans = q.responses[question.id]
         const normalized = Array.isArray(ans) ? ans.join(', ') : (ans ?? '')
         return {
@@ -2824,7 +2824,7 @@ function QuestionnairesTab() {
 
   const getResponsesByCategory = (responses: Record<string, any>) => {
     const categories: Record<string, any[]> = {}
-    comprehensiveQuestions.forEach(question => {
+    essentialQuestions.forEach(question => {
       if (!categories[question.category]) {
         categories[question.category] = []
       }
@@ -3164,7 +3164,7 @@ function QuestionnairesTab() {
                   <div>
                     <span className="text-gray-500">Progress:</span>
                     <div className="font-medium text-gray-900">
-                      {Object.keys(selectedQuestionnaire.responses).length}/{comprehensiveQuestions.length}
+                      {Object.keys(selectedQuestionnaire.responses).length}/{essentialQuestions.length}
                     </div>
                   </div>
                 </div>
