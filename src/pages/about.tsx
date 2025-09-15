@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Heart, Clock, Users, Award, ArrowRight, CheckCircle } from 'lucide-react'
 import Footer from '@/components/Footer'
+import BrandLogo from '@/components/BrandLogo'
 
 export default function About() {
   return (
@@ -16,12 +17,12 @@ export default function About() {
 
       <main className="min-h-screen bg-white">
         {/* Navigation */}
-        <nav className="bg-white shadow-sm">
+        <nav className="bg-white/90 backdrop-blur-md border-b border-gray-200/50 shadow-sm sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center py-6">
               <Link href="/" className="flex items-center">
-                <Heart className="h-8 w-8 text-primary-600" />
-                <span className="ml-2 text-2xl font-bold text-gray-900">Make My Knot</span>
+                <BrandLogo size="sm" className="mr-2" />
+                <span className="text-2xl font-bold text-gray-900">Make My Knot</span>
               </Link>
               <div className="hidden md:flex items-center space-x-8">
                 <Link href="/#how-it-works" className="text-gray-700 hover:text-primary-600 transition-colors">How It Works</Link>

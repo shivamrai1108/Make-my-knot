@@ -5,6 +5,7 @@ import { Heart, Filter, Search, MapPin, Users, MessageCircle, Star, Sparkles, Ta
 import EnhancedMatchCard from '@/components/EnhancedMatchCard'
 import { getMatchRecommendations, MatchResult } from '@/lib/aiMatching'
 import { useUser } from '@/lib/UserContext'
+import BrandLogo from '@/components/BrandLogo'
 
 // Enhanced AI-powered matching system
 function useAIMatches(userId?: string) {
@@ -122,12 +123,12 @@ export default function Matches() {
           </div>
         )}
         {/* Header */}
-        <header className="bg-white shadow-sm">
+        <header className="bg-white/90 backdrop-blur-md border-b border-gray-200/50 shadow-sm sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center py-6">
               <div className="flex items-center">
-                <Heart className="h-8 w-8 text-primary-600" />
-                <span className="ml-2 text-2xl font-bold text-gray-900">Make My Knot</span>
+                <BrandLogo size="sm" className="mr-2" />
+                <span className="text-2xl font-bold text-gray-900">Make My Knot</span>
               </div>
               <nav className="hidden md:flex items-center space-x-8">
                 <Link href="/matches" className="text-primary-600 font-semibold">Matches</Link>

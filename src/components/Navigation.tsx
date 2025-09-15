@@ -17,7 +17,7 @@ export default function Navigation({ variant = 'transparent', className = '' }: 
     ? 'fixed w-full z-[100] top-0' 
     : variant === 'dark'
     ? 'bg-gray-900 border-b border-gray-800 relative z-[100]'
-    : 'bg-white shadow-sm border-b border-gray-100 relative z-[100]'
+    : 'bg-white/90 backdrop-blur-md border-b border-gray-200/50 shadow-sm sticky top-0 z-[100]'
 
   const textColor = variant === 'dark' ? 'text-white' : variant === 'transparent' ? 'text-white' : 'text-gray-900'
   const linkColor = variant === 'dark' 
