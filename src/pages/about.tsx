@@ -27,8 +27,6 @@ export default function About() {
               <div className="hidden md:flex items-center space-x-8">
                 <Link href="/#how-it-works" className="text-gray-700 hover:text-primary-600 transition-colors">How It Works</Link>
                 <Link href="/webinars" className="text-gray-700 hover:text-primary-600 transition-colors">Webinars</Link>
-                <Link href="/login" className="btn-secondary text-sm">Sign In</Link>
-                <Link href="/signup" className="btn-primary text-sm">Get Started</Link>
               </div>
             </div>
           </div>
