@@ -172,7 +172,6 @@ export default function AssessmentPage() {
     <ComprehensiveQuestionnaire
       userId={userId as string}
       leadId={leadId as string}
-      onComplete={handleQuestionnaireComplete}
       showIntro={true}
       source={source as string || (leadId ? 'lead_assessment' : 'user_assessment')}
     />

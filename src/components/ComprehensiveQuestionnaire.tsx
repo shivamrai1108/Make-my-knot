@@ -31,25 +31,10 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
   const [isTransitioning, setIsTransitioning] = useState(false)
 
   useEffect(() => {
-    // Clear any existing incomplete responses to ensure fresh start
-    // Only load if user explicitly chooses to continue a previous session
-    const shouldLoadExisting = localStorage.getItem('continue_previous_questionnaire') === 'true'
-    
-    if (shouldLoadExisting) {
-      const existingResponse = userId 
-        ? getQuestionnaireResponseByUser(userId)
-        : leadId 
-          ? getQuestionnaireResponseByLead(leadId)
-          : null
-
-      if (existingResponse && !existingResponse.isComplete) {
-        setResponses(existingResponse.responses)
-        const answeredCount = Object.keys(existingResponse.responses).length
-        setCurrentStep(answeredCount)
-      }
-      // Clear the flag after checking
-      localStorage.removeItem('continue_previous_questionnaire')
-    }
+    // Always start fresh - no automatic loading of previous incomplete responses
+    // Users who want to continue can be handled through a separate "Continue Previous" button
+    // This ensures users get a clean experience every time they start the questionnaire
+    console.log('Questionnaire initialized - starting fresh')
   }, [userId, leadId])
 
   useEffect(() => {
@@ -152,6 +137,65 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
       return answer && answer.length > 0
     }
     return answer !== undefined && answer !== ''
+  }
+
+  const handleFinalRedirect = () => {
+    // Handle the final redirect based on the context
+    const sessionLeadId = typeof window !== 'undefined' ? sessionStorage.getItem('leadId') : null
+    const effectiveLeadId = leadId || sessionLeadId
+    
+    // Check if this is a lead flow
+    if ((source === 'lead' || source === 'lead_assessment' || sessionLeadId) && effectiveLeadId) {
+      console.log('Processing lead flow with leadId:', effectiveLeadId)
+      // For leads, get the lead data and redirect to signup with pre-filled info
+      try {
+        const leads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
+        const lead = leads.find((l: any) => l.id === effectiveLeadId)
+        
+        if (lead) {
+          // Store lead data for signup
+          const leadSignupData = {
+            name: lead.name,
+            email: lead.email,
+            phone: lead.phone,
+            leadId: effectiveLeadId,
+            assessmentCompleted: true,
+            timestamp: Date.now()
+          }
+          
+          localStorage.setItem('lead_signup_data', JSON.stringify(leadSignupData))
+          if (typeof window !== 'undefined') {
+            sessionStorage.setItem('leadId', effectiveLeadId)
+            sessionStorage.setItem(`assessment_completed_${effectiveLeadId}`, 'true')
+            window.location.href = '/lead-signup'
+          }
+        } else {
+          router.push('/signup?fromAssessment=true')
+        }
+      } catch (error) {
+        console.error('Error retrieving lead data:', error)
+        router.push('/signup?fromAssessment=true')
+      }
+    } else if (userId) {
+      // For existing users, redirect to dashboard
+      router.push('/dashboard')
+    } else {
+      // Default fallback to signup
+      router.push('/signup')
+    }
+  }
+
+  const getNextStepButtonText = () => {
+    const sessionLeadId = typeof window !== 'undefined' ? sessionStorage.getItem('leadId') : null
+    const effectiveLeadId = leadId || sessionLeadId
+    
+    if ((source === 'lead' || source === 'lead_assessment' || sessionLeadId) && effectiveLeadId) {
+      return 'Complete Setup & Find Matches'
+    } else if (userId) {
+      return 'Go to Dashboard'
+    } else {
+      return 'Create Your Account'
+    }
   }
 
   const renderQuestionInput = (question: typeof essentialQuestions[0]) => {
@@ -390,11 +434,11 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
           
           <button
             onClick={() => {
-              router.push(userId ? '/dashboard' : '/signup')
+              handleFinalRedirect()
             }}
             className="btn-primary text-lg px-8 py-4"
           >
-            {userId ? 'Go to Dashboard' : 'Create Your Account'}
+            {getNextStepButtonText()}
             <ChevronRight className="w-5 h-5 ml-2" />
           </button>
         </div>
