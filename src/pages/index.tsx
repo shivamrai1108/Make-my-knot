@@ -385,13 +385,23 @@ export default function Home() {
           <link rel="icon" href="/favicon.ico" />
         </Head>
         
-        <div className="min-h-screen bg-gradient-to-br from-primary-600 via-purple-700 to-pink-600 flex items-center justify-center relative overflow-hidden">
-          {/* Animated Background Elements */}
+        <div className="min-h-screen bg-gradient-to-br from-red-900 via-red-800 to-purple-900 flex items-center justify-center relative overflow-hidden">
+          {/* Animated Wine Color Background */}
           <div className="absolute inset-0">
-            <div className="absolute top-20 left-20 w-40 h-40 bg-white/10 rounded-full blur-2xl animate-pulse"></div>
-            <div className="absolute bottom-32 right-16 w-64 h-64 bg-gold-400/20 rounded-full blur-3xl animate-bounce" style={{animationDuration: '3s'}}></div>
-            <div className="absolute top-1/3 right-1/3 w-32 h-32 bg-pink-300/15 rounded-full blur-xl animate-ping" style={{animationDelay: '1s'}}></div>
-            <div className="absolute bottom-1/4 left-1/4 w-48 h-48 bg-purple-300/10 rounded-full blur-2xl animate-pulse" style={{animationDelay: '0.5s'}}></div>
+            {/* Base animated gradient layers */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-red-800/80 via-red-700/60 to-red-900/90 animate-pulse" style={{animationDuration: '4s'}}></div>
+            <div className="absolute inset-0 bg-gradient-to-bl from-purple-800/70 via-red-600/50 to-red-800/80 animate-pulse" style={{animationDuration: '6s', animationDelay: '1s'}}></div>
+            
+            {/* Wine color animated elements */}
+            <div className="absolute top-20 left-20 w-40 h-40 bg-red-300/20 rounded-full blur-2xl animate-pulse" style={{animationDuration: '5s'}}></div>
+            <div className="absolute bottom-32 right-16 w-64 h-64 bg-red-400/15 rounded-full blur-3xl animate-bounce" style={{animationDuration: '4s'}}></div>
+            <div className="absolute top-1/3 right-1/3 w-32 h-32 bg-purple-300/20 rounded-full blur-xl animate-ping" style={{animationDelay: '1.5s', animationDuration: '3s'}}></div>
+            <div className="absolute bottom-1/4 left-1/4 w-48 h-48 bg-red-500/15 rounded-full blur-2xl animate-pulse" style={{animationDelay: '2s', animationDuration: '4s'}}></div>
+            <div className="absolute top-1/2 left-1/2 w-36 h-36 bg-red-600/10 rounded-full blur-xl animate-bounce" style={{animationDelay: '0.8s', animationDuration: '5s'}}></div>
+            
+            {/* Additional wine-themed floating elements */}
+            <div className="absolute top-1/4 right-1/4 w-24 h-24 bg-purple-400/15 rounded-full blur-lg animate-pulse" style={{animationDelay: '3s', animationDuration: '3.5s'}}></div>
+            <div className="absolute bottom-1/3 right-1/3 w-20 h-20 bg-red-300/25 rounded-full blur-md animate-ping" style={{animationDelay: '2.5s', animationDuration: '4s'}}></div>
           </div>
           
           <div className="relative z-10 text-center">
@@ -432,7 +442,7 @@ export default function Home() {
                 transition={{ duration: 0.6, delay: 1.2 }}
                 className="text-xl text-white/90 font-medium italic"
               >
-                Where Hearts Meet Forever
+                From Handshake to Pheras
               </motion.p>
             </motion.div>
             
@@ -466,9 +476,11 @@ export default function Home() {
               )}
             </motion.div>
             
-            {/* Floating Elements */}
-            <div className="absolute -top-10 -left-10 w-20 h-20 border border-white/20 rounded-full animate-spin" style={{animationDuration: '8s'}}></div>
-            <div className="absolute -bottom-10 -right-10 w-16 h-16 border-2 border-gold-300/30 rounded-full animate-ping"></div>
+            {/* Wine-themed Floating Elements */}
+            <div className="absolute -top-10 -left-10 w-20 h-20 border border-red-200/30 rounded-full animate-spin" style={{animationDuration: '8s'}}></div>
+            <div className="absolute -bottom-10 -right-10 w-16 h-16 border-2 border-red-300/40 rounded-full animate-ping"></div>
+            <div className="absolute top-2/3 left-10 w-12 h-12 border border-purple-200/25 rounded-full animate-pulse" style={{animationDuration: '6s', animationDelay: '1s'}}></div>
+            <div className="absolute bottom-1/3 right-20 w-8 h-8 border-2 border-red-400/35 rounded-full animate-bounce" style={{animationDuration: '3s', animationDelay: '2s'}}></div>
           </div>
         </div>
       </>
