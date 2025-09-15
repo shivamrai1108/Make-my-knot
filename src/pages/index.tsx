@@ -488,7 +488,7 @@ export default function Home() {
         <Navigation variant="wine-glass" />
 
         {/* Hero Section - Questionnaire with Couple Slider Background */}
-        <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16 md:pt-0">
           {/* Background Couple Slider */}
           <div className="absolute inset-0 w-full h-full overflow-hidden">
             <div className="relative w-full h-full">

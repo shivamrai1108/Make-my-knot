@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import BrandLogo from '@/components/BrandLogo'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Menu, X } from 'lucide-react'
 
 interface NavigationProps {
@@ -11,15 +11,38 @@ interface NavigationProps {
 
 export default function Navigation({ variant = 'transparent', className = '' }: NavigationProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isScrollingUp, setIsScrollingUp] = useState(true)
+  const [lastScrollY, setLastScrollY] = useState(0)
   const router = useRouter()
 
+  // Mobile scroll detection for auto-hide navigation
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY
+      
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // Scrolling down
+        setIsScrollingUp(false)
+        setIsMenuOpen(false) // Close mobile menu when scrolling down
+      } else {
+        // Scrolling up
+        setIsScrollingUp(true)
+      }
+      
+      setLastScrollY(currentScrollY)
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [lastScrollY])
+
   const baseClasses = variant === 'transparent' 
-    ? 'fixed w-full z-[100] top-0' 
+    ? `fixed w-full z-[100] top-0 transition-transform duration-300 ${isScrollingUp ? 'translate-y-0' : '-translate-y-full md:translate-y-0'}` 
     : variant === 'wine-glass'
-    ? 'fixed w-full z-[100] top-0 bg-gradient-to-r from-red-900/30 via-red-800/25 to-purple-900/30 backdrop-blur-md border-b border-red-200/20 shadow-lg'
+    ? `fixed w-full z-[100] top-0 bg-gradient-to-r from-red-900/30 via-red-800/25 to-purple-900/30 backdrop-blur-md border-b border-red-200/20 shadow-lg transition-transform duration-300 ${isScrollingUp ? 'translate-y-0' : '-translate-y-full md:translate-y-0'}`
     : variant === 'dark'
     ? 'bg-gray-900 border-b border-gray-800 relative z-[100]'
-    : 'bg-white/90 backdrop-blur-md border-b border-gray-200/50 shadow-sm sticky top-0 z-[100]'
+    : `bg-white/90 backdrop-blur-md border-b border-gray-200/50 shadow-sm sticky top-0 z-[100] transition-transform duration-300 ${isScrollingUp ? 'translate-y-0' : '-translate-y-full md:translate-y-0'}`
 
   const textColor = variant === 'dark' ? 'text-white' : variant === 'transparent' ? 'text-white' : variant === 'wine-glass' ? 'text-white' : 'text-gray-900'
   const linkColor = variant === 'dark' 
