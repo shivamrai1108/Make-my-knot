@@ -14,6 +14,7 @@ import { useState, useEffect, useRef } from 'react'
 function CoupleSlider() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
+  const [imageErrors, setImageErrors] = useState<{ [key: number]: boolean }>({})
   const autoplayRef = useRef<NodeJS.Timeout | null>(null)
   const touchStartX = useRef<number | null>(null)
   const touchEndX = useRef<number | null>(null)
@@ -21,6 +22,7 @@ function CoupleSlider() {
   const couples = [
     {
       image: '/images/1.png',
+      fallback: 'https://images.unsplash.com/photo-1606800052052-a08af7148866?w=800&h=600&fit=crop&auto=format',
       names: 'Rajesh & Priya',
       story: 'Found love through shared values in Mumbai, celebrated with a grand Indian wedding in 2023',
       quote: "Make My Knot's AI understood what we were truly looking for. We couldn't be happier!",
@@ -28,6 +30,7 @@ function CoupleSlider() {
     },
     {
       image: '/images/2.png',
+      fallback: 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?w=800&h=600&fit=crop&auto=format',
       names: 'Arjun & Kavya',
       story: 'Connected across cities, engaged in a beautiful ceremony with both families in 2024',
       quote: 'The compatibility matching was spot-on. We share the same dreams and aspirations!',
@@ -35,6 +38,7 @@ function CoupleSlider() {
     },
     {
       image: '/images/3.png',
+      fallback: 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=800&h=600&fit=crop&auto=format',
       names: 'Vikram & Sneha',
       story: 'Long-distance match turned into a beautiful partnership, now settled together in Delhi',
       quote: 'Distance meant nothing when we found our perfect match. Thank you Make My Knot!',
@@ -42,6 +46,7 @@ function CoupleSlider() {
     },
     {
       image: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=800&h=600&fit=crop&auto=format',
+      fallback: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=800&h=600&fit=crop&auto=format',
       names: 'Rohit & Ananya',
       story: 'Both medical professionals who found love through compatibility and understanding',
       quote: 'We connected instantly over our shared passion for helping others. Perfect match!',
@@ -49,6 +54,7 @@ function CoupleSlider() {
     },
     {
       image: 'https://images.unsplash.com/photo-1591604466107-ec97de577aff?w=800&h=600&fit=crop&auto=format',
+      fallback: 'https://images.unsplash.com/photo-1591604466107-ec97de577aff?w=800&h=600&fit=crop&auto=format',
       names: 'Karan & Meera',
       story: 'Traditional values met modern love, celebrated with a spectacular Rajasthani wedding',
       quote: 'Make My Knot respected our traditions while finding us our soulmate. Incredible!',
@@ -56,6 +62,7 @@ function CoupleSlider() {
     },
     {
       image: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=800&h=600&fit=crop&auto=format',
+      fallback: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=800&h=600&fit=crop&auto=format',
       names: 'Nikhil & Anjali',
       story: 'Childhood friends of families, matched through AI and realized they were meant to be',
       quote: 'Sometimes the perfect match is closer than you think. AI helped us see it!',
@@ -153,10 +160,16 @@ function CoupleSlider() {
                 >
                   <div className="relative h-96">
                     <Image
-                      src={couple.image}
-                      alt={couple.names}
+                      src={imageErrors[index] ? (couple.fallback || couple.image) : couple.image}
+                      alt={couple.alt || couple.names}
                       fill
                       className="object-cover"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      priority={index < 3}
+                      onError={() => {
+                        console.log('Image failed to load:', couple.image, 'using fallback:', couple.fallback);
+                        setImageErrors(prev => ({ ...prev, [index]: true }));
+                      }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
@@ -1101,63 +1114,72 @@ export default function Home() {
               </h2>
             </div>
 
-            {/* Grid Layout */}
-            <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
-              {/* Row 1 */}
-              <div className="space-y-8">
-                {/* Verified Profiles */}
-                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">Verified Profiles</h3>
-                  <p className="text-gray-700 leading-relaxed">
-                    Every profile goes through AI-powered verification so you can feel confident that the people you meet are genuine, safe, and serious about finding meaningful connections.
-                  </p>
+            {/* Perfect Grid Layout - All cards equal height */}
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Verified Profiles */}
+              <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50 flex flex-col h-full">
+                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl mb-6 flex items-center justify-center">
+                  <CheckCircle className="h-6 w-6 text-white" />
                 </div>
-
-                {/* Meaningful Likes */}
-                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">Meaningful Likes</h3>
-                  <p className="text-gray-700 leading-relaxed">
-                    Likes on Make My Knot aren't random swipes—they're thoughtful. You can send voice notes, reactions, or thoughtful comments, so every like feels personal and genuine.
-                  </p>
-                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">Verified Profiles</h3>
+                <p className="text-gray-700 leading-relaxed flex-grow">
+                  Every profile goes through AI-powered verification so you can feel confident that the people you meet are genuine, safe, and serious about finding meaningful connections.
+                </p>
               </div>
 
-              {/* Row 2 */}
-              <div className="space-y-8">
-                {/* AI Compatibility Scores */}
-                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">AI Compatibility Scores</h3>
-                  <p className="text-gray-700 leading-relaxed">
-                    Our unique AI engine calculates compatibility not just between two people, but also considers family expectations, lifestyle choices, and values—making every match more real and lasting.
-                  </p>
+              {/* Meaningful Likes */}
+              <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50 flex flex-col h-full">
+                <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-rose-600 rounded-xl mb-6 flex items-center justify-center">
+                  <Heart className="h-6 w-6 text-white" />
                 </div>
-
-                {/* Transparent Intentions */}
-                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">Transparent Intentions</h3>
-                  <p className="text-gray-700 leading-relaxed">
-                    No guessing games. Profiles highlight key details like education, family background, and even optional income visibility—so you know exactly who you're connecting with.
-                  </p>
-                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">Meaningful Likes</h3>
+                <p className="text-gray-700 leading-relaxed flex-grow">
+                  Likes on Make My Knot aren't random swipes—they're thoughtful. You can send voice notes, reactions, or thoughtful comments, so every like feels personal and genuine.
+                </p>
               </div>
 
-              {/* Row 3 */}
-              <div className="space-y-8">
-                {/* Personalized Conversation Starters */}
-                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">Personalized Conversation Starters</h3>
-                  <p className="text-gray-700 leading-relaxed">
-                    We don't leave you hanging. From icebreaker games to AI-generated conversation prompts, we make sure you never run out of things to say and can connect more naturally.
-                  </p>
+              {/* AI Compatibility Scores */}
+              <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50 flex flex-col h-full">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl mb-6 flex items-center justify-center">
+                  <Star className="h-6 w-6 text-white" />
                 </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">AI Compatibility Scores</h3>
+                <p className="text-gray-700 leading-relaxed flex-grow">
+                  Our unique AI engine calculates compatibility not just between two people, but also considers family expectations, lifestyle choices, and values—making every match more real and lasting.
+                </p>
+              </div>
 
-                {/* Knot Specials */}
-                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">Knot Specials</h3>
-                  <p className="text-gray-700 leading-relaxed">
-                    Go beyond just chatting. Access premium experiences like numerology insights, curated private events, and AI-powered relationship counseling through our Knot Counselor.
-                  </p>
+              {/* Transparent Intentions */}
+              <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50 flex flex-col h-full">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-violet-600 rounded-xl mb-6 flex items-center justify-center">
+                  <Users className="h-6 w-6 text-white" />
                 </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">Transparent Intentions</h3>
+                <p className="text-gray-700 leading-relaxed flex-grow">
+                  No guessing games. Profiles highlight key details like education, family background, and even optional income visibility—so you know exactly who you're connecting with.
+                </p>
+              </div>
+
+              {/* Personalized Conversation Starters */}
+              <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50 flex flex-col h-full">
+                <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl mb-6 flex items-center justify-center">
+                  <MessageCircle className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">Personalized Conversation Starters</h3>
+                <p className="text-gray-700 leading-relaxed flex-grow">
+                  We don't leave you hanging. From icebreaker games to AI-generated conversation prompts, we make sure you never run out of things to say and can connect more naturally.
+                </p>
+              </div>
+
+              {/* Knot Specials */}
+              <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50 flex flex-col h-full">
+                <div className="w-12 h-12 bg-gradient-to-br from-gold-500 to-yellow-600 rounded-xl mb-6 flex items-center justify-center">
+                  <ArrowRight className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">Knot Specials</h3>
+                <p className="text-gray-700 leading-relaxed flex-grow">
+                  Go beyond just chatting. Access premium experiences like numerology insights, curated private events, and AI-powered relationship counseling through our Knot Counselor.
+                </p>
               </div>
             </div>
           </div>
