@@ -485,7 +485,7 @@ export default function Home() {
 
       <main className="min-h-screen bg-white">
         {/* Navigation */}
-        <Navigation variant="transparent" />
+        <Navigation variant="wine-glass" />
 
         {/* Hero Section - Questionnaire with Couple Slider Background */}
         <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
