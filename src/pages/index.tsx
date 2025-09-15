@@ -294,6 +294,8 @@ function TestimonialsSection() {
 
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0)
+  const [showSplash, setShowSplash] = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
   
   const couples = [
     {
@@ -340,6 +342,22 @@ export default function Home() {
     }
   ]
 
+  // Splash screen effect
+  useEffect(() => {
+    const loadTimer = setTimeout(() => {
+      setIsLoading(false)
+    }, 2500)
+    
+    const splashTimer = setTimeout(() => {
+      setShowSplash(false)
+    }, 3500)
+    
+    return () => {
+      clearTimeout(loadTimer)
+      clearTimeout(splashTimer)
+    }
+  }, [])
+
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % couples.length)
@@ -353,6 +371,100 @@ export default function Home() {
 
   const prevSlide = () => {
     setCurrentSlide((prev) => (prev - 1 + couples.length) % couples.length)
+  }
+
+  // Splash Screen Component
+  if (showSplash) {
+    return (
+      <>
+        <Head>
+          <title>Make My Knot - AI-Powered Wedding Matchmaking</title>
+          <meta name="description" content="Find your perfect life partner with our AI-powered matchmaking platform. Quality matches, compatibility-based pairing, and personalized service." />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="icon" href="/favicon.ico" />
+        </Head>
+        
+        <div className="min-h-screen bg-gradient-to-br from-primary-600 via-purple-700 to-pink-600 flex items-center justify-center relative overflow-hidden">
+          {/* Animated Background Elements */}
+          <div className="absolute inset-0">
+            <div className="absolute top-20 left-20 w-40 h-40 bg-white/10 rounded-full blur-2xl animate-pulse"></div>
+            <div className="absolute bottom-32 right-16 w-64 h-64 bg-gold-400/20 rounded-full blur-3xl animate-bounce" style={{animationDuration: '3s'}}></div>
+            <div className="absolute top-1/3 right-1/3 w-32 h-32 bg-pink-300/15 rounded-full blur-xl animate-ping" style={{animationDelay: '1s'}}></div>
+            <div className="absolute bottom-1/4 left-1/4 w-48 h-48 bg-purple-300/10 rounded-full blur-2xl animate-pulse" style={{animationDelay: '0.5s'}}></div>
+          </div>
+          
+          <div className="relative z-10 text-center">
+            {/* Logo Animation */}
+            <motion.div
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ duration: 1, delay: 0.2, type: "spring", stiffness: 200 }}
+              className="mb-8"
+            >
+              <div className="w-24 h-24 bg-white rounded-2xl mx-auto flex items-center justify-center shadow-2xl transform rotate-12 hover:rotate-0 transition-all duration-500">
+                <Heart className="w-12 h-12 text-primary-600 animate-pulse" />
+              </div>
+            </motion.div>
+            
+            {/* Brand Name */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.8 }}
+              className="mb-6"
+            >
+              <h1 className="text-5xl md:text-6xl font-bold text-white mb-2 text-shadow-lg">
+                <span className="bg-gradient-to-r from-gold-300 to-gold-100 bg-clip-text text-transparent">
+                  Make My Knot
+                </span>
+              </h1>
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 1.2 }}
+                className="text-xl text-white/90 font-medium italic"
+              >
+                Where Hearts Meet Forever
+              </motion.p>
+            </motion.div>
+            
+            {/* Loading Animation */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 1.6 }}
+              className="mb-8"
+            >
+              {isLoading ? (
+                <div className="flex items-center justify-center space-x-2 text-white/80">
+                  <div className="w-3 h-3 bg-white/60 rounded-full animate-bounce"></div>
+                  <div className="w-3 h-3 bg-white/60 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                  <div className="w-3 h-3 bg-white/60 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                  <span className="ml-3 text-lg font-medium">Loading your journey...</span>
+                </div>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5 }}
+                  className="text-white/90"
+                >
+                  <div className="flex items-center justify-center space-x-2 mb-4">
+                    <CheckCircle className="w-6 h-6 text-green-400" />
+                    <span className="text-lg font-semibold">Ready to find your perfect match!</span>
+                  </div>
+                  <div className="w-16 h-1 bg-gradient-to-r from-green-400 to-gold-400 mx-auto rounded-full"></div>
+                </motion.div>
+              )}
+            </motion.div>
+            
+            {/* Floating Elements */}
+            <div className="absolute -top-10 -left-10 w-20 h-20 border border-white/20 rounded-full animate-spin" style={{animationDuration: '8s'}}></div>
+            <div className="absolute -bottom-10 -right-10 w-16 h-16 border-2 border-gold-300/30 rounded-full animate-ping"></div>
+          </div>
+        </div>
+      </>
+    )
   }
 
   return (
