@@ -253,7 +253,7 @@ export default function About() {
                 <div className="flex-shrink-0">
                   <div className="w-64 h-64 rounded-2xl overflow-hidden shadow-lg">
                     <Image
-                      src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=faces&auto=format"
+                      src="/images/ceo.JPG"
                       alt="Maulik Goyal - Chief Executive Officer"
                       width={256}
                       height={256}
