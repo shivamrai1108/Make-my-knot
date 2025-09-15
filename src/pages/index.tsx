@@ -20,21 +20,21 @@ function CoupleSlider() {
   
   const couples = [
     {
-      image: 'https://images.unsplash.com/photo-1606800052052-a08af7148866?w=800&h=600&fit=crop&auto=format',
+      image: '/images/1.png',
       names: 'Rajesh & Priya',
       story: 'Found love through shared values in Mumbai, celebrated with a grand Indian wedding in 2023',
       quote: "Make My Knot's AI understood what we were truly looking for. We couldn't be happier!",
       alt: 'Happy couple Rajesh and Priya at their Indian wedding'
     },
     {
-      image: 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?w=800&h=600&fit=crop&auto=format',
+      image: '/images/2.png',
       names: 'Arjun & Kavya',
       story: 'Connected across cities, engaged in a beautiful ceremony with both families in 2024',
       quote: 'The compatibility matching was spot-on. We share the same dreams and aspirations!',
       alt: 'Engaged couple Arjun and Kavya at their engagement ceremony'
     },
     {
-      image: 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=800&h=600&fit=crop&auto=format',
+      image: '/images/3.png',
       names: 'Vikram & Sneha',
       story: 'Long-distance match turned into a beautiful partnership, now settled together in Delhi',
       quote: 'Distance meant nothing when we found our perfect match. Thank you Make My Knot!',
@@ -451,14 +451,49 @@ export default function Home() {
                   Make My Knot
                 </span>
               </h1>
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.6, delay: 1.2 }}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8, delay: 1.2 }}
                 className="text-xl text-white/90 font-medium italic"
               >
-                From Handshake to Pheras
-              </motion.p>
+                <motion.span
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 1.5 }}
+                  className="inline-block"
+                >
+                  From
+                </motion.span>
+                {' '}
+                <motion.span
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6, delay: 1.8 }}
+                  className="inline-block bg-gradient-to-r from-gold-300 to-gold-100 bg-clip-text text-transparent font-bold"
+                >
+                  Handshake
+                </motion.span>
+                {' '}
+                <motion.span
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 2.1 }}
+                  className="inline-block"
+                >
+                  to
+                </motion.span>
+                {' '}
+                <motion.span
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.8, delay: 2.4 }}
+                  className="inline-block bg-gradient-to-r from-red-300 to-pink-200 bg-clip-text text-transparent font-bold animate-pulse"
+                  style={{ animationDelay: '3s', animationDuration: '2s' }}
+                >
+                  Pheras
+                </motion.span>
+              </motion.div>
             </motion.div>
             
             {/* Loading Animation */}
@@ -592,7 +627,50 @@ export default function Home() {
                     className="mb-6"
                   >
                     <p className="text-lg text-gold-200 font-medium italic leading-relaxed">
-                      "From handshake to pheras, let us guide your journey to love and lifelong happiness."
+                      "<motion.span
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5, delay: 1.2 }}
+                        className="inline-block"
+                      >
+                        From
+                      </motion.span>
+                      {' '}
+                      <motion.span
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.6, delay: 1.4 }}
+                        className="inline-block font-bold text-gold-300"
+                      >
+                        handshake
+                      </motion.span>
+                      {' '}
+                      <motion.span
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 1.6 }}
+                        className="inline-block"
+                      >
+                        to
+                      </motion.span>
+                      {' '}
+                      <motion.span
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.7, delay: 1.8 }}
+                        className="inline-block font-bold text-red-300 animate-pulse"
+                        style={{ animationDelay: '2.5s', animationDuration: '2s' }}
+                      >
+                        pheras
+                      </motion.span>
+                      <motion.span
+                        initial={{ opacity: 0, x: 10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5, delay: 2.0 }}
+                        className="inline-block"
+                      >
+                        , let us guide your journey to love and lifelong happiness.
+                      </motion.span>"
                     </p>
                   </motion.div>
                   <p className="text-gray-200 leading-relaxed">
@@ -801,7 +879,55 @@ export default function Home() {
                     viewport={{ once: true }}
                     className="text-2xl lg:text-3xl font-semibold text-gold-300 italic leading-relaxed"
                   >
-                    "From handshake to pheras, let us guide your journey to love and lifelong happiness."
+                    "<motion.span
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.6, delay: 0.8 }}
+                      viewport={{ once: true }}
+                      className="inline-block"
+                    >
+                      From
+                    </motion.span>
+                    {' '}
+                    <motion.span
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.6, delay: 1.0 }}
+                      viewport={{ once: true }}
+                      className="inline-block font-bold bg-gradient-to-r from-gold-200 to-gold-400 bg-clip-text text-transparent"
+                    >
+                      handshake
+                    </motion.span>
+                    {' '}
+                    <motion.span
+                      initial={{ opacity: 0, y: 10 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: 1.2 }}
+                      viewport={{ once: true }}
+                      className="inline-block"
+                    >
+                      to
+                    </motion.span>
+                    {' '}
+                    <motion.span
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.8, delay: 1.4 }}
+                      viewport={{ once: true }}
+                      className="inline-block font-bold bg-gradient-to-r from-red-300 to-pink-300 bg-clip-text text-transparent animate-pulse"
+                      style={{ animationDelay: '2s', animationDuration: '2s' }}
+                    >
+                      pheras
+                    </motion.span>
+                    <motion.span
+                      initial={{ opacity: 0, x: 10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.6, delay: 1.6 }}
+                      viewport={{ once: true }}
+                      className="inline-block"
+                    >
+                      , let us guide your journey to love and lifelong happiness.
+                    </motion.span>"
                   </motion.p>
                   <motion.div
                     initial={{ width: 0 }}
@@ -957,16 +1083,20 @@ export default function Home() {
 
         {/* The Make My Knot Difference Section */}
         <section className="relative py-20 overflow-hidden">
-          {/* Dark Background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-900">
+          {/* Light Background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-100">
             {/* Subtle pattern overlay */}
-            <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.15)_1px,transparent_0)] bg-[length:40px_40px]"></div>
+            <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_1px_1px,rgba(0,0,0,0.1)_1px,transparent_0)] bg-[length:40px_40px]"></div>
+            {/* Light decorative elements */}
+            <div className="absolute top-20 left-16 w-40 h-40 bg-primary-100/30 rounded-full blur-2xl"></div>
+            <div className="absolute bottom-32 right-20 w-56 h-56 bg-gold-100/25 rounded-full blur-3xl"></div>
+            <div className="absolute top-1/2 left-1/3 w-32 h-32 bg-pink-100/30 rounded-full blur-xl"></div>
           </div>
           
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Header */}
             <div className="text-center mb-16">
-              <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
+              <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
                 The Make My Knot Difference
               </h2>
             </div>
@@ -976,17 +1106,17 @@ export default function Home() {
               {/* Row 1 */}
               <div className="space-y-8">
                 {/* Verified Profiles */}
-                <div>
-                  <h3 className="text-2xl font-bold text-white mb-4">Verified Profiles</h3>
-                  <p className="text-gray-300 leading-relaxed">
+                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">Verified Profiles</h3>
+                  <p className="text-gray-700 leading-relaxed">
                     Every profile goes through AI-powered verification so you can feel confident that the people you meet are genuine, safe, and serious about finding meaningful connections.
                   </p>
                 </div>
 
                 {/* Meaningful Likes */}
-                <div>
-                  <h3 className="text-2xl font-bold text-white mb-4">Meaningful Likes</h3>
-                  <p className="text-gray-300 leading-relaxed">
+                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">Meaningful Likes</h3>
+                  <p className="text-gray-700 leading-relaxed">
                     Likes on Make My Knot aren't random swipes—they're thoughtful. You can send voice notes, reactions, or thoughtful comments, so every like feels personal and genuine.
                   </p>
                 </div>
@@ -995,17 +1125,17 @@ export default function Home() {
               {/* Row 2 */}
               <div className="space-y-8">
                 {/* AI Compatibility Scores */}
-                <div>
-                  <h3 className="text-2xl font-bold text-white mb-4">AI Compatibility Scores</h3>
-                  <p className="text-gray-300 leading-relaxed">
+                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">AI Compatibility Scores</h3>
+                  <p className="text-gray-700 leading-relaxed">
                     Our unique AI engine calculates compatibility not just between two people, but also considers family expectations, lifestyle choices, and values—making every match more real and lasting.
                   </p>
                 </div>
 
                 {/* Transparent Intentions */}
-                <div>
-                  <h3 className="text-2xl font-bold text-white mb-4">Transparent Intentions</h3>
-                  <p className="text-gray-300 leading-relaxed">
+                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">Transparent Intentions</h3>
+                  <p className="text-gray-700 leading-relaxed">
                     No guessing games. Profiles highlight key details like education, family background, and even optional income visibility—so you know exactly who you're connecting with.
                   </p>
                 </div>
@@ -1014,17 +1144,17 @@ export default function Home() {
               {/* Row 3 */}
               <div className="space-y-8">
                 {/* Personalized Conversation Starters */}
-                <div>
-                  <h3 className="text-2xl font-bold text-white mb-4">Personalized Conversation Starters</h3>
-                  <p className="text-gray-300 leading-relaxed">
+                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">Personalized Conversation Starters</h3>
+                  <p className="text-gray-700 leading-relaxed">
                     We don't leave you hanging. From icebreaker games to AI-generated conversation prompts, we make sure you never run out of things to say and can connect more naturally.
                   </p>
                 </div>
 
                 {/* Knot Specials */}
-                <div>
-                  <h3 className="text-2xl font-bold text-white mb-4">Knot Specials</h3>
-                  <p className="text-gray-300 leading-relaxed">
+                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">Knot Specials</h3>
+                  <p className="text-gray-700 leading-relaxed">
                     Go beyond just chatting. Access premium experiences like numerology insights, curated private events, and AI-powered relationship counseling through our Knot Counselor.
                   </p>
                 </div>
