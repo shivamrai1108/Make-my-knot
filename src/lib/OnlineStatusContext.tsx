@@ -26,17 +26,8 @@ interface OnlineStatusProviderProps {
   children: ReactNode;
 }
 
-// Mock data for demonstration - replace with actual user data
-const mockUsers = [
-  { id: 'user-1', name: 'Sarah Johnson', avatar: '/avatars/sarah.jpg' },
-  { id: 'user-2', name: 'Michael Chen', avatar: '/avatars/michael.jpg' },
-  { id: 'user-3', name: 'Emily Rodriguez', avatar: '/avatars/emily.jpg' },
-  { id: 'user-4', name: 'David Thompson', avatar: '/avatars/david.jpg' },
-  { id: 'user-5', name: 'Jessica Lee', avatar: '/avatars/jessica.jpg' },
-  { id: 'user-6', name: 'Ryan Wilson', avatar: '/avatars/ryan.jpg' },
-  { id: 'user-7', name: 'Amanda Davis', avatar: '/avatars/amanda.jpg' },
-  { id: 'user-8', name: 'Christopher Brown', avatar: '/avatars/christopher.jpg' },
-];
+// User data - loaded from database in production
+const mockUsers: { id: string; name: string; avatar: string }[] = [];
 
 export const OnlineStatusProvider: React.FC<OnlineStatusProviderProps> = ({ children }) => {
   const { user } = useUser();

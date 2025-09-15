@@ -184,96 +184,11 @@ interface Offer {
   updatedAt: string
 }
 
-// Mock webinar data
-const mockWebinars: Webinar[] = [
-  {
-    id: '1',
-    title: 'Building Stronger Marriages: Communication Workshop',
-    description: 'Learn effective communication techniques that strengthen relationships and build lasting marriages.',
-    speaker: 'Dr. Priya Sharma',
-    date: '2024-03-25',
-    time: '19:00',
-    duration: 90,
-    maxParticipants: 200,
-    registeredCount: 180,
-    price: 0,
-    currency: 'INR',
-    image: '/api/placeholder/300/200',
-    status: 'published',
-    tags: ['communication', 'marriage', 'relationships'],
-    createdAt: '2024-03-01T00:00:00Z',
-    updatedAt: '2024-03-01T00:00:00Z'
-  },
-  {
-    id: '2',
-    title: 'Pre-Marriage Counseling Session',
-    description: 'Essential guidance for couples preparing for marriage. Understand expectations, resolve conflicts, and build a strong foundation.',
-    speaker: 'Dr. Rajesh Mehta',
-    date: '2024-03-28',
-    time: '20:00',
-    duration: 120,
-    maxParticipants: 150,
-    registeredCount: 95,
-    price: 299,
-    currency: 'INR',
-    image: '/api/placeholder/300/200',
-    status: 'published',
-    tags: ['counseling', 'pre-marriage', 'guidance'],
-    createdAt: '2024-03-10T00:00:00Z',
-    updatedAt: '2024-03-15T00:00:00Z'
-  },
-  {
-    id: '3',
-    title: 'Love Languages Workshop',
-    description: 'Discover your love language and learn how to express and receive love effectively in relationships.',
-    speaker: 'Dr. Kavita Patel',
-    date: '2024-04-02',
-    time: '19:30',
-    duration: 75,
-    maxParticipants: 180,
-    registeredCount: 120,
-    price: 199,
-    currency: 'INR',
-    image: '/api/placeholder/300/200',
-    status: 'draft',
-    tags: ['love languages', 'workshop', 'relationships'],
-    createdAt: '2024-03-18T00:00:00Z',
-    updatedAt: '2024-03-20T00:00:00Z'
-  }
-]
+// Webinar data - loaded from database in production
+const mockWebinars: Webinar[] = []
 
-// Mock offers data
-const mockOffers: Offer[] = [
-  {
-    id: '1',
-    title: 'Launch Offer - 15 Days Free',
-    description: '15 days free membership for first 100 customers - Launch special offer!',
-    discountType: 'percentage',
-    discountValue: 100,
-    validFrom: '2024-03-01',
-    validUntil: '2024-04-30',
-    targetUsers: ['new', 'trial'],
-    isActive: true,
-    maxUses: 100,
-    currentUses: 23,
-    createdAt: '2024-03-01T00:00:00Z',
-    updatedAt: '2024-03-01T00:00:00Z'
-  },
-  {
-    id: '2',
-    title: 'Loyalty Reward',
-    description: '₹500 off for existing premium users on annual upgrade',
-    discountType: 'fixed',
-    discountValue: 500,
-    validFrom: '2024-03-01',
-    validUntil: '2024-03-31',
-    targetUsers: ['monthly'],
-    isActive: true,
-    currentUses: 12,
-    createdAt: '2024-02-25T00:00:00Z',
-    updatedAt: '2024-03-01T00:00:00Z'
-  }
-]
+// Offers data - loaded from database in production
+const mockOffers: Offer[] = []
 
 export default function Admin() {
   const [authed, setAuthed] = useState(false)
@@ -328,7 +243,6 @@ export default function Admin() {
                 </button>
               </div>
             </div>
-            <p className="text-xs text-gray-500 text-center">Demo password: admin123</p>
             <div className="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
               <p className="text-xs text-gray-600">🔒 Secure admin access for Make My Knot management</p>
             </div>
@@ -3804,56 +3718,8 @@ function NominationsTab() {
         setNominations([])
       }
     } else {
-      // Add some mock data for demonstration
-      const mockNominations = [
-        {
-          id: 'nom_001',
-          nominatorName: 'Priya Sharma',
-          nominatorEmail: 'priya.sharma@email.com',
-          nominatorPhone: '+91 98765 43210',
-          nomineeName: 'Rahul Gupta',
-          nomineeAge: 28,
-          nomineeLocation: 'Mumbai',
-          relationship: 'Friend',
-          reasons: 'Great personality, career-focused, family-oriented',
-          nomineeInterests: 'Reading, Traveling, Photography',
-          status: 'pending',
-          submittedAt: new Date('2024-01-15T10:30:00').toISOString(),
-          notes: ''
-        },
-        {
-          id: 'nom_002',
-          nominatorName: 'Anjali Mehta',
-          nominatorEmail: 'anjali.mehta@gmail.com',
-          nominatorPhone: '+91 87654 32109',
-          nomineeName: 'Sneha Patel',
-          nomineeAge: 26,
-          nomineeLocation: 'Delhi',
-          relationship: 'Sister',
-          reasons: 'Looking for a life partner, very caring and understanding',
-          nomineeInterests: 'Cooking, Dancing, Music',
-          status: 'contacted',
-          submittedAt: new Date('2024-01-12T14:45:00').toISOString(),
-          notes: 'Called nominee on Jan 13, interested to join'
-        },
-        {
-          id: 'nom_003',
-          nominatorName: 'Vikram Singh',
-          nominatorEmail: 'vikram.singh@yahoo.com',
-          nominatorPhone: '+91 76543 21098',
-          nomineeName: 'Arjun Kumar',
-          nomineeAge: 30,
-          nomineeLocation: 'Bangalore',
-          relationship: 'Brother',
-          reasons: 'Software engineer, well-settled, looking for marriage',
-          nomineeInterests: 'Cricket, Technology, Movies',
-          status: 'matched',
-          submittedAt: new Date('2024-01-08T09:15:00').toISOString(),
-          notes: 'Successfully matched with user ID: usr_456'
-        }
-      ]
-      localStorage.setItem('makemyknot_nominations', JSON.stringify(mockNominations))
-      setNominations(mockNominations)
+      // No sample data for live system
+      setNominations([])
     }
   }, [])
 
