@@ -21,7 +21,7 @@ function CoupleSlider() {
   
   const couples = [
     {
-      image: '/images/1.png',
+      image: '/images/1.jpg', // Web-optimized: 397KB vs 5.8MB PNG
       fallback: 'https://images.unsplash.com/photo-1606800052052-a08af7148866?w=800&h=600&fit=crop&auto=format',
       names: 'Rajesh & Priya',
       story: 'Found love through shared values in Mumbai, celebrated with a grand Indian wedding in 2023',
@@ -29,7 +29,7 @@ function CoupleSlider() {
       alt: 'Happy couple Rajesh and Priya at their Indian wedding'
     },
     {
-      image: '/images/2.png',
+      image: '/images/2.jpg', // Web-optimized: 253KB vs 4.0MB PNG
       fallback: 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?w=800&h=600&fit=crop&auto=format',
       names: 'Arjun & Kavya',
       story: 'Connected across cities, engaged in a beautiful ceremony with both families in 2024',
@@ -37,7 +37,7 @@ function CoupleSlider() {
       alt: 'Engaged couple Arjun and Kavya at their engagement ceremony'
     },
     {
-      image: '/images/3.png',
+      image: '/images/3.jpg', // Web-optimized: 371KB vs 5.3MB PNG
       fallback: 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=800&h=600&fit=crop&auto=format',
       names: 'Vikram & Sneha',
       story: 'Long-distance match turned into a beautiful partnership, now settled together in Delhi',
@@ -167,8 +167,11 @@ function CoupleSlider() {
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       priority={index < 3}
                       onError={() => {
-                        console.log('Image failed to load:', couple.image, 'using fallback:', couple.fallback);
+                        console.log('Web-optimized image failed to load:', couple.image, 'using fallback:', couple.fallback);
                         setImageErrors(prev => ({ ...prev, [index]: true }));
+                      }}
+                      onLoad={() => {
+                        console.log('✅ Web-optimized image loaded successfully:', couple.image);
                       }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
@@ -371,15 +374,15 @@ export default function Home() {
     }
   ]
 
-  // Splash screen effect
+  // Splash screen effect - Extended timing for better visibility
   useEffect(() => {
     const loadTimer = setTimeout(() => {
       setIsLoading(false)
-    }, 2500)
+    }, 3500) // Increased from 2500 to 3500
     
     const splashTimer = setTimeout(() => {
       setShowSplash(false)
-    }, 3500)
+    }, 6000) // Increased from 3500 to 6000 (6 seconds total)
     
     return () => {
       clearTimeout(loadTimer)
@@ -468,12 +471,12 @@ export default function Home() {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8, delay: 1.2 }}
-                className="text-xl text-white/90 font-medium italic"
+                className="text-2xl md:text-3xl lg:text-4xl text-white/90 font-medium italic"
               >
                 <motion.span
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 1.5 }}
+                  transition={{ duration: 0.8, delay: 1.8 }}
                   className="inline-block"
                 >
                   From
@@ -482,8 +485,8 @@ export default function Home() {
                 <motion.span
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.6, delay: 1.8 }}
-                  className="inline-block bg-gradient-to-r from-gold-300 to-gold-100 bg-clip-text text-transparent font-bold"
+                  transition={{ duration: 0.8, delay: 2.2 }}
+                  className="inline-block bg-gradient-to-r from-gold-300 to-gold-100 bg-clip-text text-transparent font-bold text-shadow-lg"
                 >
                   Handshake
                 </motion.span>
@@ -491,7 +494,7 @@ export default function Home() {
                 <motion.span
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 2.1 }}
+                  transition={{ duration: 0.8, delay: 2.6 }}
                   className="inline-block"
                 >
                   to
@@ -500,9 +503,9 @@ export default function Home() {
                 <motion.span
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.8, delay: 2.4 }}
-                  className="inline-block bg-gradient-to-r from-red-300 to-pink-200 bg-clip-text text-transparent font-bold animate-pulse"
-                  style={{ animationDelay: '3s', animationDuration: '2s' }}
+                  transition={{ duration: 1.0, delay: 3.0 }}
+                  className="inline-block bg-gradient-to-r from-red-300 to-pink-200 bg-clip-text text-transparent font-bold animate-pulse text-shadow-lg"
+                  style={{ animationDelay: '4s', animationDuration: '2s' }}
                 >
                   Pheras
                 </motion.span>
