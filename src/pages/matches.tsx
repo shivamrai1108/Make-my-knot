@@ -125,16 +125,16 @@ export default function Matches() {
         {/* Header */}
         <header className="bg-white/90 backdrop-blur-md border-b border-gray-200/50 shadow-sm sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center py-6">
+            <div className="flex justify-between items-center py-3">
               <div className="flex items-center">
                 <BrandLogo size="sm" className="mr-2" />
-                <span className="text-2xl font-bold text-gray-900">Make My Knot</span>
+                <span className="text-xl font-bold text-gray-900">Make My Knot</span>
               </div>
-              <nav className="hidden md:flex items-center space-x-8">
-                <Link href="/matches" className="text-primary-600 font-semibold">Matches</Link>
-                <Link href="/conversations" className="text-gray-700 hover:text-primary-600 transition-colors">Conversations</Link>
-                <Link href="/profile" className="text-gray-700 hover:text-primary-600 transition-colors">Profile</Link>
-                <button className="btn-secondary text-sm">Settings</button>
+              <nav className="hidden md:flex items-center space-x-1">
+                <Link href="/matches" className="text-primary-600 font-semibold text-sm px-3 py-2 rounded-md">Matches</Link>
+                <Link href="/conversations" className="text-gray-700 hover:text-primary-600 transition-colors duration-200 font-semibold text-sm px-3 py-2 rounded-md">Conversations</Link>
+                <Link href="/profile" className="text-gray-700 hover:text-primary-600 transition-colors duration-200 font-semibold text-sm px-3 py-2 rounded-md">Profile</Link>
+                <button className="btn-secondary text-sm px-3 py-2">Settings</button>
               </nav>
             </div>
           </div>

@@ -33,28 +33,28 @@ export default function Navigation({ variant = 'transparent', className = '' }: 
   return (
     <nav className={`${baseClasses} ${className}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center py-6">
+        <div className="flex justify-between items-center py-3">
           {/* Logo */}
           <Link href="/" className="flex items-center">
-            <BrandLogo size="md" className="mr-2" />
-            <span className={`text-2xl font-bold ${textColor}`}>Make My Knot</span>
+            <BrandLogo size="sm" className="mr-2" />
+            <span className={`text-xl font-bold ${textColor}`}>Make My Knot</span>
           </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
-            <Link href="/" className={`${linkColor} transition-colors duration-200 px-4 py-3 rounded-lg hover:bg-white/20 active:bg-white/30 font-medium cursor-pointer pointer-events-auto`}>
+            <Link href="/" className={`${linkColor} transition-colors duration-200 px-3 py-2 rounded-md hover:bg-white/20 active:bg-white/30 font-semibold text-sm cursor-pointer pointer-events-auto`}>
               Home
             </Link>
-            <Link href="/#how-it-works" className={`${linkColor} transition-colors duration-200 px-4 py-3 rounded-lg hover:bg-white/20 active:bg-white/30 font-medium cursor-pointer pointer-events-auto whitespace-nowrap`}>
+            <Link href="/#how-it-works" className={`${linkColor} transition-colors duration-200 px-3 py-2 rounded-md hover:bg-white/20 active:bg-white/30 font-semibold text-sm cursor-pointer pointer-events-auto whitespace-nowrap`}>
               How It Works
             </Link>
-            <Link href="/about" className={`${linkColor} transition-colors duration-200 px-4 py-3 rounded-lg hover:bg-white/20 active:bg-white/30 font-medium cursor-pointer pointer-events-auto`}>
+            <Link href="/about" className={`${linkColor} transition-colors duration-200 px-3 py-2 rounded-md hover:bg-white/20 active:bg-white/30 font-semibold text-sm cursor-pointer pointer-events-auto`}>
               Our Story
             </Link>
-            <Link href="/#testimonials" className={`${linkColor} transition-colors duration-200 px-4 py-3 rounded-lg hover:bg-white/20 active:bg-white/30 font-medium cursor-pointer pointer-events-auto whitespace-nowrap`}>
+            <Link href="/#testimonials" className={`${linkColor} transition-colors duration-200 px-3 py-2 rounded-md hover:bg-white/20 active:bg-white/30 font-semibold text-sm cursor-pointer pointer-events-auto whitespace-nowrap`}>
               Success Stories
             </Link>
-            <Link href="/webinars" className={`${linkColor} transition-colors duration-200 px-4 py-3 rounded-lg hover:bg-white/20 active:bg-white/30 font-medium cursor-pointer pointer-events-auto`}>
+            <Link href="/webinars" className={`${linkColor} transition-colors duration-200 px-3 py-2 rounded-md hover:bg-white/20 active:bg-white/30 font-semibold text-sm cursor-pointer pointer-events-auto`}>
               Webinars
             </Link>
             
@@ -64,48 +64,48 @@ export default function Navigation({ variant = 'transparent', className = '' }: 
           <div className="md:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className={`${textColor} hover:text-primary-600 transition-all duration-200 p-3 rounded-lg hover:bg-white/20 active:bg-white/30 transform hover:scale-110 active:scale-95 touch-manipulation`}
+              className={`${textColor} hover:text-primary-600 transition-all duration-200 p-2 rounded-md hover:bg-white/20 active:bg-white/30 transform hover:scale-110 active:scale-95 touch-manipulation`}
             >
-              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
         </div>
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className={`md:hidden py-4 border-t ${variant === 'wine-glass' ? 'border-red-200/30' : 'border-white/20'} relative z-[110]`}>
-            <div className="flex flex-col space-y-1">
+          <div className={`md:hidden py-2 border-t ${variant === 'wine-glass' ? 'border-red-200/30' : 'border-white/20'} relative z-[110]`}>
+            <div className="flex flex-col space-y-0">
               <Link 
                 href="/" 
-                className={`${linkColor} transition-all duration-200 px-4 py-4 rounded-lg hover:bg-white/10 active:bg-white/20 font-medium text-base block touch-manipulation`}
+                className={`${linkColor} transition-all duration-200 px-4 py-3 rounded-md hover:bg-white/10 active:bg-white/20 font-semibold text-sm block touch-manipulation`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 Home
               </Link>
               <Link 
                 href="/#how-it-works" 
-                className={`${linkColor} transition-all duration-200 px-4 py-4 rounded-lg hover:bg-white/10 active:bg-white/20 font-medium text-base block touch-manipulation`}
+                className={`${linkColor} transition-all duration-200 px-4 py-3 rounded-md hover:bg-white/10 active:bg-white/20 font-semibold text-sm block touch-manipulation`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 How It Works
               </Link>
               <Link 
                 href="/about" 
-                className={`${linkColor} transition-all duration-200 px-4 py-4 rounded-lg hover:bg-white/10 active:bg-white/20 font-medium text-base block touch-manipulation`}
+                className={`${linkColor} transition-all duration-200 px-4 py-3 rounded-md hover:bg-white/10 active:bg-white/20 font-semibold text-sm block touch-manipulation`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 Our Story
               </Link>
               <Link 
                 href="/#testimonials" 
-                className={`${linkColor} transition-all duration-200 px-4 py-4 rounded-lg hover:bg-white/10 active:bg-white/20 font-medium text-base block touch-manipulation`}
+                className={`${linkColor} transition-all duration-200 px-4 py-3 rounded-md hover:bg-white/10 active:bg-white/20 font-semibold text-sm block touch-manipulation`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 Success Stories
               </Link>
               <Link 
                 href="/webinars" 
-                className={`${linkColor} transition-all duration-200 px-4 py-4 rounded-lg hover:bg-white/10 active:bg-white/20 font-medium text-base block touch-manipulation`}
+                className={`${linkColor} transition-all duration-200 px-4 py-3 rounded-md hover:bg-white/10 active:bg-white/20 font-semibold text-sm block touch-manipulation`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 Webinars

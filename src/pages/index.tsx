@@ -1067,53 +1067,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Comparison */}
-            <div className="mt-16">
-              <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-                <div className="bg-gray-50 px-6 py-4 border-b">
-                  <h4 className="text-xl font-bold text-gray-900">Why Choose Make My Knot?</h4>
-                </div>
-                
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="bg-gray-50">
-                        <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">Features</th>
-                        <th className="px-6 py-4 text-center text-sm font-medium text-primary-600">Make My Knot</th>
-                        <th className="px-6 py-4 text-center text-sm font-medium text-gray-500">Dating Apps</th>
-                        <th className="px-6 py-4 text-center text-sm font-medium text-gray-500">Other Services</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200">
-                      <tr>
-                        <td className="px-6 py-4 text-sm text-gray-900">AI-Powered Matching</td>
-                        <td className="px-6 py-4 text-center"><CheckCircle className="h-5 w-5 text-green-500 mx-auto" /></td>
-                        <td className="px-6 py-4 text-center"><X className="h-5 w-5 text-red-500 mx-auto" /></td>
-                        <td className="px-6 py-4 text-center"><X className="h-5 w-5 text-red-500 mx-auto" /></td>
-                      </tr>
-                      <tr className="bg-gray-50">
-                        <td className="px-6 py-4 text-sm text-gray-900">Personal Relationship Advisor</td>
-                        <td className="px-6 py-4 text-center"><CheckCircle className="h-5 w-5 text-green-500 mx-auto" /></td>
-                        <td className="px-6 py-4 text-center"><X className="h-5 w-5 text-red-500 mx-auto" /></td>
-                        <td className="px-6 py-4 text-center">💰</td>
-                      </tr>
-                      <tr>
-                        <td className="px-6 py-4 text-sm text-gray-900">Profile Verification</td>
-                        <td className="px-6 py-4 text-center"><CheckCircle className="h-5 w-5 text-green-500 mx-auto" /></td>
-                        <td className="px-6 py-4 text-center">⚠️</td>
-                        <td className="px-6 py-4 text-center"><CheckCircle className="h-5 w-5 text-green-500 mx-auto" /></td>
-                      </tr>
-                      <tr className="bg-gray-50">
-                        <td className="px-6 py-4 text-sm text-gray-900">Quality Over Quantity</td>
-                        <td className="px-6 py-4 text-center"><CheckCircle className="h-5 w-5 text-green-500 mx-auto" /></td>
-                        <td className="px-6 py-4 text-center"><X className="h-5 w-5 text-red-500 mx-auto" /></td>
-                        <td className="px-6 py-4 text-center">⚠️</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
           </div>
         </section>
 

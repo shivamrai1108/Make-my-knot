@@ -19,14 +19,14 @@ export default function About() {
         {/* Navigation */}
         <nav className="bg-white/90 backdrop-blur-md border-b border-gray-200/50 shadow-sm sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center py-6">
+            <div className="flex justify-between items-center py-3">
               <Link href="/" className="flex items-center">
                 <BrandLogo size="sm" className="mr-2" />
-                <span className="text-2xl font-bold text-gray-900">Make My Knot</span>
+                <span className="text-xl font-bold text-gray-900">Make My Knot</span>
               </Link>
-              <div className="hidden md:flex items-center space-x-8">
-                <Link href="/#how-it-works" className="text-gray-700 hover:text-primary-600 transition-colors">How It Works</Link>
-                <Link href="/webinars" className="text-gray-700 hover:text-primary-600 transition-colors">Webinars</Link>
+              <div className="hidden md:flex items-center space-x-1">
+                <Link href="/#how-it-works" className="text-gray-700 hover:text-primary-600 transition-colors duration-200 px-3 py-2 rounded-md font-semibold text-sm">How It Works</Link>
+                <Link href="/webinars" className="text-gray-700 hover:text-primary-600 transition-colors duration-200 px-3 py-2 rounded-md font-semibold text-sm">Webinars</Link>
               </div>
             </div>
           </div>
