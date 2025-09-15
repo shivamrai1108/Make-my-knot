@@ -9,8 +9,16 @@ export default function Footer() {
           {/* Brand */}
           <div className="md:col-span-1">
             <div className="flex items-center mb-4">
-              <Heart className="h-8 w-8 text-primary-400" />
-              <span className="ml-2 text-2xl font-bold">Make My Knot</span>
+              <div className="w-8 h-8 mr-2 flex-shrink-0">
+                <Image
+                  src="/images/logo.png"
+                  alt="Make My Knot Logo"
+                  width={32}
+                  height={32}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <span className="text-2xl font-bold">Make My Knot</span>
             </div>
             <p className="text-gray-400 mb-6">
               AI-powered matchmaking platform connecting hearts through compatibility, not just chemistry.

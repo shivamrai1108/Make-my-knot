@@ -758,13 +758,14 @@ function AssessmentsTab() {
         pdf.line(i, 0, i + 60, 120)
       }
       
-      // Company logo placeholder and title
+      // Company logo and branding
       pdf.setFillColor(255, 255, 255)
-      pdf.circle(margin + 25, 45, 20, 'F')
+      pdf.roundedRect(margin + 10, 25, 40, 40, 8, 8, 'F')
       pdf.setTextColor(colors.primary[0], colors.primary[1], colors.primary[2])
-      pdf.setFontSize(14)
+      pdf.setFontSize(10)
       pdf.setFont('helvetica', 'bold')
-      pdf.text('MMK', margin + 18, 50)
+      pdf.text('Make My', margin + 15, 42)
+      pdf.text('Knot', margin + 22, 52)
       
       // Main title
       pdf.setTextColor(255, 255, 255)

@@ -1,5 +1,6 @@
 import Head from 'next/head'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import { Heart, Shield, Eye, EyeOff, ArrowRight } from 'lucide-react'
@@ -51,8 +52,17 @@ export default function AdminLogin() {
           {/* Header */}
           <div className="text-center">
             <div className="flex items-center justify-center mb-6">
-              <Shield className="h-12 w-12 text-blue-400 mr-3" />
-              <Heart className="h-8 w-8 text-primary-400" />
+              <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mr-3 p-2">
+                <Image
+                  src="/images/logo.png"
+                  alt="Make My Knot Logo"
+                  width={48}
+                  height={48}
+                  className="w-full h-full object-contain"
+                  priority
+                />
+              </div>
+              <Shield className="h-12 w-12 text-blue-400" />
             </div>
             <h1 className="text-3xl font-bold text-white mb-2">Admin Portal</h1>
             <p className="text-slate-400">Make My Knot Administrative Dashboard</p>
@@ -139,7 +149,15 @@ export default function AdminLogin() {
           {/* Back to Site */}
           <div className="text-center">
             <Link href="/" className="text-slate-400 hover:text-slate-300 text-sm flex items-center justify-center">
-              <Heart className="h-4 w-4 mr-2" />
+              <div className="w-4 h-4 mr-2 flex items-center justify-center">
+                <Image
+                  src="/images/logo.png"
+                  alt="Make My Knot Logo"
+                  width={16}
+                  height={16}
+                  className="w-full h-full object-contain"
+                />
+              </div>
               Back to Make My Knot
             </Link>
           </div>

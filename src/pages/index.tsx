@@ -401,8 +401,15 @@ export default function Home() {
               transition={{ duration: 1, delay: 0.2, type: "spring", stiffness: 200 }}
               className="mb-8"
             >
-              <div className="w-24 h-24 bg-white rounded-2xl mx-auto flex items-center justify-center shadow-2xl transform rotate-12 hover:rotate-0 transition-all duration-500">
-                <Heart className="w-12 h-12 text-primary-600 animate-pulse" />
+              <div className="w-32 h-32 bg-white rounded-2xl mx-auto flex items-center justify-center shadow-2xl p-4 hover:scale-105 transition-all duration-500">
+                <Image
+                  src="/images/logo.png"
+                  alt="Make My Knot Logo"
+                  width={96}
+                  height={96}
+                  className="w-full h-full object-contain animate-pulse"
+                  priority
+                />
               </div>
             </motion.div>
             
