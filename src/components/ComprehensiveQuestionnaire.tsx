@@ -389,15 +389,45 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
               Your compatibility profile is now complete!
             </p>
             
-            <div className="bg-gradient-to-r from-primary-50 to-gold-50 rounded-2xl p-6 mb-8 animate-slide-up">
+            <div className="bg-gradient-to-r from-primary-50 to-gold-50 rounded-2xl p-6 mb-6 animate-slide-up">
               <h3 className="text-xl font-semibold text-gray-900 mb-3">🤖 AI Matchmaker is now working for you!</h3>
-              <p className="text-gray-700 leading-relaxed">
+              <p className="text-gray-700 leading-relaxed mb-4">
                 Our advanced AI is analyzing your responses and will notify you when compatible matches are found. 
                 Get ready to meet your perfect match!
               </p>
+              
+              {/* Notification Methods */}
+              <div className="bg-white/70 rounded-xl p-4 mb-4">
+                <h4 className="text-lg font-semibold text-gray-900 mb-2">📱 We'll notify you via:</h4>
+                <div className="flex items-center justify-center space-x-6">
+                  <div className="flex items-center space-x-2 text-green-600">
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                      <span className="text-lg">📱</span>
+                    </div>
+                    <span className="font-medium">WhatsApp</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-blue-600">
+                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                      <span className="text-lg">📧</span>
+                    </div>
+                    <span className="font-medium">Email</span>
+                  </div>
+                </div>
+              </div>
             </div>
             
-            <div className="flex items-center justify-center space-x-2 text-primary-600 animate-pulse">
+            {/* Okay Button */}
+            <button
+              onClick={() => {
+                // Redirect to home page
+                window.location.href = '/'
+              }}
+              className="bg-gradient-to-r from-primary-600 to-gold-500 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:from-primary-700 hover:to-gold-600 transition-all duration-300 transform hover:scale-105 shadow-lg animate-slide-up"
+            >
+              Okay! Take me to Home 🏠
+            </button>
+            
+            <div className="flex items-center justify-center space-x-2 text-primary-600 animate-pulse mt-6">
               <div className="w-3 h-3 bg-primary-500 rounded-full animate-bounce"></div>
               <div className="w-3 h-3 bg-primary-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
               <div className="w-3 h-3 bg-primary-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
