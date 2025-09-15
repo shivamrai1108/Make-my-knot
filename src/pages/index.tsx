@@ -957,144 +957,79 @@ export default function Home() {
 
         {/* The Make My Knot Difference Section */}
         <section className="relative py-20 overflow-hidden">
-          {/* Modern Vibrant Blush-tone Background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-rose-400 via-pink-300 to-purple-400">
-            <div className="absolute inset-0 bg-gradient-to-tl from-peach-300/40 via-transparent to-lavender-200/50"></div>
-            <div className="absolute inset-0 bg-gradient-to-tr from-coral-200/30 via-transparent to-blush-300/40"></div>
-            {/* Enhanced Animated Background Elements */}
-            <div className="absolute top-16 left-12 w-40 h-40 bg-white/15 rounded-full blur-2xl animate-pulse" style={{animationDuration: '3s'}}></div>
-            <div className="absolute bottom-20 right-16 w-64 h-64 bg-rose-300/20 rounded-full blur-3xl animate-bounce" style={{animationDuration: '6s'}}></div>
-            <div className="absolute top-1/3 right-1/4 w-32 h-32 bg-pink-200/25 rounded-full blur-xl animate-ping" style={{animationDelay: '0.5s', animationDuration: '4s'}}></div>
-            <div className="absolute bottom-1/3 left-1/5 w-48 h-48 bg-purple-200/20 rounded-full blur-2xl animate-pulse" style={{animationDelay: '2s', animationDuration: '5s'}}></div>
-            <div className="absolute top-3/4 left-2/3 w-28 h-28 bg-coral-300/30 rounded-full blur-lg animate-bounce" style={{animationDelay: '1.5s', animationDuration: '4s'}}></div>
+          {/* Dark Background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-900">
+            {/* Subtle pattern overlay */}
+            <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.15)_1px,transparent_0)] bg-[length:40px_40px]"></div>
           </div>
+          
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Header */}
             <div className="text-center mb-16">
               <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
-                The <span className="text-gold-300">Make My Knot</span> Difference
+                The Make My Knot Difference
               </h2>
-              <p className="text-xl text-white/90 max-w-3xl mx-auto">
-                Why thousands choose us over traditional dating apps and other matchmaking services
-              </p>
             </div>
 
-            <div className="grid lg:grid-cols-3 gap-8 mb-16">
-              {/* AI-Powered Matching */}
-              <div className="text-center group">
-                <div className="relative mb-8">
-                  <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl mx-auto mb-6 flex items-center justify-center transform group-hover:scale-110 transition-all duration-300 shadow-lg group-hover:shadow-xl">
-                    <MessageCircle className="h-10 w-10 text-white" />
-                  </div>
-                  <div className="absolute top-0 right-1/4 w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
+            {/* Grid Layout */}
+            <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
+              {/* Row 1 */}
+              <div className="space-y-8">
+                {/* Verified Profiles */}
+                <div>
+                  <h3 className="text-2xl font-bold text-white mb-4">Verified Profiles</h3>
+                  <p className="text-gray-300 leading-relaxed">
+                    Every profile goes through AI-powered verification so you can feel confident that the people you meet are genuine, safe, and serious about finding meaningful connections.
+                  </p>
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-4">AI-Powered Precision</h3>
-                <p className="text-white/80 mb-6 leading-relaxed">
-                  Our advanced algorithm analyzes 50+ compatibility factors, from deep personality traits to life goals, ensuring every match has real potential.
-                </p>
-                <ul className="text-sm text-white/70 space-y-2 text-left">
-                  <li className="flex items-center">
-                    <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
-                    Psychological compatibility analysis
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
-                    Values and lifestyle alignment
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
-                    Future goals compatibility
-                  </li>
-                </ul>
+
+                {/* Meaningful Likes */}
+                <div>
+                  <h3 className="text-2xl font-bold text-white mb-4">Meaningful Likes</h3>
+                  <p className="text-gray-300 leading-relaxed">
+                    Likes on Make My Knot aren't random swipes—they're thoughtful. You can send voice notes, reactions, or thoughtful comments, so every like feels personal and genuine.
+                  </p>
+                </div>
               </div>
 
-              {/* Human Touch */}
-              <div className="text-center group">
-                <div className="relative mb-8">
-                  <div className="w-20 h-20 bg-gradient-to-r from-pink-500 to-rose-600 rounded-2xl mx-auto mb-6 flex items-center justify-center transform group-hover:scale-110 transition-all duration-300 shadow-lg group-hover:shadow-xl">
-                    <Heart className="h-10 w-10 text-white" />
-                  </div>
-                  <div className="absolute top-0 left-1/4 w-3 h-3 bg-pink-400 rounded-full animate-pulse"></div>
+              {/* Row 2 */}
+              <div className="space-y-8">
+                {/* AI Compatibility Scores */}
+                <div>
+                  <h3 className="text-2xl font-bold text-white mb-4">AI Compatibility Scores</h3>
+                  <p className="text-gray-300 leading-relaxed">
+                    Our unique AI engine calculates compatibility not just between two people, but also considers family expectations, lifestyle choices, and values—making every match more real and lasting.
+                  </p>
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-4">Personal Touch</h3>
-                <p className="text-white/80 mb-6 leading-relaxed">
-                  Unlike apps that leave you swiping endlessly, our dedicated relationship experts provide personalized guidance throughout your journey.
-                </p>
-                <ul className="text-sm text-white/70 space-y-2 text-left">
-                  <li className="flex items-center">
-                    <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
-                    Dedicated relationship advisor
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
-                    Profile optimization support
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
-                    Date coaching and feedback
-                  </li>
-                </ul>
+
+                {/* Transparent Intentions */}
+                <div>
+                  <h3 className="text-2xl font-bold text-white mb-4">Transparent Intentions</h3>
+                  <p className="text-gray-300 leading-relaxed">
+                    No guessing games. Profiles highlight key details like education, family background, and even optional income visibility—so you know exactly who you're connecting with.
+                  </p>
+                </div>
               </div>
 
-              {/* Quality Over Quantity */}
-              <div className="text-center group">
-                <div className="relative mb-8">
-                  <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl mx-auto mb-6 flex items-center justify-center transform group-hover:scale-110 transition-all duration-300 shadow-lg group-hover:shadow-xl">
-                    <Star className="h-10 w-10 text-white" />
-                  </div>
-                  <div className="absolute bottom-0 right-1/4 w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+              {/* Row 3 */}
+              <div className="space-y-8">
+                {/* Personalized Conversation Starters */}
+                <div>
+                  <h3 className="text-2xl font-bold text-white mb-4">Personalized Conversation Starters</h3>
+                  <p className="text-gray-300 leading-relaxed">
+                    We don't leave you hanging. From icebreaker games to AI-generated conversation prompts, we make sure you never run out of things to say and can connect more naturally.
+                  </p>
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-4">Quality Over Quantity</h3>
-                <p className="text-white/80 mb-6 leading-relaxed">
-                  We focus on meaningful connections, not endless scrolling. Every profile is verified, and every match is curated with intention.
-                </p>
-                <ul className="text-sm text-white/70 space-y-2 text-left">
-                  <li className="flex items-center">
-                    <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
-                    100% verified profiles
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
-                    Background checks available
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
-                    Curated, not random matches
-                  </li>
-                </ul>
-              </div>
-            </div>
 
-            {/* Stats Section */}
-            <div className="bg-gradient-to-r from-primary-600 to-purple-700 rounded-3xl p-8 md:p-12 text-white">
-              <div className="text-center mb-8">
-                <h3 className="text-3xl font-bold mb-4">Results That Speak</h3>
-                <p className="text-primary-100 text-lg">Our track record of creating lasting relationships</p>
-              </div>
-              
-              <div className="grid md:grid-cols-4 gap-8">
-                <div className="text-center">
-                  <div className="text-4xl font-bold mb-2">91%</div>
-                  <div className="text-primary-200">Success Rate</div>
-                  <div className="text-sm text-primary-100 mt-1">Find meaningful matches</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-4xl font-bold mb-2">3.2M</div>
-                  <div className="text-primary-200">Average Days</div>
-                  <div className="text-sm text-primary-100 mt-1">To first quality match</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-4xl font-bold mb-2">87%</div>
-                  <div className="text-primary-200">Go on Dates</div>
-                  <div className="text-sm text-primary-100 mt-1">Within first month</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-4xl font-bold mb-2">2.1K+</div>
-                  <div className="text-primary-200">Weddings</div>
-                  <div className="text-sm text-primary-100 mt-1">Celebrated this year</div>
+                {/* Knot Specials */}
+                <div>
+                  <h3 className="text-2xl font-bold text-white mb-4">Knot Specials</h3>
+                  <p className="text-gray-300 leading-relaxed">
+                    Go beyond just chatting. Access premium experiences like numerology insights, curated private events, and AI-powered relationship counseling through our Knot Counselor.
+                  </p>
                 </div>
               </div>
             </div>
-
           </div>
         </section>
 
