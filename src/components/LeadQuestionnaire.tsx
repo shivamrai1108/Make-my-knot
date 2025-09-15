@@ -51,12 +51,23 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
   // Check if already submitted to prevent double submissions
   useEffect(() => {
     const alreadySubmitted = sessionStorage.getItem('leadSubmitted')
-    if (alreadySubmitted) {
-      setSubmitted(true)
-      const storedLeadId = sessionStorage.getItem('leadId')
-      if (storedLeadId) {
-        setLeadId(storedLeadId)
+    const storedLeadId = sessionStorage.getItem('leadId')
+    
+    // Check if assessment was already completed for this lead
+    if (alreadySubmitted && storedLeadId) {
+      const assessmentCompleted = sessionStorage.getItem(`assessment_completed_${storedLeadId}`)
+      
+      if (assessmentCompleted === 'true') {
+        // Assessment is completed, clear the lead submission state to allow fresh start
+        console.log('Assessment already completed, clearing lead submission state')
+        sessionStorage.removeItem('leadSubmitted')
+        sessionStorage.removeItem('leadId')
+        return // Don't show the countdown screen
       }
+      
+      // Assessment not completed yet, show countdown
+      setSubmitted(true)
+      setLeadId(storedLeadId)
     }
   }, [])
 

@@ -298,6 +298,21 @@ export default function Home() {
   const [showSplash, setShowSplash] = useState(true)
   const [isLoading, setIsLoading] = useState(true)
   
+  // Clean up completed lead sessions on page load
+  useEffect(() => {
+    const leadId = sessionStorage.getItem('leadId')
+    if (leadId) {
+      const assessmentCompleted = sessionStorage.getItem(`assessment_completed_${leadId}`)
+      if (assessmentCompleted === 'true') {
+        // Assessment is completed, clear all lead-related session storage
+        console.log('Cleaning up completed lead session on home page load')
+        sessionStorage.removeItem('leadSubmitted')
+        sessionStorage.removeItem('leadId')
+        // Keep the assessment_completed flag for future reference but clean up lead flow
+      }
+    }
+  }, [])
+  
   const couples = [
     {
       image: 'https://images.unsplash.com/photo-1606800052052-a08af7148866?w=1920&h=1080&fit=crop&auto=format',
