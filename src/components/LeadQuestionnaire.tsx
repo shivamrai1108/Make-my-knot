@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { saveLead, Lead } from '@/lib/leadStore'
-import { Heart, ArrowRight, CheckCircle, Calendar } from 'lucide-react'
+import { Heart, ArrowRight, CheckCircle, Calendar, Upload, X } from 'lucide-react'
 
 interface Props {
   onSubmitted?: () => void
@@ -41,6 +41,8 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
     dateOfBirth: '',
     countryCode: '+91' // Default to India
   })
+  const [biodataFile, setBiodataFile] = useState<File | null>(null)
+  const [uploadError, setUploadError] = useState<string>('')
   const [submitted, setSubmitted] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [countdown, setCountdown] = useState(3)
@@ -134,6 +136,41 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
     return age >= 18
   }
 
+  // File validation for biodata
+  const validateBiodataFile = (file: File) => {
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg']
+    const maxSize = 5 * 1024 * 1024 // 5MB
+    
+    if (!allowedTypes.includes(file.type)) {
+      return 'Please upload only PDF or JPEG files'
+    }
+    
+    if (file.size > maxSize) {
+      return 'File size must be less than 5MB'
+    }
+    
+    return null
+  }
+
+  const handleBiodataUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const validationError = validateBiodataFile(file)
+      if (validationError) {
+        setUploadError(validationError)
+        setBiodataFile(null)
+      } else {
+        setUploadError('')
+        setBiodataFile(file)
+      }
+    }
+  }
+
+  const removeBiodataFile = () => {
+    setBiodataFile(null)
+    setUploadError('')
+  }
+
   const canSubmitContact = contact.name && contact.email && validatePhone(contact.phone) && validateAge(contact.dateOfBirth)
 
   const handleSubmitLead = async () => {
@@ -147,7 +184,9 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
       ...answers,
       dateOfBirth: contact.dateOfBirth,
       countryCode: contact.countryCode,
-      fullPhoneNumber: contact.countryCode + contact.phone
+      fullPhoneNumber: contact.countryCode + contact.phone,
+      biodataFileName: biodataFile?.name || null,
+      hasBiodata: !!biodataFile
     }
     
     const lead: Lead = {
@@ -158,7 +197,8 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
       email: contact.email,
       phone: contact.countryCode + contact.phone, // Store full international phone number
       answers: enhancedAnswers,
-      status: 'new'
+      status: 'new',
+      biodataFile: biodataFile // Store file for admin access
     }
     
     try {
@@ -347,6 +387,55 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
             />
             {contact.dateOfBirth && !validateAge(contact.dateOfBirth) && (
               <p className="text-red-500 text-xs mt-1">You must be at least 18 years old</p>
+            )}
+          </div>
+
+          {/* Optional Biodata Upload */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              <Upload className="w-4 h-4 inline mr-1" />
+              Upload Biodata (Optional)
+            </label>
+            <p className="text-xs text-gray-500 mb-3">
+              Upload your biodata in PDF or JPEG format (max 5MB) to help us serve you better
+            </p>
+            
+            {!biodataFile ? (
+              <div className="relative">
+                <input
+                  type="file"
+                  accept=".pdf,.jpeg,.jpg"
+                  onChange={handleBiodataUpload}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  id="biodata-upload"
+                />
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary-400 hover:bg-primary-50 transition-colors">
+                  <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                  <p className="text-sm text-gray-600 mb-1">Click to upload biodata</p>
+                  <p className="text-xs text-gray-500">PDF or JPEG files only</p>
+                </div>
+              </div>
+            ) : (
+              <div className="border border-primary-200 bg-primary-50 rounded-lg p-4 flex items-center justify-between">
+                <div className="flex items-center">
+                  <CheckCircle className="h-5 w-5 text-primary-600 mr-2" />
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">{biodataFile.name}</p>
+                    <p className="text-xs text-gray-500">{(biodataFile.size / 1024 / 1024).toFixed(1)} MB</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={removeBiodataFile}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            )}
+            
+            {uploadError && (
+              <p className="text-red-500 text-xs mt-2">{uploadError}</p>
             )}
           </div>
 

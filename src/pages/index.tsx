@@ -7,6 +7,7 @@ import Footer from '@/components/Footer'
 import LeadQuestionnaire from '@/components/LeadQuestionnaire'
 import Navigation from '@/components/Navigation'
 import NominationMarquee from '@/components/NominationMarquee'
+import { NAVIGATION_CONSTANTS } from '@/lib/constants/navigation'
 import { useState, useEffect, useRef } from 'react'
 
 // Couple Slider Component
@@ -488,7 +489,7 @@ export default function Home() {
         <Navigation variant="wine-glass" />
 
         {/* Hero Section - Questionnaire with Couple Slider Background */}
-        <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16 md:pt-0">
+        <section className="relative min-h-screen flex items-center justify-center overflow-hidden" style={{ paddingTop: `${NAVIGATION_CONSTANTS.MOBILE_HEIGHT}px` }}>
           {/* Background Couple Slider */}
           <div className="absolute inset-0 w-full h-full overflow-hidden">
             <div className="relative w-full h-full">

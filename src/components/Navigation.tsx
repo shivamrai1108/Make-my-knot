@@ -3,6 +3,7 @@ import BrandLogo from '@/components/BrandLogo'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import { Menu, X } from 'lucide-react'
+import { NAVIGATION_CONSTANTS } from '@/lib/constants/navigation'
 
 interface NavigationProps {
   variant?: 'transparent' | 'white' | 'dark' | 'wine-glass'
@@ -13,23 +14,56 @@ export default function Navigation({ variant = 'transparent', className = '' }: 
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isScrollingUp, setIsScrollingUp] = useState(true)
   const [lastScrollY, setLastScrollY] = useState(0)
+  const [isMobile, setIsMobile] = useState(false)
   const router = useRouter()
 
-  // Mobile scroll detection for auto-hide navigation
+  // Check if we're on mobile on mount and resize
   useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY
-      
-      if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        // Scrolling down
-        setIsScrollingUp(false)
-        setIsMenuOpen(false) // Close mobile menu when scrolling down
-      } else {
-        // Scrolling up
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+      // Always show navbar on desktop
+      if (window.innerWidth >= 768) {
         setIsScrollingUp(true)
+        setIsMenuOpen(false)
       }
-      
-      setLastScrollY(currentScrollY)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  // Enhanced mobile scroll detection for auto-hide navigation
+  useEffect(() => {
+    let ticking = false
+    
+    const handleScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY
+          const scrollDelta = currentScrollY - lastScrollY
+          
+          // Only hide on mobile/tablet screens
+          if (isMobile) {
+            // More refined scroll detection
+            if (scrollDelta > 5 && currentScrollY > 80) {
+              // Scrolling down with significant movement
+              setIsScrollingUp(false)
+              setIsMenuOpen(false) // Close mobile menu when scrolling down
+            } else if (scrollDelta < -5 || currentScrollY < 10) {
+              // Scrolling up with significant movement or near top
+              setIsScrollingUp(true)
+            }
+          } else {
+            // Always show on desktop
+            setIsScrollingUp(true)
+          }
+          
+          setLastScrollY(currentScrollY)
+          ticking = false
+        })
+        ticking = true
+      }
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })
@@ -37,12 +71,12 @@ export default function Navigation({ variant = 'transparent', className = '' }: 
   }, [lastScrollY])
 
   const baseClasses = variant === 'transparent' 
-    ? `fixed w-full z-[100] top-0 transition-transform duration-300 ${isScrollingUp ? 'translate-y-0' : '-translate-y-full md:translate-y-0'}` 
+    ? `fixed w-full z-[100] top-0 transition-all duration-500 ease-in-out ${isScrollingUp ? 'translate-y-0' : '-translate-y-full md:translate-y-0'}` 
     : variant === 'wine-glass'
-    ? `fixed w-full z-[100] top-0 bg-gradient-to-r from-red-900/30 via-red-800/25 to-purple-900/30 backdrop-blur-md border-b border-red-200/20 shadow-lg transition-transform duration-300 ${isScrollingUp ? 'translate-y-0' : '-translate-y-full md:translate-y-0'}`
+    ? `fixed w-full z-[100] top-0 bg-gradient-to-r from-red-900/30 via-red-800/25 to-purple-900/30 backdrop-blur-md border-b border-red-200/20 shadow-lg transition-all duration-500 ease-in-out ${isScrollingUp ? 'translate-y-0' : '-translate-y-full md:translate-y-0'}`
     : variant === 'dark'
     ? 'bg-gray-900 border-b border-gray-800 relative z-[100]'
-    : `bg-white/90 backdrop-blur-md border-b border-gray-200/50 shadow-sm sticky top-0 z-[100] transition-transform duration-300 ${isScrollingUp ? 'translate-y-0' : '-translate-y-full md:translate-y-0'}`
+    : `bg-white/90 backdrop-blur-md border-b border-gray-200/50 shadow-sm sticky top-0 z-[100] transition-all duration-500 ease-in-out ${isScrollingUp ? 'translate-y-0' : '-translate-y-full md:translate-y-0'}`
 
   const textColor = variant === 'dark' ? 'text-white' : variant === 'transparent' ? 'text-white' : variant === 'wine-glass' ? 'text-white' : 'text-gray-900'
   const linkColor = variant === 'dark' 
@@ -56,7 +90,7 @@ export default function Navigation({ variant = 'transparent', className = '' }: 
   return (
     <nav className={`${baseClasses} ${className}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center py-3">
+        <div className="flex justify-between items-center py-4">
           {/* Logo */}
           <Link href="/" className="flex items-center">
             <BrandLogo size="sm" className="mr-2" />
@@ -95,8 +129,8 @@ export default function Navigation({ variant = 'transparent', className = '' }: 
         </div>
 
         {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className={`md:hidden py-2 border-t ${variant === 'wine-glass' ? 'border-red-200/30' : 'border-white/20'} relative z-[110]`}>
+        <div className={`md:hidden overflow-hidden transition-all duration-300 ${isMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+          <div className={`py-2 border-t ${variant === 'wine-glass' ? 'border-red-200/30' : 'border-white/20'} relative z-[110]`}>
             <div className="flex flex-col space-y-0">
               <Link 
                 href="/" 
@@ -135,7 +169,7 @@ export default function Navigation({ variant = 'transparent', className = '' }: 
               </Link>
             </div>
           </div>
-        )}
+        </div>
       </div>
     </nav>
   )

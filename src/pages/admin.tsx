@@ -112,6 +112,8 @@ interface EnhancedLead extends Lead {
   questionnaire: QuestionnaireResponse | null
   hasQuestionnaire: boolean
   questionnaireComplete: boolean
+  answers?: Record<string, any>
+  biodataFile?: File | null
 }
 
 // Mock lead management functions
@@ -2085,6 +2087,13 @@ function CRMLeadsTab() {
                           </span>
                         </div>
                       )}
+                      {lead.answers?.hasBiodata && (
+                        <div className="mt-1">
+                          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                            📄 Biodata Uploaded
+                          </span>
+                        </div>
+                      )}
                     </td>
                     {showQuestionnaireData && (
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -2245,6 +2254,56 @@ function CRMLeadsTab() {
                   </div>
                 </div>
               </div>
+
+              {/* Biodata Section */}
+              {selectedLead.answers?.hasBiodata && (
+                <div className="mb-6 p-4 bg-blue-50 rounded-lg">
+                  <h4 className="font-semibold text-blue-900 mb-3">Biodata Document</h4>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-5 w-5 text-blue-600" />
+                      <span className="text-sm font-medium text-blue-900">
+                        {selectedLead.answers?.biodataFileName || 'biodata.pdf'}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => {
+                        if (selectedLead.biodataFile) {
+                          const url = URL.createObjectURL(selectedLead.biodataFile)
+                          const a = document.createElement('a')
+                          a.href = url
+                          a.download = selectedLead.answers?.biodataFileName || `biodata_${selectedLead.name}.pdf`
+                          document.body.appendChild(a)
+                          a.click()
+                          document.body.removeChild(a)
+                          URL.revokeObjectURL(url)
+                        } else {
+                          alert('Biodata file not available for download')
+                        }
+                      }}
+                      className="text-blue-600 hover:text-blue-900 flex items-center gap-1 px-3 py-1 rounded border border-blue-200 hover:bg-blue-100"
+                    >
+                      <Download className="h-4 w-4" />
+                      Download
+                    </button>
+                    {selectedLead.biodataFile && selectedLead.biodataFile.type === 'application/pdf' && (
+                      <button
+                        onClick={() => {
+                          const url = URL.createObjectURL(selectedLead.biodataFile)
+                          window.open(url, '_blank')
+                        }}
+                        className="text-green-600 hover:text-green-900 flex items-center gap-1 px-3 py-1 rounded border border-green-200 hover:bg-green-100"
+                      >
+                        <Eye className="h-4 w-4" />
+                        View
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-blue-700 text-xs mt-2">
+                    Uploaded biodata document - Admin can view and download for verification purposes
+                  </p>
+                </div>
+              )}
 
               {/* Assessment Data */}
               {selectedLead.questionnaire ? (

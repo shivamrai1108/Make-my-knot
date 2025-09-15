@@ -18,6 +18,7 @@ export interface Lead {
   assignedTo?: string
   followUpDate?: string
   isActive?: boolean
+  biodataFile?: File | null // Biodata upload file
 }
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
