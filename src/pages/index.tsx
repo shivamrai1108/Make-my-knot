@@ -521,33 +521,41 @@ export default function Home() {
                 className="flex transition-transform duration-1000 ease-in-out"
                 style={{ 
                   transform: `translateX(-${currentSlide * 100}%)`,
-                  width: `${couples.length * 100}%`
+                  width: `${couples.length * 100}%`,
+                  height: '100vh',
+                  minHeight: '100vh'
                 }}
               >
                 {couples.map((couple, index) => (
-                  <div key={index} className="flex-shrink-0 relative h-full min-w-full">
-                    {/* Background Image */}
-                    <div className={`absolute inset-0 w-full h-full transition-all duration-1000 ${
+                  <div key={index} className="flex-shrink-0 relative h-full min-w-full" style={{ height: '100vh' }}>
+                    {/* Background Image Container */}
+                    <div className={`absolute inset-0 w-full h-full bg-gray-900 transition-all duration-1000 ${
                       index === currentSlide ? 'scale-100' : 'scale-110'
                     }`}>
-                      {/* Desktop Image - using regular img tag */}
+                      {/* Desktop Image */}
                       <img
                         src={couple.image}
                         alt={couple.names}
-                        className="absolute inset-0 w-full h-full object-cover"
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                          position: 'absolute',
-                          top: 0,
-                          left: 0
-                        }}
+                        className="absolute inset-0 w-full h-full object-cover block md:block"
                         onError={(e) => {
-                          console.log('Failed to load desktop image:', e.currentTarget.src);
+                          console.log('❌ Failed to load desktop image:', e.currentTarget.src);
+                          e.currentTarget.style.display = 'none';
                         }}
                         onLoad={(e) => {
                           console.log('✅ Desktop image loaded successfully:', e.currentTarget.src);
+                        }}
+                      />
+                      {/* Mobile Image - shows on mobile only */}
+                      <img
+                        src={couple.mobileImage}
+                        alt={couple.names}
+                        className="absolute inset-0 w-full h-full object-cover block md:hidden"
+                        onError={(e) => {
+                          console.log('❌ Failed to load mobile image:', e.currentTarget.src);
+                          e.currentTarget.style.display = 'none';
+                        }}
+                        onLoad={(e) => {
+                          console.log('✅ Mobile image loaded successfully:', e.currentTarget.src);
                         }}
                       />
                     </div>
