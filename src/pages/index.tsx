@@ -127,8 +127,7 @@ function CoupleSlider() {
               {couples.map((couple, index) => (
                 <div 
                   key={index} 
-                  className="flex-shrink-0 relative"
-                  style={{ width: `${100 / couples.length}%` }}
+                  className="flex-shrink-0 relative w-full"
                 >
                   <div className="relative h-96">
                     <Image
@@ -514,13 +513,16 @@ export default function Home() {
         <section className="relative min-h-screen flex items-center justify-center overflow-hidden" style={{ paddingTop: `${NAVIGATION_CONSTANTS.MOBILE_HEIGHT}px` }}>
           {/* Background Couple Slider */}
           <div className="absolute inset-0 w-full h-full overflow-hidden">
-            <div className="relative w-full h-full">
+            <div className="relative w-full h-full overflow-hidden">
               <div 
-                className="flex transition-transform duration-1000 ease-in-out w-full h-full"
-                style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+                className="flex transition-transform duration-1000 ease-in-out"
+                style={{ 
+                  transform: `translateX(-${currentSlide * 100}%)`,
+                  width: `${couples.length * 100}%`
+                }}
               >
                 {couples.map((couple, index) => (
-                  <div key={index} className="min-w-full flex-shrink-0 relative h-full">
+                  <div key={index} className="flex-shrink-0 relative h-full min-w-full">
                     {/* Background Image */}
                     <div className={`absolute inset-0 w-full h-full transition-all duration-1000 ${
                       index === currentSlide ? 'scale-100' : 'scale-110'
