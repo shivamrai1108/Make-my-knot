@@ -130,7 +130,7 @@ export default function Navigation({ variant = 'transparent', className = '' }: 
 
         {/* Mobile Navigation */}
         <div className={`md:hidden overflow-hidden transition-all duration-300 ${isMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
-          <div className={`py-2 border-t ${variant === 'wine-glass' ? 'border-red-200/30' : 'border-white/20'} relative z-[110]`}>
+          <div className={`py-2 border-t ${variant === 'wine-glass' ? 'border-red-200/30' : 'border-white/20'} relative z-[105]`}>
             <div className="flex flex-col space-y-0">
               <Link 
                 href="/" 

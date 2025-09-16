@@ -361,7 +361,7 @@ export default function Home() {
         <Head>
           <title>Make My Knot - AI-Powered Wedding Matchmaking</title>
           <meta name="description" content="Find your perfect life partner with our AI-powered matchmaking platform. Quality matches, compatibility-based pairing, and personalized service." />
-          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
           <link rel="icon" href="/favicon.ico" />
         </Head>
         
@@ -507,7 +507,7 @@ export default function Home() {
       <Head>
         <title>Make My Knot - AI-Powered Wedding Matchmaking</title>
         <meta name="description" content="Find your perfect life partner with our AI-powered matchmaking platform. Quality matches, compatibility-based pairing, and personalized service." />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -516,7 +516,7 @@ export default function Home() {
         <Navigation variant="wine-glass" />
 
         {/* Hero Section - Questionnaire with Couple Slider Background */}
-        <section className="relative h-screen flex items-center justify-center overflow-hidden" style={{ paddingTop: `${NAVIGATION_CONSTANTS.MOBILE_HEIGHT}px`, height: `calc(100vh - ${NAVIGATION_CONSTANTS.MOBILE_HEIGHT}px)` }}>
+        <section className="relative min-h-screen md:h-screen flex items-center justify-center overflow-hidden" style={{ paddingTop: `${NAVIGATION_CONSTANTS.MOBILE_HEIGHT}px` }}>
           {/* Background Couple Slider */}
           <div className="absolute inset-0 w-full h-full overflow-hidden">
             <div className="relative w-full h-full overflow-hidden">
@@ -530,32 +530,20 @@ export default function Home() {
               >
                 {couples.map((couple, index) => (
                   <div key={index} className="flex-shrink-0 relative h-full min-w-full">
-                    {/* Background Image Container - No scaling animation to prevent zoom */}
+                    {/* Background Image Container */}
                     <div className="absolute inset-0 w-full h-full bg-gray-900">
                       {/* Desktop Image with SVG fallback */}
                       <img
                         src={couple.image}
                         alt={couple.names}
-                        className="absolute inset-0 w-full h-full block md:block"
-                        style={{
-                          objectFit: 'cover',
-                          objectPosition: 'center',
-                          width: '100%',
-                          height: '100%'
-                        }}
+                        className="absolute inset-0 w-full h-full hidden md:block object-contain"
                         onError={(e) => {
-                          console.log('❌ Failed to load SVG image:', e.currentTarget.src);
-                          console.log('🔄 Trying fallback JPEG image:', couple.fallbackImage);
                           // Try fallback JPEG if SVG fails
                           if (e.currentTarget.src.includes('.svg') && couple.fallbackImage) {
                             e.currentTarget.src = couple.fallbackImage;
                           } else {
-                            console.log('❌ Both SVG and JPEG failed, hiding image');
                             e.currentTarget.style.display = 'none';
                           }
-                        }}
-                        onLoad={(e) => {
-                          console.log('✅ Desktop image loaded successfully:', e.currentTarget.src);
                         }}
                       />
                       {/* Mobile Image - shows on mobile only */}
@@ -563,28 +551,19 @@ export default function Home() {
                         src={couple.mobileImage}
                         alt={couple.names}
                         className="absolute inset-0 w-full h-full object-cover block md:hidden"
-                        style={{
-                          objectFit: 'cover',
-                          objectPosition: 'center'
-                        }}
                         onError={(e) => {
-                          console.log('❌ Failed to load mobile image:', e.currentTarget.src);
                           e.currentTarget.style.display = 'none';
-                        }}
-                        onLoad={(e) => {
-                          console.log('✅ Mobile image loaded successfully:', e.currentTarget.src);
                         }}
                       />
                     </div>
-                    {/* Gradient overlay for readability */}
+                    {/* Gradient overlays for readability */}
                     <div className={`absolute inset-0 w-full h-full ${couple.gradient} opacity-30 transition-all duration-1000`} />
-                    {/* Enhanced gradient overlays */}
                     <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-black/50" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40" />
                     <div className="absolute inset-0 bg-gradient-to-br from-primary-900/30 via-transparent to-gold-800/20" />
                     
                     {/* Subtle quote overlay */}
-                    <div className="absolute bottom-16 right-8 left-8 text-center z-10 pointer-events-none">
+                    <div className="absolute bottom-4 md:bottom-16 right-8 left-8 text-center z-10 pointer-events-none">
                       <div className={`transition-all duration-1000 transform ${
                         index === currentSlide 
                           ? 'opacity-100 translate-y-0' 
@@ -609,11 +588,11 @@ export default function Home() {
             initial={{ opacity: 0, x: -100 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.5 }}
-            className="relative z-10 w-full px-4 sm:px-6 lg:px-8 py-20"
+            className="relative z-[110] w-full px-4 sm:px-6 lg:px-8 py-8 md:py-20"
           >
-            <div className="flex justify-start items-center min-h-[600px]">
-              {/* Left Aligned Glass Questionnaire */}
-              <div className="w-full max-w-lg ml-8 lg:ml-16">
+            <div className="flex justify-start items-start md:items-center min-h-[400px] md:min-h-[600px]">
+              {/* Left Aligned Glass Questionnaire - Better mobile spacing */}
+              <div className="w-full max-w-lg ml-0 md:ml-8 lg:ml-16">
                 <motion.div 
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -676,7 +655,7 @@ export default function Home() {
                       </motion.span>"
                     </p>
                   </motion.div>
-                  <p className="text-gray-200 leading-relaxed">
+                  <p className="text-gray-200 leading-relaxed text-sm md:text-base">
                     Answer a few questions to help us find your perfect match
                   </p>
                 </motion.div>
@@ -684,6 +663,7 @@ export default function Home() {
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.6, delay: 0.9 }}
+                  className="bg-white/10 backdrop-blur-md rounded-xl p-4 md:p-6 border border-white/20 relative z-[120]"
                 >
                   <LeadQuestionnaire />
                 </motion.div>
@@ -715,8 +695,8 @@ export default function Home() {
             <ChevronRight className="h-5 w-5" />
           </motion.button>
 
-          {/* Enhanced Dots Indicator - Positioned higher on mobile */}
-          <div className="absolute bottom-2 md:bottom-8 right-4 md:left-1/2 md:transform md:-translate-x-1/2 flex space-x-3 md:space-x-4 z-20">
+          {/* Enhanced Dots Indicator - Centered on desktop, positioned higher on mobile */}
+          <div className="absolute bottom-2 right-4 md:bottom-8 md:left-1/2 md:right-auto md:transform md:-translate-x-1/2 flex space-x-3 md:space-x-4 z-20">
             {couples.map((_, index) => (
               <button
                 key={index}
