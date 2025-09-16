@@ -192,28 +192,28 @@ function TestimonialsSection() {
     {
       name: 'Priya Sharma',
       age: '28, Marketing Manager',
-      image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=faces',
+      image: '/images/profile1.jpg',
       quote: 'I was skeptical about online matchmaking, but Make My Knot changed my perspective completely. The AI understood my preferences better than I did myself!',
       rating: 5
     },
     {
       name: 'Arjun Patel',
       age: '31, Software Engineer',
-      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=faces',
+      image: '/images/profile2.jpg',
       quote: 'The quality of matches was exceptional. Every profile I received was thoughtfully curated. Found my life partner within 3 months!',
       rating: 5
     },
     {
       name: 'Kavya Reddy',
       age: '26, Doctor',
-      image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=faces',
+      image: '/images/profile3.jpg',
       quote: 'The personalized approach made all the difference. My matchmaker understood my busy schedule and found someone who truly complements my lifestyle.',
       rating: 5
     },
     {
       name: 'Rohit Gupta',
       age: '29, Financial Analyst',
-      image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=faces',
+      image: '/images/profile1.jpg',
       quote: 'Professional, efficient, and results-driven. The team at Make My Knot goes above and beyond to ensure successful matches.',
       rating: 5
     }
@@ -296,46 +296,25 @@ export default function Home() {
   
   const couples = [
     {
-      image: 'https://images.unsplash.com/photo-1606800052052-a08af7148866?w=1920&h=1080&fit=crop&auto=format',
+      image: '/images/1.jpg', // Custom web-optimized image
       gradient: 'bg-gradient-to-br from-purple-600 via-pink-600 to-red-500',
       names: 'Rajesh & Priya',
       story: 'Found love through shared values in Mumbai, celebrated with a grand Indian wedding in 2023',
       quote: "Make My Knot's AI understood what we were truly looking for. We couldn't be happier!"
     },
     {
-      image: 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?w=1920&h=1080&fit=crop&auto=format',
+      image: '/images/2.jpg', // Custom web-optimized image
       gradient: 'bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600',
       names: 'Arjun & Kavya',
       story: 'Connected across cities, engaged in a beautiful ceremony with both families in 2024',
       quote: 'The compatibility matching was spot-on. We share the same dreams and aspirations!'
     },
     {
-      image: 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=1920&h=1080&fit=crop&auto=format',
+      image: '/images/3.jpg', // Custom web-optimized image
       gradient: 'bg-gradient-to-br from-green-600 via-teal-600 to-blue-600',
       names: 'Vikram & Sneha',
       story: 'Long-distance match turned into a beautiful partnership, now settled together in Delhi',
       quote: 'Distance meant nothing when we found our perfect match. Thank you Make My Knot!'
-    },
-    {
-      image: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=1920&h=1080&fit=crop&auto=format',
-      gradient: 'bg-gradient-to-br from-orange-600 via-red-600 to-pink-600',
-      names: 'Rohit & Ananya',
-      story: 'Both medical professionals who found love through compatibility and understanding',
-      quote: 'We connected instantly over our shared passion for helping others. Perfect match!'
-    },
-    {
-      image: 'https://images.unsplash.com/photo-1591604466107-ec97de577aff?w=1920&h=1080&fit=crop&auto=format',
-      gradient: 'bg-gradient-to-br from-gold-600 via-primary-600 to-purple-600',
-      names: 'Karan & Meera',
-      story: 'Traditional values met modern love, celebrated with a spectacular Rajasthani wedding',
-      quote: 'Make My Knot respected our traditions while finding us our soulmate. Incredible!'
-    },
-    {
-      image: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=1920&h=1080&fit=crop&auto=format',
-      gradient: 'bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600',
-      names: 'Nikhil & Anjali',
-      story: 'Childhood friends of families, matched through AI and realized they were meant to be',
-      quote: 'Sometimes the perfect match is closer than you think. AI helped us see it!'
     }
   ]
 
@@ -801,8 +780,8 @@ export default function Home() {
           <div className="absolute inset-0">
             {/* Background Image as Primary */}
             <Image
-              src="https://images.unsplash.com/photo-1519741497674-611481863552?w=1920&h=1080&fit=crop&auto=format"
-              alt="Beautiful Indian wedding celebration background"
+              src="/images/1.jpg"
+              alt="Beautiful wedding celebration background"
               fill
               className="object-cover"
               priority
@@ -982,7 +961,7 @@ export default function Home() {
                     <div className="relative">
                       <div className="w-16 h-16 rounded-full overflow-hidden border-3 border-white/30 shadow-lg">
                         <Image
-                          src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&h=150&fit=crop&crop=faces&auto=format"
+                          src="/images/speaker.jpg"
                           alt="Dr. Sarah Mitchell - Relationship Expert"
                           width={64}
                           height={64}
