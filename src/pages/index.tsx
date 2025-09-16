@@ -509,6 +509,33 @@ export default function Home() {
         <meta name="description" content="Find your perfect life partner with our AI-powered matchmaking platform. Quality matches, compatibility-based pairing, and personalized service." />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
         <link rel="icon" href="/favicon.ico" />
+        <style jsx>{`
+          .hero-image-container {
+            transform: translateZ(0);
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            -moz-backface-visibility: hidden;
+            -ms-backface-visibility: hidden;
+            perspective: 1000px;
+            -webkit-perspective: 1000px;
+          }
+          .hero-image {
+            transform: none !important;
+            transition: none !important;
+            animation: none !important;
+            will-change: auto;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            image-rendering: pixelated;
+          }
+          .no-zoom {
+            -webkit-transform: scale(1) !important;
+            -moz-transform: scale(1) !important;
+            -ms-transform: scale(1) !important;
+            -o-transform: scale(1) !important;
+            transform: scale(1) !important;
+          }
+        `}</style>
       </Head>
 
       <main className="min-h-screen bg-white">
@@ -516,7 +543,14 @@ export default function Home() {
         <Navigation variant="wine-glass" />
 
         {/* Hero Section - Questionnaire with Couple Slider Background */}
-        <section className="relative min-h-screen md:h-screen flex items-center justify-center overflow-hidden" style={{ paddingTop: `${NAVIGATION_CONSTANTS.MOBILE_HEIGHT}px` }}>
+        <section 
+          className="relative min-h-screen md:h-screen flex items-center justify-center overflow-hidden" 
+          style={{ 
+            paddingTop: `${NAVIGATION_CONSTANTS.MOBILE_HEIGHT}px`,
+            transform: 'translateZ(0)', // Force hardware acceleration and prevent zoom
+            backfaceVisibility: 'hidden' // Prevent flickering
+          }}
+        >
           {/* Background Couple Slider */}
           <div className="absolute inset-0 w-full h-full overflow-hidden">
             <div className="relative w-full h-full overflow-hidden">
@@ -525,18 +559,32 @@ export default function Home() {
                 style={{ 
                   transform: `translateX(-${currentSlide * 100}%)`,
                   width: `${couples.length * 100}%`,
-                  height: '100%'
+                  height: '100%',
+                  willChange: 'transform',
+                  backfaceVisibility: 'hidden'
                 }}
               >
                 {couples.map((couple, index) => (
-                  <div key={index} className="flex-shrink-0 relative h-full min-w-full">
-                    {/* Background Image Container */}
-                    <div className="absolute inset-0 w-full h-full bg-gray-900">
-                      {/* Desktop Image with SVG fallback */}
+                  <div 
+                    key={index} 
+                    className="flex-shrink-0 relative h-full w-full"
+                    style={{
+                      minWidth: '100%',
+                      maxWidth: '100%',
+                      transform: 'translateZ(0)'
+                    }}
+                  >
+                    {/* Background Image Container - Fixed dimensions to prevent zoom */}
+                    <div className="hero-image-container absolute inset-0 w-full h-full bg-gray-900 overflow-hidden">
+                      {/* Desktop Image with SVG fallback - Fixed sizing */}
                       <img
                         src={couple.image}
                         alt={couple.names}
-                        className="absolute inset-0 w-full h-full hidden md:block object-contain"
+                        className="hero-image no-zoom absolute inset-0 w-full h-full hidden md:block object-cover object-center"
+                        style={{
+                          maxWidth: '100%',
+                          maxHeight: '100%'
+                        }}
                         onError={(e) => {
                           // Try fallback JPEG if SVG fails
                           if (e.currentTarget.src.includes('.svg') && couple.fallbackImage) {
@@ -550,7 +598,11 @@ export default function Home() {
                       <img
                         src={couple.mobileImage}
                         alt={couple.names}
-                        className="absolute inset-0 w-full h-full object-cover block md:hidden"
+                        className="hero-image no-zoom absolute inset-0 w-full h-full object-cover object-center block md:hidden"
+                        style={{
+                          maxWidth: '100%',
+                          maxHeight: '100%'
+                        }}
                         onError={(e) => {
                           e.currentTarget.style.display = 'none';
                         }}
@@ -589,6 +641,7 @@ export default function Home() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.5 }}
             className="relative z-[110] w-full px-4 sm:px-6 lg:px-8 py-8 md:py-20"
+            style={{ transform: 'translateZ(0)' }}
           >
             <div className="flex justify-start items-start md:items-center min-h-[400px] md:min-h-[600px]">
               {/* Left Aligned Glass Questionnaire - Better mobile spacing */}
