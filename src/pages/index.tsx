@@ -295,7 +295,7 @@ export default function Home() {
   
   const couples = [
     {
-      image: '/images/1.jpg', // Desktop landscape image
+      image: '/images/1.svg', // Desktop SVG image (1200x800px)
       mobileImage: '/images/p1-mobile.jpg', // Mobile portrait image
       gradient: 'bg-gradient-to-br from-purple-600 via-pink-600 to-red-500',
       names: 'Rajesh & Priya',
@@ -303,7 +303,7 @@ export default function Home() {
       quote: "Make My Knot's AI understood what we were truly looking for. We couldn't be happier!"
     },
     {
-      image: '/images/2.jpg', // Desktop landscape image
+      image: '/images/2.svg', // Desktop SVG image (1200x800px)
       mobileImage: '/images/p2-mobile.jpg', // Mobile portrait image
       gradient: 'bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600',
       names: 'Arjun & Kavya',
@@ -311,7 +311,7 @@ export default function Home() {
       quote: 'The compatibility matching was spot-on. We share the same dreams and aspirations!'
     },
     {
-      image: '/images/3.jpg', // Desktop landscape image
+      image: '/images/3.svg', // Desktop SVG image (1200x800px)
       mobileImage: '/images/p3-mobile.jpg', // Mobile portrait image
       gradient: 'bg-gradient-to-br from-green-600 via-teal-600 to-blue-600',
       names: 'Vikram & Sneha',
