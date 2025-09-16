@@ -277,21 +277,6 @@ export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [showSplash, setShowSplash] = useState(true)
   const [isLoading, setIsLoading] = useState(true)
-  const [isMobile, setIsMobile] = useState(false)
-  
-  // Mobile detection for responsive images
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768) // md breakpoint
-    }
-    
-    // Check on mount
-    checkMobile()
-    
-    // Listen for resize
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
   
   // Clean up completed lead sessions on page load
   useEffect(() => {
@@ -545,13 +530,25 @@ export default function Home() {
                     <div className={`absolute inset-0 w-full h-full transition-all duration-1000 ${
                       index === currentSlide ? 'scale-100' : 'scale-110'
                     }`}>
-                      <Image
-                        src={isMobile ? couple.mobileImage : couple.image}
+                      {/* Desktop Image - using regular img tag */}
+                      <img
+                        src={couple.image}
                         alt={couple.names}
-                        fill
-                        className="object-cover"
-                        priority={index === 0}
-                        sizes="(max-width: 768px) 100vw, 100vw"
+                        className="absolute inset-0 w-full h-full object-cover"
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          position: 'absolute',
+                          top: 0,
+                          left: 0
+                        }}
+                        onError={(e) => {
+                          console.log('Failed to load desktop image:', e.currentTarget.src);
+                        }}
+                        onLoad={(e) => {
+                          console.log('✅ Desktop image loaded successfully:', e.currentTarget.src);
+                        }}
                       />
                     </div>
                     {/* Gradient overlay for readability */}
