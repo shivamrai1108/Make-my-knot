@@ -295,7 +295,8 @@ export default function Home() {
   
   const couples = [
     {
-      image: '/images/1.svg', // Desktop SVG image (1200x800px)
+      image: '/images/1.svg', // Desktop SVG image (1200x800px) - fallback to JPEG if fails
+      fallbackImage: '/images/1.jpg', // JPEG fallback
       mobileImage: '/images/p1-mobile.jpg', // Mobile portrait image
       gradient: 'bg-gradient-to-br from-purple-600 via-pink-600 to-red-500',
       names: 'Rajesh & Priya',
@@ -303,7 +304,8 @@ export default function Home() {
       quote: "Make My Knot's AI understood what we were truly looking for. We couldn't be happier!"
     },
     {
-      image: '/images/2.svg', // Desktop SVG image (1200x800px)
+      image: '/images/2.svg', // Desktop SVG image (1200x800px) - fallback to JPEG if fails
+      fallbackImage: '/images/2.jpg', // JPEG fallback
       mobileImage: '/images/p2-mobile.jpg', // Mobile portrait image
       gradient: 'bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600',
       names: 'Arjun & Kavya',
@@ -311,7 +313,8 @@ export default function Home() {
       quote: 'The compatibility matching was spot-on. We share the same dreams and aspirations!'
     },
     {
-      image: '/images/3.svg', // Desktop SVG image (1200x800px)
+      image: '/images/3.svg', // Desktop SVG image (1200x800px) - fallback to JPEG if fails
+      fallbackImage: '/images/3.jpg', // JPEG fallback
       mobileImage: '/images/p3-mobile.jpg', // Mobile portrait image
       gradient: 'bg-gradient-to-br from-green-600 via-teal-600 to-blue-600',
       names: 'Vikram & Sneha',
@@ -529,20 +532,27 @@ export default function Home() {
                   <div key={index} className="flex-shrink-0 relative h-full min-w-full">
                     {/* Background Image Container - No scaling animation to prevent zoom */}
                     <div className="absolute inset-0 w-full h-full bg-gray-900">
-                      {/* Desktop Image */}
+                      {/* Desktop Image with SVG fallback */}
                       <img
                         src={couple.image}
                         alt={couple.names}
                         className="absolute inset-0 w-full h-full block md:block"
                         style={{
-                          objectFit: 'contain',
+                          objectFit: 'cover',
                           objectPosition: 'center',
                           width: '100%',
                           height: '100%'
                         }}
                         onError={(e) => {
-                          console.log('❌ Failed to load desktop image:', e.currentTarget.src);
-                          e.currentTarget.style.display = 'none';
+                          console.log('❌ Failed to load SVG image:', e.currentTarget.src);
+                          console.log('🔄 Trying fallback JPEG image:', couple.fallbackImage);
+                          // Try fallback JPEG if SVG fails
+                          if (e.currentTarget.src.includes('.svg') && couple.fallbackImage) {
+                            e.currentTarget.src = couple.fallbackImage;
+                          } else {
+                            console.log('❌ Both SVG and JPEG failed, hiding image');
+                            e.currentTarget.style.display = 'none';
+                          }
                         }}
                         onLoad={(e) => {
                           console.log('✅ Desktop image loaded successfully:', e.currentTarget.src);
