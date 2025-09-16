@@ -277,6 +277,21 @@ export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [showSplash, setShowSplash] = useState(true)
   const [isLoading, setIsLoading] = useState(true)
+  const [isMobile, setIsMobile] = useState(false)
+  
+  // Mobile detection for responsive images
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768) // md breakpoint
+    }
+    
+    // Check on mount
+    checkMobile()
+    
+    // Listen for resize
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
   
   // Clean up completed lead sessions on page load
   useEffect(() => {
@@ -295,21 +310,24 @@ export default function Home() {
   
   const couples = [
     {
-      image: '/images/1.jpg', // Custom web-optimized image
+      image: '/images/1.jpg', // Desktop landscape image
+      mobileImage: '/images/p1-mobile.jpg', // Mobile portrait image
       gradient: 'bg-gradient-to-br from-purple-600 via-pink-600 to-red-500',
       names: 'Rajesh & Priya',
       story: 'Found love through shared values in Mumbai, celebrated with a grand Indian wedding in 2023',
       quote: "Make My Knot's AI understood what we were truly looking for. We couldn't be happier!"
     },
     {
-      image: '/images/2.jpg', // Custom web-optimized image
+      image: '/images/2.jpg', // Desktop landscape image
+      mobileImage: '/images/p2-mobile.jpg', // Mobile portrait image
       gradient: 'bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600',
       names: 'Arjun & Kavya',
       story: 'Connected across cities, engaged in a beautiful ceremony with both families in 2024',
       quote: 'The compatibility matching was spot-on. We share the same dreams and aspirations!'
     },
     {
-      image: '/images/3.jpg', // Custom web-optimized image
+      image: '/images/3.jpg', // Desktop landscape image
+      mobileImage: '/images/p3-mobile.jpg', // Mobile portrait image
       gradient: 'bg-gradient-to-br from-green-600 via-teal-600 to-blue-600',
       names: 'Vikram & Sneha',
       story: 'Long-distance match turned into a beautiful partnership, now settled together in Delhi',
@@ -528,11 +546,12 @@ export default function Home() {
                       index === currentSlide ? 'scale-100' : 'scale-110'
                     }`}>
                       <Image
-                        src={couple.image}
+                        src={isMobile ? couple.mobileImage : couple.image}
                         alt={couple.names}
                         fill
                         className="object-cover"
                         priority={index === 0}
+                        sizes="(max-width: 768px) 100vw, 100vw"
                       />
                     </div>
                     {/* Gradient overlay for readability */}
