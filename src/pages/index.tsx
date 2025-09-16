@@ -535,11 +535,10 @@ export default function Home() {
                         alt={couple.names}
                         className="absolute inset-0 w-full h-full block md:block"
                         style={{
-                          objectFit: 'cover',
-                          objectPosition: 'center top',
+                          objectFit: 'contain',
+                          objectPosition: 'center',
                           width: '100%',
-                          height: '100%',
-                          transform: 'scale(0.9)' // Slight scale down to show more of the image
+                          height: '100%'
                         }}
                         onError={(e) => {
                           console.log('❌ Failed to load desktop image:', e.currentTarget.src);
