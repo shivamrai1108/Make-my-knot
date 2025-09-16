@@ -706,8 +706,8 @@ export default function Home() {
             <ChevronRight className="h-5 w-5" />
           </motion.button>
 
-          {/* Enhanced Dots Indicator */}
-          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-4 z-20">
+          {/* Enhanced Dots Indicator - Positioned higher on mobile */}
+          <div className="absolute bottom-2 md:bottom-8 right-4 md:left-1/2 md:transform md:-translate-x-1/2 flex space-x-3 md:space-x-4 z-20">
             {couples.map((_, index) => (
               <button
                 key={index}

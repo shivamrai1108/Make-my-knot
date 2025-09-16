@@ -81,15 +81,18 @@ export default function About() {
             </div>
 
             <div className="relative">
-              {/* Timeline line */}
-              <div className="absolute left-1/2 transform -translate-x-px h-full w-0.5 bg-primary-200"></div>
+              {/* Timeline line - Hidden on mobile, centered on desktop */}
+              <div className="hidden md:block absolute left-1/2 transform -translate-x-px h-full w-0.5 bg-primary-200"></div>
+              {/* Mobile Timeline line - Left aligned */}
+              <div className="md:hidden absolute left-4 top-0 bottom-0 w-0.5 bg-primary-200"></div>
 
               {/* Timeline items */}
               <div className="space-y-12">
                 {/* 1975 */}
                 <div className="relative flex items-center">
-                  <div className="flex-1 text-right pr-8">
-                    <div className="flex justify-end mb-4">
+                  {/* Mobile Layout */}
+                  <div className="md:hidden pl-12 w-full">
+                    <div className="mb-4">
                       <div className="relative w-48 h-32 rounded-lg overflow-hidden shadow-lg">
                         <Image
                           src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=400&h=300&fit=crop&auto=format"
@@ -119,8 +122,43 @@ export default function About() {
                       </p>
                     </div>
                   </div>
-                  <div className="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-primary-600 rounded-full border-4 border-white"></div>
-                  <div className="flex-1 pl-8"></div>
+                  {/* Desktop Layout */}
+                  <div className="hidden md:flex md:items-center md:w-full">
+                    <div className="flex-1 text-right pr-8">
+                      <div className="flex justify-end mb-4">
+                        <div className="relative w-48 h-32 rounded-lg overflow-hidden shadow-lg">
+                          <Image
+                            src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=400&h=300&fit=crop&auto=format"
+                            alt="Traditional Indian family gathering representing 1975 matchmaking foundation"
+                            fill
+                            className="object-cover sepia"
+                          />
+                        </div>
+                      </div>
+                      <h3 className="text-2xl font-bold text-gray-900">1975</h3>
+                      <h4 className="text-lg font-semibold text-primary-600 mb-2">The Foundation of Goyal Marriage Bureau</h4>
+                      <div className="bg-gradient-to-r from-primary-50 to-gold-50 rounded-lg p-4 mb-4">
+                        <h5 className="font-bold text-primary-800 mb-2">Matches Made with Mannat, Not Just Metrics</h5>
+                      </div>
+                      <p className="text-gray-600 mb-3">
+                        In 1975, <strong>Chaman Prakash Goyal</strong>, lovingly called Dadu, sowed the seeds of what is today one of India's most trusted matchmaking legacies.
+                      </p>
+                      <p className="text-gray-600 mb-3">
+                        For him, matchmaking was never about numbers or biodatas—it was about emotions, families, and dreams. He would personally meet families, listen to their stories, understand their values, and spend hours ensuring that every rishta was not just a formality, but a true partnership for life.
+                      </p>
+                      <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 mb-3">
+                        <p className="text-sm text-gray-700 italic">
+                          💡 People remember him not as a businessman, but as a well-wisher, a guide, and sometimes even a father figure. Families trusted his judgment because he always worked with sincerity, blessings, and an unshakable belief that:
+                        </p>
+                        <p className="text-primary-800 font-semibold mt-2 text-center">
+                          "Shaadi sirf do logon ka milan nahi hota, do parivaron ka rishta hota hai."
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex-1 pl-8"></div>
+                  </div>
+                  {/* Timeline dot */}
+                  <div className="absolute left-4 md:left-1/2 transform md:-translate-x-1/2 w-8 h-8 bg-primary-600 rounded-full border-4 border-white"></div>
                 </div>
 
                 {/* 1985s */}
