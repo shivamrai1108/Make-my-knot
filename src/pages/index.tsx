@@ -513,7 +513,7 @@ export default function Home() {
         <Navigation variant="wine-glass" />
 
         {/* Hero Section - Questionnaire with Couple Slider Background */}
-        <section className="relative min-h-screen flex items-center justify-center overflow-hidden" style={{ paddingTop: `${NAVIGATION_CONSTANTS.MOBILE_HEIGHT}px` }}>
+        <section className="relative h-screen flex items-center justify-center overflow-hidden" style={{ paddingTop: `${NAVIGATION_CONSTANTS.MOBILE_HEIGHT}px`, height: `calc(100vh - ${NAVIGATION_CONSTANTS.MOBILE_HEIGHT}px)` }}>
           {/* Background Couple Slider */}
           <div className="absolute inset-0 w-full h-full overflow-hidden">
             <div className="relative w-full h-full overflow-hidden">
@@ -522,21 +522,25 @@ export default function Home() {
                 style={{ 
                   transform: `translateX(-${currentSlide * 100}%)`,
                   width: `${couples.length * 100}%`,
-                  height: '100vh',
-                  minHeight: '100vh'
+                  height: '100%'
                 }}
               >
                 {couples.map((couple, index) => (
-                  <div key={index} className="flex-shrink-0 relative h-full min-w-full" style={{ height: '100vh' }}>
-                    {/* Background Image Container */}
-                    <div className={`absolute inset-0 w-full h-full bg-gray-900 transition-all duration-1000 ${
-                      index === currentSlide ? 'scale-100' : 'scale-110'
-                    }`}>
+                  <div key={index} className="flex-shrink-0 relative h-full min-w-full">
+                    {/* Background Image Container - No scaling animation to prevent zoom */}
+                    <div className="absolute inset-0 w-full h-full bg-gray-900">
                       {/* Desktop Image */}
                       <img
                         src={couple.image}
                         alt={couple.names}
-                        className="absolute inset-0 w-full h-full object-cover block md:block"
+                        className="absolute inset-0 w-full h-full block md:block"
+                        style={{
+                          objectFit: 'cover',
+                          objectPosition: 'center top',
+                          width: '100%',
+                          height: '100%',
+                          transform: 'scale(0.9)' // Slight scale down to show more of the image
+                        }}
                         onError={(e) => {
                           console.log('❌ Failed to load desktop image:', e.currentTarget.src);
                           e.currentTarget.style.display = 'none';
@@ -550,6 +554,10 @@ export default function Home() {
                         src={couple.mobileImage}
                         alt={couple.names}
                         className="absolute inset-0 w-full h-full object-cover block md:hidden"
+                        style={{
+                          objectFit: 'cover',
+                          objectPosition: 'center'
+                        }}
                         onError={(e) => {
                           console.log('❌ Failed to load mobile image:', e.currentTarget.src);
                           e.currentTarget.style.display = 'none';
