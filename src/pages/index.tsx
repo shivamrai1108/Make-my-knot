@@ -101,8 +101,8 @@ function CoupleSlider() {
     <section className="py-20 bg-gradient-to-br from-pink-50 to-purple-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">Happy Couples</h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">Happy Couples</h2>
+          <p className="text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">
             Over 50,000 couples have found love through Make My Knot. Here are some of their beautiful stories.
           </p>
         </div>
@@ -232,8 +232,8 @@ function TestimonialsSection() {
       
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">What Our Members Say</h2>
-          <p className="text-xl text-gray-700 max-w-3xl mx-auto">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-6">What Our Members Say</h2>
+          <p className="text-base md:text-lg lg:text-xl text-gray-700 max-w-3xl mx-auto">
             Don't just take our word for it. Here's what our successful members have to say about their experience.
           </p>
         </div>
@@ -406,7 +406,7 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.8 }}
               className="mb-6"
             >
-              <h1 className="text-5xl md:text-6xl font-bold text-white mb-2 text-shadow-lg">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 text-shadow-lg">
                 <span className="bg-gradient-to-r from-gold-300 to-gold-100 bg-clip-text text-transparent">
                   Make My Knot
                 </span>
@@ -415,7 +415,7 @@ export default function Home() {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8, delay: 1.2 }}
-                className="text-2xl md:text-3xl lg:text-4xl text-white/90 font-medium italic"
+                className="text-lg md:text-xl lg:text-2xl text-white/90 font-medium italic"
               >
                 <motion.span
                   initial={{ opacity: 0, y: 20 }}
@@ -577,7 +577,7 @@ export default function Home() {
                   transition={{ duration: 0.6, delay: 0.7 }}
                   className="mb-8"
                 >
-                  <h2 className="text-2xl lg:text-3xl font-bold text-white mb-4">
+                  <h2 className="text-xl md:text-2xl font-bold text-white mb-4">
                     Start Your Journey
                   </h2>
                   <motion.div 
@@ -586,7 +586,7 @@ export default function Home() {
                     transition={{ duration: 0.8, delay: 1.0 }}
                     className="mb-6"
                   >
-                    <p className="text-lg text-gold-200 font-medium italic leading-relaxed">
+                    <p className="text-base md:text-lg text-gold-200 font-medium italic leading-relaxed">
                       "<motion.span
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -709,12 +709,12 @@ export default function Home() {
                   Launch Offer
                 </div>
                 
-                <h2 className="text-4xl lg:text-5xl font-bold mb-6 leading-tight">
+                <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-6 leading-tight">
                   15 Days Free
                   <span className="block">Membership! 🎉</span>
                 </h2>
                 
-                <p className="text-xl text-white/90 mb-8 leading-relaxed">
+                <p className="text-base md:text-lg lg:text-xl text-white/90 mb-8 leading-relaxed">
                   Be among the first 100 customers to experience our premium matchmaking service. 
                   Get 15 days of complete access to find your perfect match!
                 </p>
@@ -817,7 +817,7 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
                 viewport={{ once: true }}
-                className="text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight"
+                className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight"
               >
                 Meet Your <span className="text-gold-400">Perfect</span><br />
                 Life Partner
@@ -837,7 +837,7 @@ export default function Home() {
                     whileInView={{ opacity: 1 }}
                     transition={{ duration: 1, delay: 0.5 }}
                     viewport={{ once: true }}
-                    className="text-2xl lg:text-3xl font-semibold text-gold-300 italic leading-relaxed"
+                    className="text-lg md:text-xl lg:text-2xl font-semibold text-gold-300 italic leading-relaxed"
                   >
                     "<motion.span
                       initial={{ opacity: 0, x: -10 }}
@@ -904,7 +904,7 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.4 }}
                 viewport={{ once: true }}
-                className="text-xl text-gray-200 mb-8 leading-relaxed max-w-4xl mx-auto"
+                className="text-base md:text-lg lg:text-xl text-gray-200 mb-8 leading-relaxed max-w-4xl mx-auto"
               >
                 50 years of matchmaking expertise now powered by AI. We understand your values, lifestyle, and what truly matters to you.
               </motion.p>
@@ -972,7 +972,7 @@ export default function Home() {
                     </div>
                   </div>
                   
-                  <h3 className="text-xl font-bold text-center mb-2">Relationship Mastery Webinar</h3>
+                  <h3 className="text-lg md:text-xl font-bold text-center mb-2">Relationship Mastery Webinar</h3>
                   <p className="text-center text-white/90 text-sm mb-1 font-medium">with Dr. Sarah Mitchell</p>
                   <p className="text-center text-white/80 text-sm mb-6">Join our expert therapist for insights on building lasting relationships</p>
                   
@@ -995,8 +995,8 @@ export default function Home() {
         <section id="how-it-works" className="py-20 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">How Make My Knot Works</h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">How Make My Knot Works</h2>
+              <p className="text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">
                 Our intelligent matching process ensures you meet people who truly align with your values and life goals
               </p>
             </div>
@@ -1007,7 +1007,7 @@ export default function Home() {
                 <div className="w-16 h-16 bg-primary-600 rounded-2xl mx-auto mb-6 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
                   <MessageCircle className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">Meet Your Matchmaker</h3>
+                <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-4">Meet Your Matchmaker</h3>
                 <p className="text-gray-600">
                   Have a conversation with your AI matchmaker about your values, lifestyle, and what you're looking for in a life partner.
                 </p>
@@ -1018,7 +1018,7 @@ export default function Home() {
                 <div className="w-16 h-16 bg-gold-600 rounded-2xl mx-auto mb-6 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
                   <Users className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">Get Curated Matches</h3>
+                <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-4">Get Curated Matches</h3>
                 <p className="text-gray-600">
                   Receive 3-5 carefully selected profiles each week, chosen based on deep compatibility rather than just photos.
                 </p>
@@ -1029,7 +1029,7 @@ export default function Home() {
                 <div className="w-16 h-16 bg-green-600 rounded-2xl mx-auto mb-6 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
                   <Heart className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">Connect & Meet</h3>
+                <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-4">Connect & Meet</h3>
                 <p className="text-gray-600">
                   When both parties are interested, your matchmaker introduces you personally and helps facilitate your first meeting.
                 </p>
@@ -1056,7 +1056,7 @@ export default function Home() {
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Header */}
             <div className="text-center mb-16">
-              <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-6">
                 The Make My Knot Difference
               </h2>
             </div>
@@ -1068,7 +1068,7 @@ export default function Home() {
                 <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl mb-6 flex items-center justify-center">
                   <CheckCircle className="h-6 w-6 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Verified Profiles</h3>
+                <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-4">Verified Profiles</h3>
                 <p className="text-gray-700 leading-relaxed flex-grow">
                   Every profile goes through AI-powered verification so you can feel confident that the people you meet are genuine, safe, and serious about finding meaningful connections.
                 </p>
@@ -1079,7 +1079,7 @@ export default function Home() {
                 <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-rose-600 rounded-xl mb-6 flex items-center justify-center">
                   <Heart className="h-6 w-6 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Meaningful Likes</h3>
+                <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-4">Meaningful Likes</h3>
                 <p className="text-gray-700 leading-relaxed flex-grow">
                   Likes on Make My Knot aren't random swipes—they're thoughtful. You can send voice notes, reactions, or thoughtful comments, so every like feels personal and genuine.
                 </p>
@@ -1090,7 +1090,7 @@ export default function Home() {
                 <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl mb-6 flex items-center justify-center">
                   <Star className="h-6 w-6 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">AI Compatibility Scores</h3>
+                <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-4">AI Compatibility Scores</h3>
                 <p className="text-gray-700 leading-relaxed flex-grow">
                   Our unique AI engine calculates compatibility not just between two people, but also considers family expectations, lifestyle choices, and values—making every match more real and lasting.
                 </p>
@@ -1101,7 +1101,7 @@ export default function Home() {
                 <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-violet-600 rounded-xl mb-6 flex items-center justify-center">
                   <Users className="h-6 w-6 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Transparent Intentions</h3>
+                <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-4">Transparent Intentions</h3>
                 <p className="text-gray-700 leading-relaxed flex-grow">
                   No guessing games. Profiles highlight key details like education, family background, and even optional income visibility—so you know exactly who you're connecting with.
                 </p>
@@ -1112,7 +1112,7 @@ export default function Home() {
                 <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl mb-6 flex items-center justify-center">
                   <MessageCircle className="h-6 w-6 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Personalized Conversation Starters</h3>
+                <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-4">Personalized Conversation Starters</h3>
                 <p className="text-gray-700 leading-relaxed flex-grow">
                   We don't leave you hanging. From icebreaker games to AI-generated conversation prompts, we make sure you never run out of things to say and can connect more naturally.
                 </p>
@@ -1123,7 +1123,7 @@ export default function Home() {
                 <div className="w-12 h-12 bg-gradient-to-br from-gold-500 to-yellow-600 rounded-xl mb-6 flex items-center justify-center">
                   <ArrowRight className="h-6 w-6 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Knot Specials</h3>
+                <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-4">Knot Specials</h3>
                 <p className="text-gray-700 leading-relaxed flex-grow">
                   Go beyond just chatting. Access premium experiences like numerology insights, curated private events, and AI-powered relationship counseling through our Knot Counselor.
                 </p>
@@ -1143,16 +1143,16 @@ export default function Home() {
           <div className="absolute bottom-10 right-10 w-96 h-96 bg-indigo-600/30 rounded-full blur-3xl opacity-70"></div>
           
           <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8 relative z-10">
-            <h2 className="text-4xl font-bold text-white mb-6 text-shadow-lg">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-6 text-shadow-lg">
               Ready to Find Your
               <span className="block mt-2 bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">Life Partner?</span>
             </h2>
-            <p className="text-xl text-slate-200 mb-8">
+            <p className="text-base md:text-lg lg:text-xl text-slate-200 mb-8">
               Join thousands of people who have found meaningful relationships through our premium matchmaking platform.
             </p>
             <Link 
               href="/signup" 
-              className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-2xl text-white bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:from-pink-600 hover:via-purple-600 hover:to-indigo-600 transform hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-purple-500/25"
+              className="inline-flex items-center justify-center px-6 py-3 text-base md:text-lg font-semibold rounded-2xl text-white bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:from-pink-600 hover:via-purple-600 hover:to-indigo-600 transform hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-purple-500/25"
             >
               Start Your Journey Today
               <ArrowRight className="ml-2 h-5 w-5" />
