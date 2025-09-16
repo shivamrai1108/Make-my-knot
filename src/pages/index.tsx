@@ -682,7 +682,7 @@ export default function Home() {
             </div>
           </motion.div>
 
-          {/* Enhanced Slider Navigation */}
+          {/* Enhanced Slider Navigation - Hidden on mobile */}
           <motion.button
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -690,7 +690,7 @@ export default function Home() {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
             onClick={prevSlide}
-            className="absolute left-6 top-1/2 transform -translate-y-1/2 bg-white/10 hover:bg-white/20 border border-white/30 text-white p-4 rounded-full backdrop-blur-md transition-all duration-300 z-20 shadow-2xl"
+            className="hidden md:block absolute left-6 top-1/2 transform -translate-y-1/2 bg-white/10 hover:bg-white/20 border border-white/30 text-white p-4 rounded-full backdrop-blur-md transition-all duration-300 z-20 shadow-2xl"
           >
             <ChevronLeft className="h-5 w-5" />
           </motion.button>
@@ -701,7 +701,7 @@ export default function Home() {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
             onClick={nextSlide}
-            className="absolute right-6 top-1/2 transform -translate-y-1/2 bg-white/10 hover:bg-white/20 border border-white/30 text-white p-4 rounded-full backdrop-blur-md transition-all duration-300 z-20 shadow-2xl"
+            className="hidden md:block absolute right-6 top-1/2 transform -translate-y-1/2 bg-white/10 hover:bg-white/20 border border-white/30 text-white p-4 rounded-full backdrop-blur-md transition-all duration-300 z-20 shadow-2xl"
           >
             <ChevronRight className="h-5 w-5" />
           </motion.button>
