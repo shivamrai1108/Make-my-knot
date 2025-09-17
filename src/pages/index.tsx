@@ -270,9 +270,9 @@ function HappyCoupleSlider() {
                   initial={{ opacity: 0, y: 60, scale: 0.9 }}
                   animate={index === currentIndex ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 60, scale: 0.9 }}
                   transition={{ duration: 1, delay: 0.3, ease: 'easeOut' }}
-                  className="text-6xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight"
+                  className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-4 sm:mb-6 leading-tight px-4"
                 >
-                  <span className="bg-gradient-to-r from-pink-300 via-rose-200 to-purple-300 bg-clip-text text-transparent drop-shadow-2xl">
+                  <span className="bg-gradient-to-r from-gold-400 via-yellow-300 to-orange-400 bg-clip-text text-transparent drop-shadow-2xl">
                     Happy Couple
                   </span>
                 </motion.h2>
@@ -283,7 +283,7 @@ function HappyCoupleSlider() {
                   initial={{ opacity: 0, x: -50 }}
                   animate={index === currentIndex ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }}
                   transition={{ duration: 0.8, delay: 0.6 }}
-                  className="text-2xl md:text-3xl lg:text-4xl font-semibold mb-4 text-white/90 drop-shadow-lg"
+                  className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-semibold mb-2 sm:mb-4 text-white/90 drop-shadow-lg px-4"
                 >
                   {slide.title}
                 </motion.div>
@@ -293,7 +293,7 @@ function HappyCoupleSlider() {
                   initial={{ opacity: 0, x: 50 }}
                   animate={index === currentIndex ? { opacity: 1, x: 0 } : { opacity: 0, x: 50 }}
                   transition={{ duration: 0.8, delay: 0.8 }}
-                  className="text-xl md:text-2xl lg:text-3xl text-white/80 font-medium italic mb-8 drop-shadow-md"
+                  className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl text-white/80 font-medium italic mb-4 sm:mb-6 lg:mb-8 drop-shadow-md px-4"
                 >
                   {slide.subtitle}
                 </motion.div>
@@ -313,12 +313,12 @@ function HappyCoupleSlider() {
       </div>
       
       {/* Navigation Controls */}
-      <div className="absolute inset-0 flex items-center justify-between px-8 pointer-events-none z-30">
+      <div className="absolute inset-0 flex items-center justify-between px-2 sm:px-4 md:px-8 pointer-events-none z-30">
         <button 
           onClick={prevSlide}
           onMouseEnter={() => setIsAutoPlaying(false)}
           onMouseLeave={() => setIsAutoPlaying(true)}
-          className="group bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white p-4 rounded-full transition-all duration-300 transform hover:scale-110 shadow-lg pointer-events-auto"
+          className="group bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white p-2 sm:p-3 md:p-4 rounded-full transition-all duration-300 transform hover:scale-110 shadow-lg pointer-events-auto text-sm sm:text-base"
           aria-label="Previous slide"
         >
           <motion.div
@@ -333,7 +333,7 @@ function HappyCoupleSlider() {
           onClick={nextSlide}
           onMouseEnter={() => setIsAutoPlaying(false)}
           onMouseLeave={() => setIsAutoPlaying(true)}
-          className="group bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white p-4 rounded-full transition-all duration-300 transform hover:scale-110 shadow-lg pointer-events-auto"
+          className="group bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white p-2 sm:p-3 md:p-4 rounded-full transition-all duration-300 transform hover:scale-110 shadow-lg pointer-events-auto text-sm sm:text-base"
           aria-label="Next slide"
         >
           <motion.div
@@ -346,7 +346,7 @@ function HappyCoupleSlider() {
       </div>
       
       {/* Animated Dots Indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3 z-30">
+      <div className="absolute bottom-4 sm:bottom-6 md:bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2 sm:space-x-3 z-30">
         {slides.map((_, index) => (
           <button
             key={index}
@@ -355,8 +355,8 @@ function HappyCoupleSlider() {
             onMouseLeave={() => setIsAutoPlaying(true)}
             className={`relative transition-all duration-500 ${
               index === currentIndex 
-                ? 'w-12 h-4 bg-white rounded-full' 
-                : 'w-4 h-4 bg-white/50 hover:bg-white/70 rounded-full'
+                ? 'w-8 h-3 sm:w-10 sm:h-3 md:w-12 md:h-4 bg-white rounded-full' 
+                : 'w-3 h-3 sm:w-4 sm:h-4 bg-white/50 hover:bg-white/70 rounded-full'
             }`}
             aria-label={`Go to slide ${index + 1}`}
           >
@@ -694,7 +694,7 @@ export default function Home() {
                 </p>
                 
                 {/* Questionnaire Container */}
-                <div className="bg-white bg-opacity-95 backdrop-blur-sm rounded-2xl p-6 shadow-2xl border border-gray-200">
+                <div className="glass rounded-2xl p-6 shadow-2xl border border-white/30">
                   <LeadQuestionnaire />
                 </div>
               </div>
