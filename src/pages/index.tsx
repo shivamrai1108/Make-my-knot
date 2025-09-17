@@ -1076,76 +1076,77 @@ export default function Home() {
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Header */}
             <div className="text-center mb-16">
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-6">
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-gray-900 mb-6 tracking-tight">
                 The Make My Knot Difference
               </h2>
+              <div className="w-24 h-1 bg-gray-900 mx-auto mt-4"></div>
             </div>
 
             {/* Perfect Grid Layout - All cards equal height */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {/* Verified Profiles */}
-              <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50 flex flex-col h-full">
-                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl mb-6 flex items-center justify-center">
-                  <CheckCircle className="h-6 w-6 text-white" />
+              <div className="bg-white rounded-xl p-8 shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100 flex flex-col h-full">
+                <div className="mb-6">
+                  <div className="w-16 h-1 bg-gray-900 mb-4"></div>
                 </div>
-                <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-4">Verified Profiles</h3>
-                <p className="text-gray-700 leading-relaxed flex-grow">
+                <h3 className="text-xl font-serif font-bold text-gray-900 mb-4 leading-tight">Verified Profiles</h3>
+                <p className="text-gray-600 leading-relaxed flex-grow font-light text-base">
                   Every profile goes through AI-powered verification so you can feel confident that the people you meet are genuine, safe, and serious about finding meaningful connections.
                 </p>
               </div>
 
               {/* Meaningful Likes */}
-              <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50 flex flex-col h-full">
-                <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-rose-600 rounded-xl mb-6 flex items-center justify-center">
-                  <Heart className="h-6 w-6 text-white" />
+              <div className="bg-white rounded-xl p-8 shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100 flex flex-col h-full">
+                <div className="mb-6">
+                  <div className="w-16 h-1 bg-gray-900 mb-4"></div>
                 </div>
-                <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-4">Meaningful Likes</h3>
-                <p className="text-gray-700 leading-relaxed flex-grow">
-                  Likes on Make My Knot aren't random swipes—they're thoughtful. You can send voice notes, reactions, or thoughtful comments, so every like feels personal and genuine.
+                <h3 className="text-xl font-serif font-bold text-gray-900 mb-4 leading-tight">Meaningful Connections</h3>
+                <p className="text-gray-600 leading-relaxed flex-grow font-light text-base">
+                  Connections on Make My Knot aren't random interactions—they're thoughtful. You can send voice notes, reactions, or thoughtful comments, so every connection feels personal and genuine.
                 </p>
               </div>
 
               {/* AI Compatibility Scores */}
-              <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50 flex flex-col h-full">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl mb-6 flex items-center justify-center">
-                  <Star className="h-6 w-6 text-white" />
+              <div className="bg-white rounded-xl p-8 shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100 flex flex-col h-full">
+                <div className="mb-6">
+                  <div className="w-16 h-1 bg-gray-900 mb-4"></div>
                 </div>
-                <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-4">AI Compatibility Scores</h3>
-                <p className="text-gray-700 leading-relaxed flex-grow">
-                  Our unique AI engine calculates compatibility not just between two people, but also considers family expectations, lifestyle choices, and values—making every match more real and lasting.
+                <h3 className="text-xl font-serif font-bold text-gray-900 mb-4 leading-tight">AI Compatibility Analysis</h3>
+                <p className="text-gray-600 leading-relaxed flex-grow font-light text-base">
+                  Our proprietary AI engine calculates compatibility not just between two people, but also considers family expectations, lifestyle choices, and values—making every match more meaningful and lasting.
                 </p>
               </div>
 
               {/* Transparent Intentions */}
-              <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50 flex flex-col h-full">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-violet-600 rounded-xl mb-6 flex items-center justify-center">
-                  <Users className="h-6 w-6 text-white" />
+              <div className="bg-white rounded-xl p-8 shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100 flex flex-col h-full">
+                <div className="mb-6">
+                  <div className="w-16 h-1 bg-gray-900 mb-4"></div>
                 </div>
-                <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-4">Transparent Intentions</h3>
-                <p className="text-gray-700 leading-relaxed flex-grow">
-                  No guessing games. Profiles highlight key details like education, family background, and even optional income visibility—so you know exactly who you're connecting with.
+                <h3 className="text-xl font-serif font-bold text-gray-900 mb-4 leading-tight">Transparent Intentions</h3>
+                <p className="text-gray-600 leading-relaxed flex-grow font-light text-base">
+                  No guessing games. Profiles highlight key details like education, family background, and optional income visibility—so you know exactly who you're connecting with from the start.
                 </p>
               </div>
 
               {/* Personalized Conversation Starters */}
-              <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50 flex flex-col h-full">
-                <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl mb-6 flex items-center justify-center">
-                  <MessageCircle className="h-6 w-6 text-white" />
+              <div className="bg-white rounded-xl p-8 shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100 flex flex-col h-full">
+                <div className="mb-6">
+                  <div className="w-16 h-1 bg-gray-900 mb-4"></div>
                 </div>
-                <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-4">Personalized Conversation Starters</h3>
-                <p className="text-gray-700 leading-relaxed flex-grow">
-                  We don't leave you hanging. From icebreaker games to AI-generated conversation prompts, we make sure you never run out of things to say and can connect more naturally.
+                <h3 className="text-xl font-serif font-bold text-gray-900 mb-4 leading-tight">Personalized Guidance</h3>
+                <p className="text-gray-600 leading-relaxed flex-grow font-light text-base">
+                  We provide comprehensive support throughout your journey. From intelligent conversation starters to AI-generated interaction prompts, we ensure you never feel uncertain about how to connect naturally.
                 </p>
               </div>
 
               {/* Knot Specials */}
-              <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50 flex flex-col h-full">
-                <div className="w-12 h-12 bg-gradient-to-br from-gold-500 to-yellow-600 rounded-xl mb-6 flex items-center justify-center">
-                  <ArrowRight className="h-6 w-6 text-white" />
+              <div className="bg-white rounded-xl p-8 shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100 flex flex-col h-full">
+                <div className="mb-6">
+                  <div className="w-16 h-1 bg-gray-900 mb-4"></div>
                 </div>
-                <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-4">Knot Specials</h3>
-                <p className="text-gray-700 leading-relaxed flex-grow">
-                  Go beyond just chatting. Access premium experiences like numerology insights, curated private events, and AI-powered relationship counseling through our Knot Counselor.
+                <h3 className="text-xl font-serif font-bold text-gray-900 mb-4 leading-tight">Premium Services</h3>
+                <p className="text-gray-600 leading-relaxed flex-grow font-light text-base">
+                  Access exclusive experiences beyond standard matchmaking. Our premium services include numerology insights, curated private events, and AI-powered relationship counseling through our expert advisors.
                 </p>
               </div>
             </div>
