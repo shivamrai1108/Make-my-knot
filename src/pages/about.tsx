@@ -9,8 +9,8 @@ export default function About() {
   return (
     <>
       <Head>
-        <title>About Us - Make My Knot | 50 Years of Matchmaking Excellence</title>
-        <meta name="description" content="Discover our 3-generation legacy of bringing families together since 1950. From traditional matchmaking to AI-powered compatibility and end-to-end wedding services, we honor trust, values, and love." />
+        <title>About Us - Make My Knot | Our Legacy: From 1975 to 2025</title>
+        <meta name="description" content="Discover our 3-generation legacy of bringing families together since 1975. From Chaman Prakash Goyal's foundation to today's AI-powered platform - 50 years of matches made with Mannat, not just metrics." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
@@ -57,9 +57,9 @@ export default function About() {
             </h1>
             <p className="text-xl text-gray-200 leading-relaxed mb-8">
               Since 1975, the Goyal family has been India's most trusted name in matchmaking. What started with 
-              Chaman Prakash Goyal (Dadu) as a heartfelt mission to create meaningful rishtas has evolved through 
-              three generations into today's AI-powered platform, but our commitment to "Mannat, not just metrics" 
-              remains unchanged.
+              Chaman Prakash Goyal (Visionary Founder) as a heartfelt mission to create meaningful rishtas has evolved through 
+              three generations into today's AI-powered platform under Managing Director Anil Goyal and CEO Moulik Goyal, 
+              but our commitment to "Matches Made with Mannat, Not Just Metrics" remains unchanged.
             </p>
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
               <p className="text-lg text-gold-300 font-medium italic">
@@ -108,17 +108,20 @@ export default function About() {
                       <h5 className="font-bold text-primary-800 mb-2">Matches Made with Mannat, Not Just Metrics</h5>
                     </div>
                     <p className="text-gray-600 mb-3">
-                      In 1975, <strong>Chaman Prakash Goyal</strong>, lovingly called Dadu, sowed the seeds of what is today one of India's most trusted matchmaking legacies.
+                      In 1975, <strong>Chaman Prakash Goyal</strong> laid the foundation of Goyal Marriage Bureau, planting the roots of what has become one of the most trusted matchmaking services in India. His belief was simple yet powerful: every rishta deserves honesty, care, and blessings.
                     </p>
                     <p className="text-gray-600 mb-3">
-                      For him, matchmaking was never about numbers or biodatas—it was about emotions, families, and dreams. He would personally meet families, listen to their stories, understand their values, and spend hours ensuring that every rishta was not just a formality, but a true partnership for life.
+                      At a time when matchmaking was limited to biodatas and formalities, Chaman Prakash Goyal brought heart into the process. He personally met families, understood their values, and ensured that every match was built on trust and compatibility. His dedication turned countless dreams into successful marriages, earning him respect as one of India's most reliable matchmakers.
+                    </p>
+                    <p className="text-gray-600 mb-3">
+                      For him, shaadi was never just about two individuals, but about uniting families. With sincerity, blessings, and a personal touch, he created a legacy of meaningful connections—one that continues to inspire generations.
                     </p>
                     <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 mb-3">
                       <p className="text-sm text-gray-700 italic">
-                        💡 People remember him not as a businessman, but as a well-wisher, a guide, and sometimes even a father figure. Families trusted his judgment because he always worked with sincerity, blessings, and an unshakable belief that:
+                        💡 His philosophy became the foundation of our approach:
                       </p>
                       <p className="text-primary-800 font-semibold mt-2 text-center">
-                        "Shaadi sirf do logon ka milan nahi hota, do parivaron ka rishta hota hai."
+                        "Matches Made with Mannat, Not Just Metrics"
                       </p>
                     </div>
                   </div>
@@ -141,17 +144,20 @@ export default function About() {
                         <h5 className="font-bold text-primary-800 mb-2">Matches Made with Mannat, Not Just Metrics</h5>
                       </div>
                       <p className="text-gray-600 mb-3">
-                        In 1975, <strong>Chaman Prakash Goyal</strong>, lovingly called Dadu, sowed the seeds of what is today one of India's most trusted matchmaking legacies.
+                        In 1975, <strong>Chaman Prakash Goyal</strong> laid the foundation of Goyal Marriage Bureau, planting the roots of what has become one of the most trusted matchmaking services in India. His belief was simple yet powerful: every rishta deserves honesty, care, and blessings.
                       </p>
                       <p className="text-gray-600 mb-3">
-                        For him, matchmaking was never about numbers or biodatas—it was about emotions, families, and dreams. He would personally meet families, listen to their stories, understand their values, and spend hours ensuring that every rishta was not just a formality, but a true partnership for life.
+                        At a time when matchmaking was limited to biodatas and formalities, Chaman Prakash Goyal brought heart into the process. He personally met families, understood their values, and ensured that every match was built on trust and compatibility. His dedication turned countless dreams into successful marriages, earning him respect as one of India's most reliable matchmakers.
+                      </p>
+                      <p className="text-gray-600 mb-3">
+                        For him, shaadi was never just about two individuals, but about uniting families. With sincerity, blessings, and a personal touch, he created a legacy of meaningful connections—one that continues to inspire generations.
                       </p>
                       <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 mb-3">
                         <p className="text-sm text-gray-700 italic">
-                          💡 People remember him not as a businessman, but as a well-wisher, a guide, and sometimes even a father figure. Families trusted his judgment because he always worked with sincerity, blessings, and an unshakable belief that:
+                          💡 His philosophy became the foundation of our approach:
                         </p>
                         <p className="text-primary-800 font-semibold mt-2 text-center">
-                          "Shaadi sirf do logon ka milan nahi hota, do parivaron ka rishta hota hai."
+                          "Matches Made with Mannat, Not Just Metrics"
                         </p>
                       </div>
                     </div>
@@ -161,7 +167,7 @@ export default function About() {
                   <div className="absolute left-4 md:left-1/2 transform md:-translate-x-1/2 w-8 h-8 bg-primary-600 rounded-full border-4 border-white"></div>
                 </div>
 
-                {/* 1985s */}
+                {/* 2000 */}
                 <div className="relative flex items-center">
                   <div className="flex-1 pr-8"></div>
                   <div className="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-primary-600 rounded-full border-4 border-white"></div>
@@ -170,55 +176,82 @@ export default function About() {
                       <div className="relative w-48 h-32 rounded-lg overflow-hidden shadow-lg">
                         <Image
                           src="https://images.unsplash.com/photo-1606800052052-a08af7148866?w=400&h=300&fit=crop&auto=format"
-                          alt="Traditional Indian wedding celebration representing the 1980s"
+                          alt="Second generation leadership in 2000"
                           fill
                           className="object-cover sepia"
                         />
                       </div>
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-900">1985</h3>
-                    <h4 className="text-lg font-semibold text-primary-600 mb-2">Second Generation</h4>
+                    <h3 className="text-2xl font-bold text-gray-900">2000</h3>
+                    <h4 className="text-lg font-semibold text-primary-600 mb-2">Second Generation Leadership</h4>
+                    <div className="bg-gradient-to-r from-primary-50 to-gold-50 rounded-lg p-4 mb-4">
+                      <h5 className="font-bold text-primary-800 mb-2">Carrying Forward a Legacy of Love</h5>
+                    </div>
+                    <p className="text-gray-600 mb-3">
+                      In 2000, <strong>Shri Anil Goyal</strong> carried forward this legacy of matchmaking with the same passion and integrity. With over 16 years of experience, he emphasized personal attention, emotional understanding, and sincerity.
+                    </p>
                     <p className="text-gray-600">
-                      Carrying Forward a Legacy of Love. The mission was taken forward by <strong>Shri Anil Goyal</strong>, who dedicated over 16 years to nurturing this vision. With deep care, personal attention, and emotional understanding, he ensured that every rishta was handled with love and sincerity, continuing the legacy Dadu had begun.
+                      Every rishta was nurtured with care, guided by his belief that marriages are not transactions—they are lifelong commitments.
                     </p>
                   </div>
                 </div>
 
-                {/* 1990s */}
+                {/* 2010 */}
                 <div className="relative flex items-center">
                   <div className="flex-1 text-right pr-8">
-                    <h3 className="text-2xl font-bold text-gray-900">1995</h3>
-                    <h4 className="text-lg font-semibold text-primary-600 mb-2">Digital Revolution</h4>
+                    <h3 className="text-2xl font-bold text-gray-900">2010</h3>
+                    <h4 className="text-lg font-semibold text-primary-600 mb-2">The Digital Shift</h4>
+                    <div className="bg-gradient-to-r from-primary-50 to-gold-50 rounded-lg p-4 mb-4">
+                      <h5 className="font-bold text-primary-800 mb-2">Where Technology Met Heart</h5>
+                    </div>
+                    <p className="text-gray-600 mb-3">
+                      As technology reshaped India, so did matchmaking. While many reduced rishtas to online biodata lists, <strong>Anil Goyal</strong> blended technology with human touch.
+                    </p>
                     <p className="text-gray-600">
-                      Where Technology Meets Heart. As the world changed, so did matchmaking. While many saw just biodata, <strong>Shri Anil Goyal</strong> saw human stories. He offered guidance, intuition, and trust—combining technology with a personal touch so each connection reflected the dreams and emotions of families across India.
+                      He believed in stories, not just profiles—helping families find matches that were not only compatible on paper but deeply meaningful in real life.
                     </p>
                   </div>
                   <div className="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-primary-600 rounded-full border-4 border-white"></div>
                   <div className="flex-1 pl-8"></div>
                 </div>
 
-                {/* 2005 */}
+                {/* 2015 */}
                 <div className="relative flex items-center">
                   <div className="flex-1 pr-8"></div>
                   <div className="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-primary-600 rounded-full border-4 border-white"></div>
                   <div className="flex-1 pl-8">
-                    <h3 className="text-2xl font-bold text-gray-900">2005</h3>
-                    <h4 className="text-lg font-semibold text-primary-600 mb-2">Notepad & Platform</h4>
+                    <h3 className="text-2xl font-bold text-gray-900">2015</h3>
+                    <h4 className="text-lg font-semibold text-primary-600 mb-2">Handwritten Diaries to Platforms</h4>
+                    <div className="bg-gradient-to-r from-primary-50 to-gold-50 rounded-lg p-4 mb-4">
+                      <h5 className="font-bold text-primary-800 mb-2">Every Rishta Tells a Story</h5>
+                    </div>
+                    <p className="text-gray-600 mb-3">
+                      From handwritten diaries filled with biodatas to meaningful conversations, over 1,000 couples were united under the guidance of the Goyal family. Their philosophy remained unchanged:
+                    </p>
+                    <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 mb-3">
+                      <p className="text-primary-800 font-semibold text-center">
+                        “Shaadi ek event nahi — ek zindagi bhar ka saath hota hai.”
+                      </p>
+                    </div>
                     <p className="text-gray-600">
-                      Where Every Rishta Was a Story. Armed with handwritten diaries and heartfelt conversations, <strong>Shri Anil Goyal</strong> helped unite over 1000 couples. Guided by the belief:
-                      <span className="block mt-2 italic">“Shaadi ek event nahi — ek zindagi bhar ka saath hota hai.”</span>
-                      Every match was more than a profile—it was a journey of love, trust, and lifelong companionship.
+                      Every rishta was not just a profile—it was a story of love, trust, and companionship.
                     </p>
                   </div>
                 </div>
 
-                {/* 2015 */}
+                {/* 2020 */}
                 <div className="relative flex items-center">
                   <div className="flex-1 text-right pr-8">
-                    <h3 className="text-2xl font-bold text-gray-900">2015</h3>
+                    <h3 className="text-2xl font-bold text-gray-900">2020</h3>
                     <h4 className="text-lg font-semibold text-primary-600 mb-2">Third Generation Leadership</h4>
+                    <div className="bg-gradient-to-r from-primary-50 to-gold-50 rounded-lg p-4 mb-4">
+                      <h5 className="font-bold text-primary-800 mb-2">Where Tradition Meets Innovation</h5>
+                    </div>
+                    <p className="text-gray-600 mb-3">
+                      The legacy entered its third generation with <strong>Moulik Goyal</strong>, who had grown up watching his father and grandfather devote their lives to matchmaking. With 5+ years of experience at Make My Knot, he is now transforming the 50-year-old family business into India’s most advanced AI-powered matchmaking platform.
+                    </p>
                     <p className="text-gray-600">
-                      Where Tradition Meets Innovation. <strong>Moulik Goyal</strong> joined as CEO, bringing the third generation of leadership. He blended modern technology with traditional matchmaking wisdom, expanding services internationally to support the NRI community.
+                      By blending traditional wisdom with cutting-edge technology, Moulik is ensuring that the Goyal family’s heritage continues to evolve for the modern world, supporting both Indian and NRI families in finding meaningful connections.
                     </p>
                   </div>
                   <div className="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-primary-600 rounded-full border-4 border-white"></div>
@@ -255,20 +288,27 @@ export default function About() {
                       </div>
                     </div>
                     <h3 className="text-2xl font-bold text-gray-900">2025</h3>
-                    <h4 className="text-lg font-semibold text-primary-600 mb-2">Tech-Powered Matchmaking & Weddings</h4>
-                    <p className="text-gray-600 mb-4">
-                      Heritage Meets Innovation. Today, the legacy of three generations continues as a technology-powered matchmaking platform. We help families create lasting relationships and meaningful connections—now with end-to-end wedding services.
-                    </p>
-                    <div className="grid md:grid-cols-2 gap-3 text-sm text-gray-700">
-                      <div className="flex items-center"><CheckCircle className="h-4 w-4 text-primary-600 mr-2" /> Anchors & Emcees</div>
-                      <div className="flex items-center"><CheckCircle className="h-4 w-4 text-primary-600 mr-2" /> Caterers</div>
-                      <div className="flex items-center"><CheckCircle className="h-4 w-4 text-primary-600 mr-2" /> Decorators</div>
-                      <div className="flex items-center"><CheckCircle className="h-4 w-4 text-primary-600 mr-2" /> Photographers</div>
-                      <div className="flex items-center"><CheckCircle className="h-4 w-4 text-primary-600 mr-2" /> Event Management</div>
-                      <div className="flex items-center"><CheckCircle className="h-4 w-4 text-primary-600 mr-2" /> Singers & Performers</div>
+                    <h4 className="text-lg font-semibold text-primary-600 mb-2">Tech-Powered Matchmaking & Beyond</h4>
+                    <div className="bg-gradient-to-r from-primary-50 to-gold-50 rounded-lg p-4 mb-4">
+                      <h5 className="font-bold text-primary-800 mb-2">Heritage Meets Innovation</h5>
                     </div>
-                    <p className="text-gray-600 mt-4">
-                      From matchmaking to wedding celebrations, we make sure every journey honors trust, family values, and love stories—just as it has for over 50 years.
+                    <p className="text-gray-600 mb-4">
+                      Today, after five decades of trust, the Goyal family legacy is stronger than ever. Through AI matchmaking, expert guidance, and personalized services, Make My Knot continues to help families create lasting, meaningful, and values-driven relationships.
+                    </p>
+                    <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
+                      <h6 className="font-bold text-blue-800 mb-2">✨ Coming Soon: End-to-end wedding services</h6>
+                      <div className="grid md:grid-cols-2 gap-2 text-sm text-blue-700">
+                        <div className="flex items-center"><CheckCircle className="h-4 w-4 text-blue-600 mr-2" /> Wedding Planners</div>
+                        <div className="flex items-center"><CheckCircle className="h-4 w-4 text-blue-600 mr-2" /> Caterers</div>
+                        <div className="flex items-center"><CheckCircle className="h-4 w-4 text-blue-600 mr-2" /> Decorators</div>
+                        <div className="flex items-center"><CheckCircle className="h-4 w-4 text-blue-600 mr-2" /> Photographers</div>
+                        <div className="flex items-center"><CheckCircle className="h-4 w-4 text-blue-600 mr-2" /> Anchors & Singers</div>
+                        <div className="flex items-center"><CheckCircle className="h-4 w-4 text-blue-600 mr-2" /> Honeymoon Packages</div>
+                      </div>
+                      <p className="text-sm text-blue-700 mt-2 italic">Making Make My Knot your one-stop partner from rishta to shaadi.</p>
+                    </div>
+                    <p className="text-gray-600">
+                      From handshake to pheras, our journey has always been about one promise: turning dreams into lifelong bonds.
                     </p>
                   </div>
                 </div>
@@ -301,12 +341,12 @@ export default function About() {
                   </div>
                 </div>
                 <div className="flex-1 text-center lg:text-left">
-                  <h3 className="text-3xl font-bold text-gray-900 mb-2">Maulik Goyal</h3>
+                  <h3 className="text-3xl font-bold text-gray-900 mb-2">Moulik Goyal</h3>
                   <div className="text-xl text-primary-600 font-semibold mb-6">Chief Executive Officer</div>
                   <p className="text-gray-600 leading-relaxed mb-6 text-lg">
-                    As the third-generation leader of the Goyal family legacy, Maulik brings together traditional matchmaking 
-                    wisdom with cutting-edge technology. Armed with an MBA from IIM Ahmedabad and a passion for innovation, 
-                    he has transformed our 50-year-old family business into India's most sophisticated AI-powered matchmaking platform.
+                    As the third-generation leader of the Goyal family legacy, Moulik brings together traditional matchmaking 
+                    wisdom with cutting-edge technology. Having grown up watching his father and grandfather devote their lives to matchmaking, 
+                    he is now transforming our 50-year-old family business into India's most sophisticated AI-powered matchmaking platform.
                   </p>
                   <div className="grid md:grid-cols-2 gap-6 text-sm text-gray-600">
                     <div>
@@ -336,7 +376,7 @@ export default function About() {
                     <div className="text-4xl font-bold text-gold-600">CG</div>
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-1">Chaman Prakash Goyal</h3>
-                  <div className="text-gold-600 font-semibold mb-4">Founder & Legacy Advisor (Dadu)</div>
+                  <div className="text-gold-600 font-semibold mb-4">Visionary Founder</div>
                 </div>
                 <p className="text-gray-600 leading-relaxed mb-6 text-sm">
                   The visionary founder who established Goyal Marriage Bureau in 1975. Known as "Dadu" to thousands of families, 
@@ -357,7 +397,7 @@ export default function About() {
                     <div className="text-4xl font-bold text-green-600">AG</div>
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-1">Anil Goyal</h3>
-                  <div className="text-green-600 font-semibold mb-4">Senior Advisor & Relationship Expert</div>
+                  <div className="text-green-600 font-semibold mb-4">Managing Director</div>
                 </div>
                 <p className="text-gray-600 leading-relaxed mb-6 text-sm">
                   The bridge between tradition and modernity, Anil Goyal dedicated over 16 years to nurturing the family vision 
@@ -397,7 +437,7 @@ export default function About() {
               <div className="text-center">
                 <div className="text-5xl font-bold text-primary-600 mb-2">20,000+</div>
                 <div className="text-lg text-gray-900 font-semibold mb-2">Happy Couples</div>
-                <div className="text-gray-600">Marriages facilitated since 1950</div>
+                <div className="text-gray-600">Marriages facilitated since 1975</div>
               </div>
               
               <div className="text-center">
@@ -569,7 +609,7 @@ export default function About() {
               Ready to Be Part of Our Story?
             </h2>
             <p className="text-xl text-primary-100 mb-8">
-              Join thousands who have found love through 75 years of proven matchmaking expertise, 
+              Join thousands who have found love through 50 years of proven matchmaking expertise, 
               now enhanced with the latest AI technology.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
