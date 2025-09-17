@@ -262,8 +262,8 @@ function HappyCoupleSlider() {
             </div>
             
             {/* Animated Content Overlay */}
-            <div className="absolute inset-0 flex items-center justify-center z-20">
-              <div className="text-center text-white max-w-4xl mx-auto px-4">
+            <div className="absolute inset-0 flex items-center justify-center z-20 pt-8 sm:pt-0">
+              <div className="text-center text-white max-w-4xl mx-auto px-4 sm:px-6">
                 {/* Main Heading */}
                 <motion.h2
                   key={`title-${index}`}
@@ -672,7 +672,11 @@ export default function Home() {
         <Navigation variant="wine-glass" />
 
         {/* Hero Section with Full-Length Slider */}
-        <section className="relative min-h-screen" style={{ paddingTop: '80px', height: 'calc(100vh - 80px)' }}>
+        <section className="relative" style={{ 
+          paddingTop: '60px', 
+          minHeight: 'calc(100vh - 60px)',
+          height: 'calc(100vh - 60px)'
+        }}>
           {/* Full-Length Background Slider */}
           <ImageSlider />
           
@@ -682,19 +686,19 @@ export default function Home() {
           {/* Overlapping Content */}
           <div className="absolute inset-0 flex items-center justify-start z-20">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-              <div className="max-w-lg">
-                <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 drop-shadow-lg">
+              <div className="max-w-lg pt-4 sm:pt-8 md:pt-0">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 sm:mb-6 drop-shadow-lg">
                   Start Your Journey
                 </h1>
-                <p className="text-xl text-white mb-8 italic leading-relaxed drop-shadow-md">
+                <p className="text-lg sm:text-xl text-white mb-6 sm:mb-8 italic leading-relaxed drop-shadow-md">
                   "From <span className="font-bold text-yellow-300">handshake</span> to <span className="font-bold text-pink-300">pheras</span>, let us guide your journey to love and lifelong happiness."
                 </p>
-                <p className="text-gray-200 mb-8 text-lg drop-shadow-sm">
+                <p className="text-gray-200 mb-6 sm:mb-8 text-base sm:text-lg drop-shadow-sm">
                   Answer a few questions to help us find your perfect match
                 </p>
                 
                 {/* Questionnaire Container */}
-                <div className="glass rounded-2xl p-6 shadow-2xl border border-white/30">
+                <div className="glass rounded-2xl p-4 sm:p-6 shadow-2xl border border-white/30 mb-4 sm:mb-8">
                   <LeadQuestionnaire />
                 </div>
               </div>
@@ -1052,7 +1056,7 @@ export default function Home() {
         </section>
 
         {/* Happy Couple Slider Section */}
-        <section className="relative py-20 overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50">
+        <section className="relative py-8 sm:py-12 md:py-16 lg:py-20 overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50">
           <HappyCoupleSlider />
         </section>
 

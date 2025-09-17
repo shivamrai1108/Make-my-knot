@@ -71,12 +71,12 @@ export default function Navigation({ variant = 'transparent', className = '' }: 
   }, [lastScrollY])
 
   const baseClasses = variant === 'transparent' 
-    ? `fixed w-full z-[100] top-0 transition-all duration-500 ease-in-out ${isScrollingUp ? 'translate-y-0' : '-translate-y-full md:translate-y-0'}` 
+    ? `fixed w-full z-[150] top-0 transition-all duration-500 ease-in-out ${isScrollingUp ? 'translate-y-0' : '-translate-y-full md:translate-y-0'}` 
     : variant === 'wine-glass'
-    ? `fixed w-full z-[100] top-0 bg-gradient-to-r from-red-900/30 via-red-800/25 to-purple-900/30 backdrop-blur-md border-b border-red-200/20 shadow-lg transition-all duration-500 ease-in-out ${isScrollingUp ? 'translate-y-0' : '-translate-y-full md:translate-y-0'}`
+    ? `fixed w-full z-[150] top-0 bg-gradient-to-r from-red-900/30 via-red-800/25 to-purple-900/30 backdrop-blur-md border-b border-red-200/20 shadow-lg transition-all duration-500 ease-in-out ${isScrollingUp ? 'translate-y-0' : '-translate-y-full md:translate-y-0'}`
     : variant === 'dark'
-    ? 'bg-gray-900 border-b border-gray-800 relative z-[100]'
-    : `bg-white/90 backdrop-blur-md border-b border-gray-200/50 shadow-sm sticky top-0 z-[100] transition-all duration-500 ease-in-out ${isScrollingUp ? 'translate-y-0' : '-translate-y-full md:translate-y-0'}`
+    ? 'bg-gray-900 border-b border-gray-800 relative z-[150]'
+    : `bg-white/90 backdrop-blur-md border-b border-gray-200/50 shadow-sm sticky top-0 z-[150] transition-all duration-500 ease-in-out ${isScrollingUp ? 'translate-y-0' : '-translate-y-full md:translate-y-0'}`
 
   const textColor = variant === 'dark' ? 'text-white' : variant === 'transparent' ? 'text-white' : variant === 'wine-glass' ? 'text-white' : 'text-gray-900'
   const linkColor = variant === 'dark' 
@@ -130,7 +130,7 @@ export default function Navigation({ variant = 'transparent', className = '' }: 
 
         {/* Mobile Navigation */}
         <div className={`md:hidden overflow-hidden transition-all duration-300 ${isMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
-          <div className={`py-2 border-t ${variant === 'wine-glass' ? 'border-red-200/30' : 'border-white/20'} relative z-[105]`}>
+          <div className={`py-2 border-t ${variant === 'wine-glass' ? 'border-red-200/30' : 'border-white/20'} relative z-[155]`}>
             <div className="flex flex-col space-y-0">
               <Link 
                 href="/" 
