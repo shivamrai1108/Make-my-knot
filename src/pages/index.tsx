@@ -511,9 +511,9 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
         <style jsx>{`
           .simple-slider {
-            position: relative;
+            position: absolute;
             width: 100%;
-            height: 100vh;
+            height: calc(100vh - 80px);
             overflow: hidden;
           }
           .simple-slide {
@@ -542,6 +542,12 @@ export default function Home() {
               object-fit: cover;
             }
           }
+          .hero-content {
+            position: relative;
+            z-index: 110;
+            height: calc(100vh - 80px);
+            padding-top: 80px;
+          }
         `}</style>
       </Head>
 
@@ -550,12 +556,9 @@ export default function Home() {
         <Navigation variant="wine-glass" />
 
         {/* Hero Section - Simple Image Slider with Questionnaire */}
-        <section 
-          className="relative min-h-screen md:h-screen flex items-center justify-center" 
-          style={{ paddingTop: `${NAVIGATION_CONSTANTS.MOBILE_HEIGHT}px` }}
-        >
+        <section className="relative min-h-screen">
           {/* Simple Background Slider */}
-          <div className="simple-slider absolute inset-0">
+          <div className="simple-slider" style={{ top: '80px' }}>
             {couples.map((couple, index) => (
               <div 
                 key={index}
@@ -590,29 +593,32 @@ export default function Home() {
                 <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-black/50" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40" />
                 
-                {/* Quote Overlay */}
+                {/* Quote Overlay - Enhanced visibility */}
                 <div className="absolute bottom-4 md:bottom-16 left-8 right-8 text-center z-10">
-                  <h3 className="text-white/90 text-lg md:text-xl font-semibold mb-2">
-                    {couple.names}
-                  </h3>
-                  <p className="text-white/70 text-sm md:text-base italic max-w-2xl mx-auto">
-                    &ldquo;{couple.quote}&rdquo;
-                  </p>
+                  <div className="bg-black/50 backdrop-blur-sm rounded-lg p-4 mx-auto max-w-2xl">
+                    <h3 className="text-white text-lg md:text-xl font-bold mb-2 drop-shadow-lg">
+                      {couple.names}
+                    </h3>
+                    <p className="text-gray-100 text-sm md:text-base italic drop-shadow-md">
+                      &ldquo;{couple.quote}&rdquo;
+                    </p>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
 
           {/* Questionnaire Content */}
-          <motion.div 
-            initial={{ opacity: 0, x: -100 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
-            className="relative z-[110] w-full px-4 sm:px-6 lg:px-8 py-8 md:py-20"
-          >
-            <div className="flex justify-start items-start md:items-center min-h-[400px] md:min-h-[600px]">
-              {/* Left Aligned Glass Questionnaire - Better mobile spacing */}
-              <div className="w-full max-w-lg ml-0 md:ml-8 lg:ml-16">
+          <div className="hero-content w-full flex items-center">
+            <motion.div 
+              initial={{ opacity: 0, x: -100 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.5 }}
+              className="w-full px-4 sm:px-6 lg:px-8 py-8"
+            >
+              <div className="flex justify-start items-center min-h-[400px] md:min-h-[600px] w-full">
+                {/* Left Aligned Glass Questionnaire */}
+                <div className="w-full max-w-lg ml-0 md:ml-8 lg:ml-16">
                 <motion.div 
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -679,17 +685,18 @@ export default function Home() {
                     Answer a few questions to help us find your perfect match
                   </p>
                 </motion.div>
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.6, delay: 0.9 }}
-                  className="bg-white/10 backdrop-blur-md rounded-xl p-4 md:p-6 border border-white/20 relative z-[120]"
-                >
-                  <LeadQuestionnaire />
-                </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.6, delay: 0.9 }}
+                    className="bg-white/10 backdrop-blur-md rounded-xl p-4 md:p-6 border border-white/20 relative z-[120]"
+                  >
+                    <LeadQuestionnaire />
+                  </motion.div>
+                </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </div>
 
           {/* Simple Navigation Buttons */}
           <button
