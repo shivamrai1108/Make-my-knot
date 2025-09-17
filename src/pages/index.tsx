@@ -510,13 +510,21 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
         <link rel="icon" href="/favicon.ico" />
         <style jsx>{`
-          .simple-slider {
-            position: absolute;
-            width: 100%;
-            height: calc(100vh - 80px);
+          .hero-section {
+            position: relative;
+            height: 100vh;
+            padding-top: 80px;
             overflow: hidden;
           }
-          .simple-slide {
+          .background-slider {
+            position: absolute;
+            top: 80px;
+            left: 0;
+            width: 100%;
+            height: calc(100vh - 80px);
+            z-index: 1;
+          }
+          .slide-item {
             position: absolute;
             top: 0;
             left: 0;
@@ -525,28 +533,27 @@ export default function Home() {
             opacity: 0;
             transition: opacity 1s ease-in-out;
           }
-          .simple-slide.active {
+          .slide-item.active {
             opacity: 1;
           }
-          .simple-image {
+          .hero-image {
             width: 100%;
             height: 100%;
             object-fit: contain;
             object-position: center;
             display: block;
-            image-rendering: -webkit-optimize-contrast;
-            image-rendering: crisp-edges;
           }
           @media (max-width: 768px) {
-            .simple-image {
+            .hero-image {
               object-fit: cover;
             }
           }
-          .hero-content {
+          .content-overlay {
             position: relative;
-            z-index: 110;
+            z-index: 10;
             height: calc(100vh - 80px);
-            padding-top: 80px;
+            display: flex;
+            align-items: center;
           }
         `}</style>
       </Head>
@@ -555,20 +562,20 @@ export default function Home() {
         {/* Navigation */}
         <Navigation variant="wine-glass" />
 
-        {/* Hero Section - Simple Image Slider with Questionnaire */}
-        <section className="relative min-h-screen">
-          {/* Simple Background Slider */}
-          <div className="simple-slider" style={{ top: '80px' }}>
+        {/* Hero Section - Clean Structure */}
+        <section className="hero-section">
+          {/* Background Image Slider */}
+          <div className="background-slider">
             {couples.map((couple, index) => (
               <div 
                 key={index}
-                className={`simple-slide ${index === currentSlide ? 'active' : ''}`}
+                className={`slide-item ${index === currentSlide ? 'active' : ''}`}
               >
                 {/* Desktop Image */}
                 <img
                   src={couple.image}
                   alt={couple.names}
-                  className="simple-image hidden md:block"
+                  className="hero-image hidden md:block"
                   onError={(e) => {
                     if (e.currentTarget.src.includes('.svg') && couple.fallbackImage) {
                       e.currentTarget.src = couple.fallbackImage;
@@ -581,8 +588,7 @@ export default function Home() {
                 <img
                   src={couple.mobileImage}
                   alt={couple.names}
-                  className="simple-image block md:hidden"
-                  style={{ objectFit: 'cover' }}
+                  className="hero-image block md:hidden"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
                   }}
@@ -593,135 +599,80 @@ export default function Home() {
                 <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-black/50" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40" />
                 
-                {/* Quote Overlay - Enhanced visibility */}
-                <div className="absolute bottom-4 md:bottom-16 left-8 right-8 text-center z-10">
-                  <div className="bg-black/50 backdrop-blur-sm rounded-lg p-4 mx-auto max-w-2xl">
-                    <h3 className="text-white text-lg md:text-xl font-bold mb-2 drop-shadow-lg">
-                      {couple.names}
-                    </h3>
-                    <p className="text-gray-100 text-sm md:text-base italic drop-shadow-md">
-                      &ldquo;{couple.quote}&rdquo;
-                    </p>
+                {/* Quote Text - Only show for active slide */}
+                {index === currentSlide && (
+                  <div className="absolute bottom-8 left-8 right-8 text-center z-[5]">
+                    <div className="bg-black/60 backdrop-blur-sm rounded-xl p-6 mx-auto max-w-2xl border border-white/10">
+                      <h3 className="text-white text-xl md:text-2xl font-bold mb-3 drop-shadow-lg">
+                        {couple.names}
+                      </h3>
+                      <p className="text-gray-100 text-base md:text-lg italic drop-shadow-md leading-relaxed">
+                        &ldquo;{couple.quote}&rdquo;
+                      </p>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             ))}
           </div>
 
-          {/* Questionnaire Content */}
-          <div className="hero-content w-full flex items-center">
-            <motion.div 
-              initial={{ opacity: 0, x: -100 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.5 }}
-              className="w-full px-4 sm:px-6 lg:px-8 py-8"
-            >
-              <div className="flex justify-start items-center min-h-[400px] md:min-h-[600px] w-full">
-                {/* Left Aligned Glass Questionnaire */}
-                <div className="w-full max-w-lg ml-0 md:ml-8 lg:ml-16">
+          {/* Content Overlay */}
+          <div className="content-overlay">
+            <div className="w-full px-4 sm:px-6 lg:px-8">
+              <div className="max-w-lg ml-0 md:ml-8 lg:ml-16">
                 <motion.div 
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.7 }}
+                  transition={{ duration: 0.8 }}
                   className="mb-8"
                 >
-                  <h2 className="text-xl md:text-2xl font-bold text-white mb-4">
+                  <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 drop-shadow-lg">
                     Start Your Journey
                   </h2>
-                  <motion.div 
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.8, delay: 1.0 }}
-                    className="mb-6"
-                  >
-                    <p className="text-base md:text-lg text-gold-200 font-medium italic leading-relaxed">
-                      "<motion.span
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.5, delay: 1.2 }}
-                        className="inline-block"
-                      >
-                        From
-                      </motion.span>
-                      {' '}
-                      <motion.span
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.6, delay: 1.4 }}
-                        className="inline-block font-bold text-gold-300"
-                      >
-                        handshake
-                      </motion.span>
-                      {' '}
-                      <motion.span
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 1.6 }}
-                        className="inline-block"
-                      >
-                        to
-                      </motion.span>
-                      {' '}
-                      <motion.span
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.7, delay: 1.8 }}
-                        className="inline-block font-bold text-red-300 animate-pulse"
-                        style={{ animationDelay: '2.5s', animationDuration: '2s' }}
-                      >
-                        pheras
-                      </motion.span>
-                      <motion.span
-                        initial={{ opacity: 0, x: 10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.5, delay: 2.0 }}
-                        className="inline-block"
-                      >
-                        , let us guide your journey to love and lifelong happiness.
-                      </motion.span>"
-                    </p>
-                  </motion.div>
-                  <p className="text-gray-200 leading-relaxed text-sm md:text-base">
+                  <p className="text-base md:text-lg text-gold-200 font-medium italic leading-relaxed mb-4 drop-shadow-md">
+                    "From <span className="font-bold text-gold-300">handshake</span> to <span className="font-bold text-red-300">pheras</span>, let us guide your journey to love and lifelong happiness."
+                  </p>
+                  <p className="text-gray-200 leading-relaxed text-sm md:text-base drop-shadow-sm">
                     Answer a few questions to help us find your perfect match
                   </p>
                 </motion.div>
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.6, delay: 0.9 }}
-                    className="bg-white/10 backdrop-blur-md rounded-xl p-4 md:p-6 border border-white/20 relative z-[120]"
-                  >
-                    <LeadQuestionnaire />
-                  </motion.div>
-                </div>
+                
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.6, delay: 0.3 }}
+                  className="bg-white/10 backdrop-blur-md rounded-xl p-4 md:p-6 border border-white/20"
+                >
+                  <LeadQuestionnaire />
+                </motion.div>
               </div>
-            </motion.div>
+            </div>
           </div>
 
-          {/* Simple Navigation Buttons */}
+          {/* Navigation Controls */}
           <button
             onClick={prevSlide}
-            className="hidden md:block absolute left-6 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full transition-colors duration-200 z-20"
+            className="hidden md:block absolute left-6 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full transition-colors duration-200 z-[15]"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
           <button
             onClick={nextSlide}
-            className="hidden md:block absolute right-6 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full transition-colors duration-200 z-20"
+            className="hidden md:block absolute right-6 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full transition-colors duration-200 z-[15]"
           >
             <ChevronRight className="h-5 w-5" />
           </button>
 
-          {/* Enhanced Dots Indicator - Centered on desktop, positioned higher on mobile */}
-          <div className="absolute bottom-2 right-4 md:bottom-8 md:left-1/2 md:right-auto md:transform md:-translate-x-1/2 flex space-x-3 md:space-x-4 z-20">
+          {/* Dots Indicator */}
+          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-3 z-[15]">
             {couples.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentSlide(index)}
-                className={`transition-all duration-300 rounded-full border-2 ${
+                className={`transition-all duration-300 rounded-full ${
                   index === currentSlide 
-                    ? 'w-4 h-4 bg-gold-400 border-gold-300 shadow-lg shadow-gold-400/50 scale-125' 
-                    : 'w-3 h-3 bg-white/40 border-white/60 hover:bg-white/60 hover:scale-110'
+                    ? 'w-4 h-4 bg-gold-400 shadow-lg' 
+                    : 'w-3 h-3 bg-white/50 hover:bg-white/70'
                 }`}
                 aria-label={`Go to slide ${index + 1}`}
               />
