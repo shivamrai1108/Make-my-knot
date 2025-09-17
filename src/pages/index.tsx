@@ -510,58 +510,65 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
         <link rel="icon" href="/favicon.ico" />
         <style jsx>{`
-          .hero-section {
+          .hero-container {
             position: relative;
             height: 100vh;
-            padding-top: 80px;
             overflow: hidden;
           }
-          .background-slider {
+          .slider-background {
             position: absolute;
-            top: 80px;
+            top: 0;
             left: 0;
             width: 100%;
-            height: calc(100vh - 80px);
-            z-index: 1;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            background: #1a1a2e;
           }
-          .slide-item {
+          .slide {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             opacity: 0;
-            transition: opacity 1s ease-in-out;
+            transition: opacity 1.5s ease-in-out;
           }
-          .slide-item.active {
+          .slide.active {
             opacity: 1;
           }
-          .hero-image {
+          .slide img {
             width: 100%;
             height: 100%;
             object-fit: contain;
             object-position: center;
-            display: block;
           }
           @media (max-width: 768px) {
-            .hero-image {
+            .slide img {
               object-fit: cover;
             }
           }
-          .content-overlay {
+          .hero-overlay {
             position: absolute;
-            top: 80px;
+            top: 0;
             left: 0;
             width: 100%;
-            z-index: 10;
-            height: calc(100vh - 80px);
-            display: flex;
-            align-items: center;
-            pointer-events: none;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 5;
           }
-          .content-overlay > * {
-            pointer-events: auto;
+          .hero-content {
+            position: absolute;
+            top: 50%;
+            left: 4%;
+            transform: translateY(-50%);
+            z-index: 10;
+            max-width: 500px;
+          }
+          @media (max-width: 768px) {
+            .hero-content {
+              left: 50%;
+              transform: translate(-50%, -50%);
+              max-width: 90%;
+            }
           }
         `}</style>
       </Head>
@@ -570,32 +577,20 @@ export default function Home() {
         {/* Navigation */}
         <Navigation variant="wine-glass" />
 
-        {/* Hero Section - Clean Structure */}
-        <section className="hero-section">
-          {/* Background Image Slider */}
-          <div className="background-slider">
+        {/* Hero Section */}
+        <section className="hero-container" style={{ paddingTop: '80px' }}>
+          {/* Background Slider */}
+          <div className="slider-background">
             {couples.map((couple, index) => (
-              <div 
-                key={index}
-                className={`slide-item ${index === currentSlide ? 'active' : ''}`}
-                style={{ backgroundColor: index === 0 ? '#ff6b6b' : index === 1 ? '#4ecdc4' : '#45b7d1' }}
-              >
+              <div key={index} className={`slide ${index === currentSlide ? 'active' : ''}`}>
                 {/* Desktop Image */}
                 <img
                   src={couple.image}
                   alt={couple.names}
-                  className="hero-image hidden md:block"
-                  onLoad={(e) => {
-                    console.log('✅ Desktop image loaded:', couple.image);
-                  }}
+                  className="hidden md:block"
                   onError={(e) => {
-                    console.log('❌ Desktop image failed:', couple.image);
-                    if (e.currentTarget.src.includes('.svg') && couple.fallbackImage) {
-                      console.log('🔄 Trying fallback:', couple.fallbackImage);
+                    if (couple.fallbackImage && e.currentTarget.src.includes('.svg')) {
                       e.currentTarget.src = couple.fallbackImage;
-                    } else {
-                      console.log('❌ No fallback available');
-                      e.currentTarget.style.display = 'none';
                     }
                   }}
                 />
@@ -603,97 +598,67 @@ export default function Home() {
                 <img
                   src={couple.mobileImage}
                   alt={couple.names}
-                  className="hero-image block md:hidden"
-                  onLoad={(e) => {
-                    console.log('✅ Mobile image loaded:', couple.mobileImage);
-                  }}
+                  className="block md:hidden"
                   onError={(e) => {
-                    console.log('❌ Mobile image failed:', couple.mobileImage);
                     e.currentTarget.style.display = 'none';
                   }}
                 />
                 
-                {/* Gradient Overlays */}
-                <div className={`absolute inset-0 ${couple.gradient} opacity-30`} />
-                <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-black/50" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40" />
+                {/* Gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-black/60"></div>
                 
-                {/* Quote Text - Only show for active slide */}
+                {/* Quote for active slide only */}
                 {index === currentSlide && (
-                  <div className="absolute bottom-8 left-8 right-8 text-center z-[5]">
-                    <div className="bg-black/60 backdrop-blur-sm rounded-xl p-6 mx-auto max-w-2xl border border-white/10">
-                      <h3 className="text-white text-xl md:text-2xl font-bold mb-3 drop-shadow-lg">
-                        {couple.names}
-                      </h3>
-                      <p className="text-gray-100 text-base md:text-lg italic drop-shadow-md leading-relaxed">
-                        &ldquo;{couple.quote}&rdquo;
-                      </p>
+                  <div className="absolute bottom-8 left-8 right-8 text-center" style={{ zIndex: 8 }}>
+                    <div className="bg-black/60 backdrop-blur-sm rounded-xl p-6 max-w-2xl mx-auto border border-white/20">
+                      <h3 className="text-white text-xl font-bold mb-2">{couple.names}</h3>
+                      <p className="text-gray-200 italic">&ldquo;{couple.quote}&rdquo;</p>
                     </div>
                   </div>
                 )}
               </div>
             ))}
           </div>
-
-          {/* Content Overlay */}
-          <div className="content-overlay">
-            <div className="w-full px-4 sm:px-6 lg:px-8">
-              <div className="max-w-lg ml-0 md:ml-8 lg:ml-16">
-                <motion.div 
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8 }}
-                  className="mb-8"
-                >
-                  <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 drop-shadow-lg">
-                    Start Your Journey
-                  </h2>
-                  <p className="text-base md:text-lg text-gold-200 font-medium italic leading-relaxed mb-4 drop-shadow-md">
-                    "From <span className="font-bold text-gold-300">handshake</span> to <span className="font-bold text-red-300">pheras</span>, let us guide your journey to love and lifelong happiness."
-                  </p>
-                  <p className="text-gray-200 leading-relaxed text-sm md:text-base drop-shadow-sm">
-                    Answer a few questions to help us find your perfect match
-                  </p>
-                </motion.div>
-                
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.6, delay: 0.3 }}
-                  className="bg-white/10 backdrop-blur-md rounded-xl p-4 md:p-6 border border-white/20"
-                >
-                  <LeadQuestionnaire />
-                </motion.div>
-              </div>
+          
+          {/* Dark overlay */}
+          <div className="hero-overlay"></div>
+          
+          {/* Content */}
+          <div className="hero-content">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-4 drop-shadow-lg">
+              Start Your Journey
+            </h1>
+            <p className="text-lg text-gold-300 mb-6 italic drop-shadow-md">
+              "From <span className="font-bold">handshake</span> to <span className="font-bold text-red-300">pheras</span>, let us guide your journey to love."
+            </p>
+            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+              <LeadQuestionnaire />
             </div>
           </div>
-
-          {/* Navigation Controls */}
+          
+          {/* Navigation */}
           <button
             onClick={prevSlide}
-            className="hidden md:block absolute left-6 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full transition-colors duration-200 z-[15]"
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full transition-colors z-20 hidden md:block"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
           <button
             onClick={nextSlide}
-            className="hidden md:block absolute right-6 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full transition-colors duration-200 z-[15]"
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full transition-colors z-20 hidden md:block"
           >
             <ChevronRight className="h-5 w-5" />
           </button>
-
-          {/* Dots Indicator */}
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-3 z-[15]">
+          
+          {/* Dots */}
+          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-3 z-20">
             {couples.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentSlide(index)}
-                className={`transition-all duration-300 rounded-full ${
-                  index === currentSlide 
-                    ? 'w-4 h-4 bg-gold-400 shadow-lg' 
-                    : 'w-3 h-3 bg-white/50 hover:bg-white/70'
+                className={`w-3 h-3 rounded-full transition-all ${
+                  index === currentSlide ? 'bg-gold-400 w-4 h-4' : 'bg-white/50 hover:bg-white/70'
                 }`}
-                aria-label={`Go to slide ${index + 1}`}
               />
             ))}
           </div>
