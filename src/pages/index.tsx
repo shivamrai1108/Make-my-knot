@@ -10,6 +10,143 @@ import NominationMarquee from '@/components/NominationMarquee'
 import { NAVIGATION_CONSTANTS } from '@/lib/constants/navigation'
 import { useState, useEffect, useRef } from 'react'
 
+// Image Slider Component
+function ImageSlider() {
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [isDragging, setIsDragging] = useState(false)
+  const [startX, setStartX] = useState(0)
+  const [currentX, setCurrentX] = useState(0)
+  const slidesRef = useRef<HTMLDivElement>(null)
+  
+  // Image data - using your existing images
+  const images = [
+    '/images/1.svg',
+    '/images/2.svg', 
+    '/images/3.svg'
+  ]
+  
+  const showSlide = (index: number) => {
+    if (index < 0) {
+      setCurrentIndex(images.length - 1)
+    } else if (index >= images.length) {
+      setCurrentIndex(0)
+    } else {
+      setCurrentIndex(index)
+    }
+  }
+  
+  // Navigation functions
+  const prevSlide = () => showSlide(currentIndex - 1)
+  const nextSlide = () => showSlide(currentIndex + 1)
+  
+  // Touch handlers for mobile swipe
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setStartX(e.touches[0].clientX)
+  }
+  
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const endX = e.changedTouches[0].clientX
+    const diff = startX - endX
+    
+    if (Math.abs(diff) > 50) { // Minimum swipe distance
+      if (diff > 0) {
+        nextSlide()
+      } else {
+        prevSlide()
+      }
+    }
+  }
+  
+  // Mouse drag handlers for desktop
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true)
+    setStartX(e.clientX)
+  }
+  
+  const handleMouseUp = (e: React.MouseEvent) => {
+    if (!isDragging) return
+    
+    const endX = e.clientX
+    const diff = startX - endX
+    
+    if (Math.abs(diff) > 50) { // Minimum drag distance
+      if (diff > 0) {
+        nextSlide()
+      } else {
+        prevSlide()
+      }
+    }
+    
+    setIsDragging(false)
+  }
+  
+  // Auto-slide every 5 seconds
+  useEffect(() => {
+    const timer = setInterval(() => {
+      nextSlide()
+    }, 5000)
+    
+    return () => clearInterval(timer)
+  }, [currentIndex])
+  
+  return (
+    <div className="relative w-full max-w-4xl mx-auto overflow-hidden rounded-2xl shadow-2xl bg-white">
+      {/* Slides Container */}
+      <div 
+        ref={slidesRef}
+        className="flex transition-transform duration-300 ease-in-out cursor-grab active:cursor-grabbing"
+        style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={() => setIsDragging(false)}
+      >
+        {images.map((image, index) => (
+          <div key={index} className="w-full flex-shrink-0">
+            <img 
+              src={image} 
+              alt={`Slide ${index + 1}`}
+              className="w-full h-[400px] md:h-[500px] object-contain bg-gray-50"
+              draggable={false}
+            />
+          </div>
+        ))}
+      </div>
+      
+      {/* Navigation Buttons */}
+      <button 
+        onClick={prevSlide}
+        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-3 rounded-full transition-all duration-200 z-10"
+        aria-label="Previous slide"
+      >
+        &#10094;
+      </button>
+      <button 
+        onClick={nextSlide}
+        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-3 rounded-full transition-all duration-200 z-10"
+        aria-label="Next slide"
+      >
+        &#10095;
+      </button>
+      
+      {/* Dots Indicator */}
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+        {images.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentIndex(index)}
+            className={`w-3 h-3 rounded-full transition-all duration-200 ${
+              index === currentIndex ? 'bg-white' : 'bg-white bg-opacity-50'
+            }`}
+            aria-label={`Go to slide ${index + 1}`}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
 
 // Testimonials Section Component
 function TestimonialsSection() {
@@ -297,12 +434,17 @@ export default function Home() {
         {/* Navigation */}
         <Navigation variant="wine-glass" />
 
-        {/* Hero Section - Simple Left Aligned */}
-        <section className="bg-gradient-to-br from-purple-50 to-pink-50 min-h-screen flex items-center" style={{ paddingTop: '80px' }}>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-            <div className="flex items-center justify-between">
-              {/* Left Content */}
-              <div className="w-full max-w-lg">
+        {/* Hero Section with Slider */}
+        <section className="bg-gradient-to-br from-purple-50 to-pink-50 min-h-screen" style={{ paddingTop: '80px' }}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Image Slider */}
+            <div className="mb-12">
+              <ImageSlider />
+            </div>
+            
+            {/* Content Below Slider */}
+            <div className="flex items-center justify-center">
+              <div className="w-full max-w-lg text-center">
                 <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
                   Start Your Journey
                 </h1>
@@ -317,11 +459,6 @@ export default function Home() {
                 <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100">
                   <LeadQuestionnaire />
                 </div>
-              </div>
-              
-              {/* Right side can be used for other content or kept empty */}
-              <div className="hidden lg:block w-1/2">
-                {/* Optional: Add an illustration or keep empty for whitespace */}
               </div>
             </div>
           </div>
