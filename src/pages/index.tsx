@@ -251,7 +251,7 @@ function HappyCoupleSlider() {
                 <img
                   src={slide.image}
                   alt={`${slide.title} - ${slide.subtitle}`}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                   draggable={false}
                 />
               </div>

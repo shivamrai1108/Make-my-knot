@@ -93,7 +93,7 @@ export default function Navigation({ variant = 'transparent', className = '' }: 
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
           <Link href="/" className="flex items-center">
-            <BrandLogo size="sm" className="mr-2" />
+            <BrandLogo size="md" className="mr-2" />
             <span className={`text-xl font-bold ${textColor}`}>Make My Knot</span>
           </Link>
 
