@@ -674,8 +674,9 @@ export default function Home() {
         {/* Hero Section with Full-Length Slider */}
         <section className="relative" style={{ 
           paddingTop: '80px', 
-          minHeight: 'calc(100vh - 80px)',
-          height: 'calc(100vh - 80px)'
+          paddingBottom: '60px',
+          minHeight: 'calc(100vh + 100px)',
+          height: 'auto'
         }}>
           {/* Full-Length Background Slider */}
           <ImageSlider />
@@ -684,9 +685,9 @@ export default function Home() {
           <div className="absolute inset-0 bg-black bg-opacity-40 z-10"></div>
           
           {/* Overlapping Content */}
-          <div className="absolute inset-0 flex items-center justify-start z-20" style={{ paddingTop: '20px' }}>
+          <div className="absolute inset-0 flex items-start justify-start z-20 pt-24 sm:pt-28 md:pt-32 lg:pt-36 xl:pt-32">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-              <div className="max-w-lg mt-8 sm:mt-12 md:mt-16 lg:mt-8 xl:mt-0">
+              <div className="max-w-lg">
                 <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 sm:mb-6 drop-shadow-lg">
                   Start Your Journey
                 </h1>
@@ -698,7 +699,7 @@ export default function Home() {
                 </p>
                 
                 {/* Questionnaire Container */}
-                <div className="glass rounded-2xl p-4 sm:p-6 shadow-2xl border border-white/30 mb-4 sm:mb-8">
+                <div className="glass rounded-2xl p-4 sm:p-6 shadow-2xl border border-white/30 mb-8 sm:mb-12 md:mb-16">
                   <LeadQuestionnaire />
                 </div>
               </div>
