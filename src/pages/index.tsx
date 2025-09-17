@@ -90,11 +90,11 @@ function ImageSlider() {
   }, [currentIndex])
   
   return (
-    <div className="relative w-full max-w-4xl mx-auto overflow-hidden rounded-2xl shadow-2xl bg-white">
+    <div className="absolute inset-0 w-full h-full overflow-hidden">
       {/* Slides Container */}
       <div 
         ref={slidesRef}
-        className="flex transition-transform duration-300 ease-in-out cursor-grab active:cursor-grabbing"
+        className="flex transition-transform duration-300 ease-in-out cursor-grab active:cursor-grabbing h-full"
         style={{ transform: `translateX(-${currentIndex * 100}%)` }}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
@@ -103,11 +103,11 @@ function ImageSlider() {
         onMouseLeave={() => setIsDragging(false)}
       >
         {images.map((image, index) => (
-          <div key={index} className="w-full flex-shrink-0">
+          <div key={index} className="w-full h-full flex-shrink-0">
             <img 
               src={image} 
               alt={`Slide ${index + 1}`}
-              className="w-full h-[400px] md:h-[500px] object-contain bg-gray-50"
+              className="w-full h-full object-cover"
               draggable={false}
             />
           </div>
@@ -117,21 +117,21 @@ function ImageSlider() {
       {/* Navigation Buttons */}
       <button 
         onClick={prevSlide}
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-3 rounded-full transition-all duration-200 z-10"
+        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-3 rounded-full transition-all duration-200 z-30"
         aria-label="Previous slide"
       >
         &#10094;
       </button>
       <button 
         onClick={nextSlide}
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-3 rounded-full transition-all duration-200 z-10"
+        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-3 rounded-full transition-all duration-200 z-30"
         aria-label="Next slide"
       >
         &#10095;
       </button>
       
       {/* Dots Indicator */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-30">
         {images.map((_, index) => (
           <button
             key={index}
@@ -434,29 +434,30 @@ export default function Home() {
         {/* Navigation */}
         <Navigation variant="wine-glass" />
 
-        {/* Hero Section with Slider */}
-        <section className="bg-gradient-to-br from-purple-50 to-pink-50 min-h-screen" style={{ paddingTop: '80px' }}>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            {/* Image Slider */}
-            <div className="mb-12">
-              <ImageSlider />
-            </div>
-            
-            {/* Content Below Slider */}
-            <div className="flex items-center justify-center">
-              <div className="w-full max-w-lg text-center">
-                <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+        {/* Hero Section with Full-Length Slider */}
+        <section className="relative min-h-screen" style={{ paddingTop: '80px', height: 'calc(100vh - 80px)' }}>
+          {/* Full-Length Background Slider */}
+          <ImageSlider />
+          
+          {/* Dark Overlay for Better Text Visibility */}
+          <div className="absolute inset-0 bg-black bg-opacity-40 z-10"></div>
+          
+          {/* Overlapping Content */}
+          <div className="absolute inset-0 flex items-center justify-start z-20">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+              <div className="max-w-lg">
+                <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 drop-shadow-lg">
                   Start Your Journey
                 </h1>
-                <p className="text-xl text-gray-700 mb-8 italic leading-relaxed">
-                  "From <span className="font-bold text-purple-600">handshake</span> to <span className="font-bold text-pink-600">pheras</span>, let us guide your journey to love and lifelong happiness."
+                <p className="text-xl text-white mb-8 italic leading-relaxed drop-shadow-md">
+                  "From <span className="font-bold text-yellow-300">handshake</span> to <span className="font-bold text-pink-300">pheras</span>, let us guide your journey to love and lifelong happiness."
                 </p>
-                <p className="text-gray-600 mb-8 text-lg">
+                <p className="text-gray-200 mb-8 text-lg drop-shadow-sm">
                   Answer a few questions to help us find your perfect match
                 </p>
                 
                 {/* Questionnaire Container */}
-                <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100">
+                <div className="bg-white bg-opacity-95 backdrop-blur-sm rounded-2xl p-6 shadow-2xl border border-gray-200">
                   <LeadQuestionnaire />
                 </div>
               </div>
