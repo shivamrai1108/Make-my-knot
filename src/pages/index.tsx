@@ -552,22 +552,30 @@ export default function Home() {
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.4);
+            background: linear-gradient(45deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0.5) 100%);
             z-index: 5;
           }
           .hero-content {
             position: absolute;
             top: 50%;
-            left: 4%;
+            left: 3%;
             transform: translateY(-50%);
             z-index: 10;
-            max-width: 500px;
+            max-width: 480px;
+            padding: 0 20px;
+          }
+          @media (max-width: 1024px) {
+            .hero-content {
+              left: 2%;
+              max-width: 450px;
+            }
           }
           @media (max-width: 768px) {
             .hero-content {
               left: 50%;
               transform: translate(-50%, -50%);
               max-width: 90%;
+              padding: 0 16px;
             }
           }
         `}</style>
@@ -631,7 +639,7 @@ export default function Home() {
             <p className="text-lg text-gold-300 mb-6 italic drop-shadow-md">
               "From <span className="font-bold">handshake</span> to <span className="font-bold text-red-300">pheras</span>, let us guide your journey to love."
             </p>
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+            <div className="bg-white/15 backdrop-blur-lg rounded-xl p-6 border border-white/30 shadow-2xl">
               <LeadQuestionnaire />
             </div>
           </div>
@@ -1013,8 +1021,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Happy Couples Slider */}
-        <CoupleSlider />
 
         {/* The Make My Knot Difference Section */}
         <section className="relative py-20 overflow-hidden">
