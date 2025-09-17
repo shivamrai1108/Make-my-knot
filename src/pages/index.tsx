@@ -2,7 +2,7 @@ import Head from 'next/head'
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Heart, Users, MessageCircle, CheckCircle, Star, ArrowRight, ChevronLeft, ChevronRight, Quote, X } from 'lucide-react'
+import { Heart, Users, MessageCircle, CheckCircle, Star, ArrowRight, Quote, X } from 'lucide-react'
 import Footer from '@/components/Footer'
 import LeadQuestionnaire from '@/components/LeadQuestionnaire'
 import Navigation from '@/components/Navigation'
@@ -10,180 +10,6 @@ import NominationMarquee from '@/components/NominationMarquee'
 import { NAVIGATION_CONSTANTS } from '@/lib/constants/navigation'
 import { useState, useEffect, useRef } from 'react'
 
-// Couple Slider Component
-function CoupleSlider() {
-  const [currentSlide, setCurrentSlide] = useState(0)
-  const [isPaused, setIsPaused] = useState(false)
-  const autoplayRef = useRef<NodeJS.Timeout | null>(null)
-  const touchStartX = useRef<number | null>(null)
-  const touchEndX = useRef<number | null>(null)
-  
-  const couples = [
-    {
-      image: '/images/1.jpg', // Web-optimized: 397KB
-      names: 'Rajesh & Priya',
-      story: 'Found love through shared values in Mumbai, celebrated with a grand Indian wedding in 2023',
-      quote: "Make My Knot's AI understood what we were truly looking for. We couldn't be happier!",
-      alt: 'Happy couple Rajesh and Priya at their Indian wedding'
-    },
-    {
-      image: '/images/2.jpg', // Web-optimized: 253KB
-      names: 'Arjun & Kavya',
-      story: 'Connected across cities, engaged in a beautiful ceremony with both families in 2024',
-      quote: 'The compatibility matching was spot-on. We share the same dreams and aspirations!',
-      alt: 'Engaged couple Arjun and Kavya at their engagement ceremony'
-    },
-    {
-      image: '/images/3.jpg', // Web-optimized: 371KB
-      names: 'Vikram & Sneha',
-      story: 'Long-distance match turned into a beautiful partnership, now settled together in Delhi',
-      quote: 'Distance meant nothing when we found our perfect match. Thank you Make My Knot!',
-      alt: 'Couple Vikram and Sneha celebrating their partnership'
-    }
-  ]
-
-  const coupleCount = couples.length
-
-  // Keyboard navigation
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "ArrowLeft") prevSlide()
-      if (e.key === "ArrowRight") nextSlide()
-    }
-    window.addEventListener("keydown", onKey)
-    return () => window.removeEventListener("keydown", onKey)
-  }, [currentSlide, coupleCount])
-
-  // Autoplay with pause functionality
-  useEffect(() => {
-    if (isPaused || coupleCount <= 1) return
-    autoplayRef.current = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % coupleCount)
-    }, 4000)
-    return () => {
-      if (autoplayRef.current) {
-        clearInterval(autoplayRef.current)
-      }
-    }
-  }, [isPaused, coupleCount])
-
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % coupleCount)
-  }
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + coupleCount) % coupleCount)
-  }
-
-  // Touch handlers for swipe functionality
-  const onTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX
-  }
-
-  const onTouchMove = (e: React.TouchEvent) => {
-    touchEndX.current = e.touches[0].clientX
-  }
-
-  const onTouchEnd = () => {
-    if (!touchStartX.current || !touchEndX.current) return
-    const dx = touchStartX.current - touchEndX.current
-    const absDx = Math.abs(dx)
-    const threshold = 50 // px
-    if (absDx > threshold) {
-      if (dx > 0) nextSlide()
-      else prevSlide()
-    }
-    touchStartX.current = null
-    touchEndX.current = null
-  }
-
-  return (
-    <section className="py-20 bg-gradient-to-br from-pink-50 to-purple-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">Happy Couples</h2>
-          <p className="text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">
-            Over 50,000 couples have found love through Make My Knot. Here are some of their beautiful stories.
-          </p>
-        </div>
-
-        <div className="relative max-w-4xl mx-auto">
-          <div 
-            className="relative overflow-hidden rounded-3xl shadow-2xl"
-            onMouseEnter={() => setIsPaused(true)}
-            onMouseLeave={() => setIsPaused(false)}
-            onTouchStart={onTouchStart}
-            onTouchMove={onTouchMove}
-            onTouchEnd={onTouchEnd}
-            aria-roledescription="carousel"
-          >
-            <div 
-              className="flex transition-transform duration-500 ease-in-out"
-              style={{ 
-                transform: `translateX(-${currentSlide * 100}%)`,
-                width: `${couples.length * 100}%`
-              }}
-            >
-              {couples.map((couple, index) => (
-                <div 
-                  key={index} 
-                  className="flex-shrink-0 relative w-full"
-                >
-                  <div className="relative h-96">
-                    <Image
-                      src={couple.image}
-                      alt={couple.alt || couple.names}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      priority={index < 3}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                    <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
-                      <h3 className="text-2xl font-bold mb-2">{couple.names}</h3>
-                      <p className="text-lg mb-2 text-gray-200">{couple.story}</p>
-                      <p className="text-sm italic text-gray-300">"{couple.quote}"</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Navigation Buttons */}
-          <button
-            onClick={prevSlide}
-            aria-label="Previous slide"
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 p-3 rounded-full shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-primary-500"
-          >
-            <ChevronLeft className="h-6 w-6" />
-          </button>
-          <button
-            onClick={nextSlide}
-            aria-label="Next slide"
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 p-3 rounded-full shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-primary-500"
-          >
-            <ChevronRight className="h-6 w-6" />
-          </button>
-
-          {/* Dots Indicator */}
-          <div className="flex justify-center mt-8 space-x-3">
-            {couples.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentSlide(index)}
-                aria-label={`Go to slide ${index + 1}`}
-                className={`w-3 h-3 rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-primary-500 ${
-                  index === currentSlide ? 'bg-primary-600' : 'bg-gray-300 hover:bg-gray-400'
-                }`}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
 
 // Testimonials Section Component
 function TestimonialsSection() {
@@ -274,7 +100,6 @@ function TestimonialsSection() {
 }
 
 export default function Home() {
-  const [currentSlide, setCurrentSlide] = useState(0)
   const [showSplash, setShowSplash] = useState(true)
   const [isLoading, setIsLoading] = useState(true)
   
@@ -293,35 +118,6 @@ export default function Home() {
     }
   }, [])
   
-  const couples = [
-    {
-      image: '/images/1.svg', // Desktop SVG image (1200x800px) - fallback to JPEG if fails
-      fallbackImage: '/images/1.jpg', // JPEG fallback
-      mobileImage: '/images/p1-mobile.jpg', // Mobile portrait image
-      gradient: 'bg-gradient-to-br from-purple-600 via-pink-600 to-red-500',
-      names: 'Rajesh & Priya',
-      story: 'Found love through shared values in Mumbai, celebrated with a grand Indian wedding in 2023',
-      quote: "Make My Knot's AI understood what we were truly looking for. We couldn't be happier!"
-    },
-    {
-      image: '/images/2.svg', // Desktop SVG image (1200x800px) - fallback to JPEG if fails
-      fallbackImage: '/images/2.jpg', // JPEG fallback
-      mobileImage: '/images/p2-mobile.jpg', // Mobile portrait image
-      gradient: 'bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600',
-      names: 'Arjun & Kavya',
-      story: 'Connected across cities, engaged in a beautiful ceremony with both families in 2024',
-      quote: 'The compatibility matching was spot-on. We share the same dreams and aspirations!'
-    },
-    {
-      image: '/images/3.svg', // Desktop SVG image (1200x800px) - fallback to JPEG if fails
-      fallbackImage: '/images/3.jpg', // JPEG fallback
-      mobileImage: '/images/p3-mobile.jpg', // Mobile portrait image
-      gradient: 'bg-gradient-to-br from-green-600 via-teal-600 to-blue-600',
-      names: 'Vikram & Sneha',
-      story: 'Long-distance match turned into a beautiful partnership, now settled together in Delhi',
-      quote: 'Distance meant nothing when we found our perfect match. Thank you Make My Knot!'
-    }
-  ]
 
   // Splash screen effect - Extended timing for better visibility
   useEffect(() => {
@@ -339,20 +135,6 @@ export default function Home() {
     }
   }, [])
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % couples.length)
-    }, 4000)
-    return () => clearInterval(timer)
-  }, [couples.length])
-
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % couples.length)
-  }
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + couples.length) % couples.length)
-  }
 
   // Splash Screen Component
   if (showSplash) {
@@ -509,166 +291,39 @@ export default function Home() {
         <meta name="description" content="Find your perfect life partner with our AI-powered matchmaking platform. Quality matches, compatibility-based pairing, and personalized service." />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
         <link rel="icon" href="/favicon.ico" />
-        <style jsx>{`
-          .hero-container {
-            position: relative;
-            height: 100vh;
-            overflow: hidden;
-          }
-          .slider-background {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #1a1a2e;
-          }
-          .slide {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            transition: opacity 1.5s ease-in-out;
-          }
-          .slide.active {
-            opacity: 1;
-          }
-          .slide img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            object-position: center;
-          }
-          @media (max-width: 768px) {
-            .slide img {
-              object-fit: cover;
-            }
-          }
-          .hero-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0.5) 100%);
-            z-index: 5;
-          }
-          .hero-content {
-            position: absolute;
-            top: 50%;
-            left: 3%;
-            transform: translateY(-50%);
-            z-index: 10;
-            max-width: 480px;
-            padding: 0 20px;
-          }
-          @media (max-width: 1024px) {
-            .hero-content {
-              left: 2%;
-              max-width: 450px;
-            }
-          }
-          @media (max-width: 768px) {
-            .hero-content {
-              left: 50%;
-              transform: translate(-50%, -50%);
-              max-width: 90%;
-              padding: 0 16px;
-            }
-          }
-        `}</style>
       </Head>
 
       <main className="min-h-screen bg-white">
         {/* Navigation */}
         <Navigation variant="wine-glass" />
 
-        {/* Hero Section */}
-        <section className="hero-container" style={{ paddingTop: '80px' }}>
-          {/* Background Slider */}
-          <div className="slider-background">
-            {couples.map((couple, index) => (
-              <div key={index} className={`slide ${index === currentSlide ? 'active' : ''}`}>
-                {/* Desktop Image */}
-                <img
-                  src={couple.image}
-                  alt={couple.names}
-                  className="hidden md:block"
-                  onError={(e) => {
-                    if (couple.fallbackImage && e.currentTarget.src.includes('.svg')) {
-                      e.currentTarget.src = couple.fallbackImage;
-                    }
-                  }}
-                />
-                {/* Mobile Image */}
-                <img
-                  src={couple.mobileImage}
-                  alt={couple.names}
-                  className="block md:hidden"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                  }}
-                />
+        {/* Hero Section - Simple Left Aligned */}
+        <section className="bg-gradient-to-br from-purple-50 to-pink-50 min-h-screen flex items-center" style={{ paddingTop: '80px' }}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+            <div className="flex items-center justify-between">
+              {/* Left Content */}
+              <div className="w-full max-w-lg">
+                <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                  Start Your Journey
+                </h1>
+                <p className="text-xl text-gray-700 mb-8 italic leading-relaxed">
+                  "From <span className="font-bold text-purple-600">handshake</span> to <span className="font-bold text-pink-600">pheras</span>, let us guide your journey to love and lifelong happiness."
+                </p>
+                <p className="text-gray-600 mb-8 text-lg">
+                  Answer a few questions to help us find your perfect match
+                </p>
                 
-                {/* Gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-black/60"></div>
-                
-                {/* Quote for active slide only */}
-                {index === currentSlide && (
-                  <div className="absolute bottom-8 left-8 right-8 text-center" style={{ zIndex: 8 }}>
-                    <div className="bg-black/60 backdrop-blur-sm rounded-xl p-6 max-w-2xl mx-auto border border-white/20">
-                      <h3 className="text-white text-xl font-bold mb-2">{couple.names}</h3>
-                      <p className="text-gray-200 italic">&ldquo;{couple.quote}&rdquo;</p>
-                    </div>
-                  </div>
-                )}
+                {/* Questionnaire Container */}
+                <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100">
+                  <LeadQuestionnaire />
+                </div>
               </div>
-            ))}
-          </div>
-          
-          {/* Dark overlay */}
-          <div className="hero-overlay"></div>
-          
-          {/* Content */}
-          <div className="hero-content">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-4 drop-shadow-lg">
-              Start Your Journey
-            </h1>
-            <p className="text-lg text-gold-300 mb-6 italic drop-shadow-md">
-              "From <span className="font-bold">handshake</span> to <span className="font-bold text-red-300">pheras</span>, let us guide your journey to love."
-            </p>
-            <div className="bg-white/15 backdrop-blur-lg rounded-xl p-6 border border-white/30 shadow-2xl">
-              <LeadQuestionnaire />
+              
+              {/* Right side can be used for other content or kept empty */}
+              <div className="hidden lg:block w-1/2">
+                {/* Optional: Add an illustration or keep empty for whitespace */}
+              </div>
             </div>
-          </div>
-          
-          {/* Navigation */}
-          <button
-            onClick={prevSlide}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full transition-colors z-20 hidden md:block"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </button>
-          <button
-            onClick={nextSlide}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full transition-colors z-20 hidden md:block"
-          >
-            <ChevronRight className="h-5 w-5" />
-          </button>
-          
-          {/* Dots */}
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-3 z-20">
-            {couples.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentSlide(index)}
-                className={`w-3 h-3 rounded-full transition-all ${
-                  index === currentSlide ? 'bg-gold-400 w-4 h-4' : 'bg-white/50 hover:bg-white/70'
-                }`}
-              />
-            ))}
           </div>
         </section>
 
