@@ -673,9 +673,9 @@ export default function Home() {
 
         {/* Hero Section with Full-Length Slider */}
         <section className="relative" style={{ 
-          paddingTop: '60px', 
-          minHeight: 'calc(100vh - 60px)',
-          height: 'calc(100vh - 60px)'
+          paddingTop: '80px', 
+          minHeight: 'calc(100vh - 80px)',
+          height: 'calc(100vh - 80px)'
         }}>
           {/* Full-Length Background Slider */}
           <ImageSlider />
@@ -684,9 +684,9 @@ export default function Home() {
           <div className="absolute inset-0 bg-black bg-opacity-40 z-10"></div>
           
           {/* Overlapping Content */}
-          <div className="absolute inset-0 flex items-center justify-start z-20">
+          <div className="absolute inset-0 flex items-center justify-start z-20" style={{ paddingTop: '20px' }}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-              <div className="max-w-lg pt-4 sm:pt-8 md:pt-0">
+              <div className="max-w-lg mt-8 sm:mt-12 md:mt-16 lg:mt-8 xl:mt-0">
                 <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 sm:mb-6 drop-shadow-lg">
                   Start Your Journey
                 </h1>
