@@ -147,6 +147,243 @@ function ImageSlider() {
   )
 }
 
+// Happy Couple Slider Component
+function HappyCoupleSlider() {
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true)
+  const slideRef = useRef<HTMLDivElement>(null)
+  
+  // Happy couple images
+  const slides = [
+    {
+      image: '/images/pic1.jpg',
+      title: 'Love Stories',
+      subtitle: 'That Inspire Us'
+    },
+    {
+      image: '/images/pic2.jpg',
+      title: 'Beautiful Journeys',
+      subtitle: 'From First Meet to Forever'
+    },
+    {
+      image: '/images/pic3.jpg',
+      title: 'Happy Endings',
+      subtitle: 'Made Possible Together'
+    },
+    {
+      image: '/images/pic4.jpg',
+      title: 'Dream Weddings',
+      subtitle: 'Crafted with Love'
+    },
+    {
+      image: '/images/pic5.jpg',
+      title: 'Perfect Matches',
+      subtitle: 'Written in the Stars'
+    }
+  ]
+  
+  // Auto-advance slides
+  useEffect(() => {
+    if (!isAutoPlaying) return
+    
+    const timer = setInterval(() => {
+      setCurrentIndex((prevIndex) => 
+        prevIndex === slides.length - 1 ? 0 : prevIndex + 1
+      )
+    }, 4000) // Change slide every 4 seconds
+    
+    return () => clearInterval(timer)
+  }, [currentIndex, isAutoPlaying, slides.length])
+  
+  const goToSlide = (index: number) => {
+    setCurrentIndex(index)
+  }
+  
+  const nextSlide = () => {
+    setCurrentIndex((prevIndex) => 
+      prevIndex === slides.length - 1 ? 0 : prevIndex + 1
+    )
+  }
+  
+  const prevSlide = () => {
+    setCurrentIndex((prevIndex) => 
+      prevIndex === 0 ? slides.length - 1 : prevIndex - 1
+    )
+  }
+  
+  return (
+    <div className="relative w-full h-screen overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-20 left-20 w-40 h-40 bg-pink-200/30 rounded-full blur-3xl animate-pulse" style={{animationDuration: '6s'}}></div>
+        <div className="absolute bottom-32 right-16 w-56 h-56 bg-rose-300/20 rounded-full blur-3xl animate-bounce" style={{animationDuration: '8s'}}></div>
+        <div className="absolute top-1/3 right-1/4 w-32 h-32 bg-purple-200/25 rounded-full blur-2xl animate-ping" style={{animationDelay: '2s', animationDuration: '4s'}}></div>
+        <div className="absolute bottom-1/4 left-1/3 w-28 h-28 bg-pink-300/20 rounded-full blur-xl animate-pulse" style={{animationDelay: '1s', animationDuration: '5s'}}></div>
+        
+        {/* Floating Hearts */}
+        <div className="absolute top-1/4 left-1/4 animate-float" style={{animationDelay: '0s'}}>
+          <Heart className="w-6 h-6 text-pink-300/40" />
+        </div>
+        <div className="absolute top-3/4 right-1/3 animate-float" style={{animationDelay: '2s'}}>
+          <Heart className="w-8 h-8 text-rose-400/30" />
+        </div>
+        <div className="absolute bottom-1/3 left-1/2 animate-float" style={{animationDelay: '4s'}}>
+          <Heart className="w-5 h-5 text-purple-300/35" />
+        </div>
+      </div>
+      
+      {/* Main Slider Container */}
+      <div className="relative w-full h-full">
+        {slides.map((slide, index) => (
+          <div
+            key={index}
+            className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
+              index === currentIndex 
+                ? 'opacity-100 scale-100 z-10' 
+                : 'opacity-0 scale-105 z-0'
+            }`}
+          >
+            {/* Image with Ken Burns Effect */}
+            <div className="relative w-full h-full overflow-hidden">
+              <div className={`w-full h-full transition-transform duration-[6000ms] ease-linear ${
+                index === currentIndex ? 'animate-ken-burns' : ''
+              }`}>
+                <img
+                  src={slide.image}
+                  alt={`${slide.title} - ${slide.subtitle}`}
+                  className="w-full h-full object-cover"
+                  draggable={false}
+                />
+              </div>
+              
+              {/* Gradient Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-br from-black/30 via-transparent to-black/50"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+            </div>
+            
+            {/* Animated Content Overlay */}
+            <div className="absolute inset-0 flex items-center justify-center z-20">
+              <div className="text-center text-white max-w-4xl mx-auto px-4">
+                {/* Main Heading */}
+                <motion.h2
+                  key={`title-${index}`}
+                  initial={{ opacity: 0, y: 60, scale: 0.9 }}
+                  animate={index === currentIndex ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 60, scale: 0.9 }}
+                  transition={{ duration: 1, delay: 0.3, ease: 'easeOut' }}
+                  className="text-6xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight"
+                >
+                  <span className="bg-gradient-to-r from-pink-300 via-rose-200 to-purple-300 bg-clip-text text-transparent drop-shadow-2xl">
+                    Happy Couple
+                  </span>
+                </motion.h2>
+                
+                {/* Animated Subtitle */}
+                <motion.div
+                  key={`subtitle-${index}`}
+                  initial={{ opacity: 0, x: -50 }}
+                  animate={index === currentIndex ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }}
+                  transition={{ duration: 0.8, delay: 0.6 }}
+                  className="text-2xl md:text-3xl lg:text-4xl font-semibold mb-4 text-white/90 drop-shadow-lg"
+                >
+                  {slide.title}
+                </motion.div>
+                
+                <motion.div
+                  key={`description-${index}`}
+                  initial={{ opacity: 0, x: 50 }}
+                  animate={index === currentIndex ? { opacity: 1, x: 0 } : { opacity: 0, x: 50 }}
+                  transition={{ duration: 0.8, delay: 0.8 }}
+                  className="text-xl md:text-2xl lg:text-3xl text-white/80 font-medium italic mb-8 drop-shadow-md"
+                >
+                  {slide.subtitle}
+                </motion.div>
+                
+                {/* Animated Decorative Line */}
+                <motion.div
+                  key={`line-${index}`}
+                  initial={{ width: 0, opacity: 0 }}
+                  animate={index === currentIndex ? { width: '200px', opacity: 1 } : { width: 0, opacity: 0 }}
+                  transition={{ duration: 1, delay: 1.2 }}
+                  className="h-1 bg-gradient-to-r from-transparent via-pink-300 to-transparent mx-auto rounded-full"
+                />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      {/* Navigation Controls */}
+      <div className="absolute inset-0 flex items-center justify-between px-8 pointer-events-none z-30">
+        <button 
+          onClick={prevSlide}
+          onMouseEnter={() => setIsAutoPlaying(false)}
+          onMouseLeave={() => setIsAutoPlaying(true)}
+          className="group bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white p-4 rounded-full transition-all duration-300 transform hover:scale-110 shadow-lg pointer-events-auto"
+          aria-label="Previous slide"
+        >
+          <motion.div
+            whileHover={{ x: -2 }}
+            transition={{ duration: 0.2 }}
+          >
+            &#10094;
+          </motion.div>
+        </button>
+        
+        <button 
+          onClick={nextSlide}
+          onMouseEnter={() => setIsAutoPlaying(false)}
+          onMouseLeave={() => setIsAutoPlaying(true)}
+          className="group bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white p-4 rounded-full transition-all duration-300 transform hover:scale-110 shadow-lg pointer-events-auto"
+          aria-label="Next slide"
+        >
+          <motion.div
+            whileHover={{ x: 2 }}
+            transition={{ duration: 0.2 }}
+          >
+            &#10095;
+          </motion.div>
+        </button>
+      </div>
+      
+      {/* Animated Dots Indicator */}
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3 z-30">
+        {slides.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => goToSlide(index)}
+            onMouseEnter={() => setIsAutoPlaying(false)}
+            onMouseLeave={() => setIsAutoPlaying(true)}
+            className={`relative transition-all duration-500 ${
+              index === currentIndex 
+                ? 'w-12 h-4 bg-white rounded-full' 
+                : 'w-4 h-4 bg-white/50 hover:bg-white/70 rounded-full'
+            }`}
+            aria-label={`Go to slide ${index + 1}`}
+          >
+            {index === currentIndex && (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="absolute inset-0 bg-gradient-to-r from-pink-400 to-purple-400 rounded-full"
+              />
+            )}
+          </button>
+        ))}
+      </div>
+      
+      {/* Progress Bar */}
+      <div className="absolute bottom-0 left-0 w-full h-1 bg-white/20 z-30">
+        <motion.div
+          key={currentIndex}
+          initial={{ width: '0%' }}
+          animate={{ width: '100%' }}
+          transition={{ duration: 4, ease: 'linear' }}
+          className="h-full bg-gradient-to-r from-pink-400 via-rose-400 to-purple-400"
+        />
+      </div>
+    </div>
+  )
+}
 
 // Testimonials Section Component
 function TestimonialsSection() {
@@ -814,6 +1051,10 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Happy Couple Slider Section */}
+        <section className="relative py-20 overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50">
+          <HappyCoupleSlider />
+        </section>
 
         {/* The Make My Knot Difference Section */}
         <section className="relative py-20 overflow-hidden">
