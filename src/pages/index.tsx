@@ -523,6 +523,7 @@ export default function Home() {
             width: 100%;
             height: calc(100vh - 80px);
             z-index: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           }
           .slide-item {
             position: absolute;
@@ -549,11 +550,18 @@ export default function Home() {
             }
           }
           .content-overlay {
-            position: relative;
+            position: absolute;
+            top: 80px;
+            left: 0;
+            width: 100%;
             z-index: 10;
             height: calc(100vh - 80px);
             display: flex;
             align-items: center;
+            pointer-events: none;
+          }
+          .content-overlay > * {
+            pointer-events: auto;
           }
         `}</style>
       </Head>
@@ -570,16 +578,23 @@ export default function Home() {
               <div 
                 key={index}
                 className={`slide-item ${index === currentSlide ? 'active' : ''}`}
+                style={{ backgroundColor: index === 0 ? '#ff6b6b' : index === 1 ? '#4ecdc4' : '#45b7d1' }}
               >
                 {/* Desktop Image */}
                 <img
                   src={couple.image}
                   alt={couple.names}
                   className="hero-image hidden md:block"
+                  onLoad={(e) => {
+                    console.log('✅ Desktop image loaded:', couple.image);
+                  }}
                   onError={(e) => {
+                    console.log('❌ Desktop image failed:', couple.image);
                     if (e.currentTarget.src.includes('.svg') && couple.fallbackImage) {
+                      console.log('🔄 Trying fallback:', couple.fallbackImage);
                       e.currentTarget.src = couple.fallbackImage;
                     } else {
+                      console.log('❌ No fallback available');
                       e.currentTarget.style.display = 'none';
                     }
                   }}
@@ -589,7 +604,11 @@ export default function Home() {
                   src={couple.mobileImage}
                   alt={couple.names}
                   className="hero-image block md:hidden"
+                  onLoad={(e) => {
+                    console.log('✅ Mobile image loaded:', couple.mobileImage);
+                  }}
                   onError={(e) => {
+                    console.log('❌ Mobile image failed:', couple.mobileImage);
                     e.currentTarget.style.display = 'none';
                   }}
                 />
