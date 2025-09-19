@@ -70,6 +70,52 @@ export default function About() {
           </div>
         </section>
 
+        {/* Our Story Section - Dadu's Foundation */}
+        <section className="py-20 bg-gradient-to-br from-gray-50 via-white to-primary-50">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">Our Story Begins</h2>
+              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                The foundation of trust, care, and meaningful connections that started it all
+              </p>
+            </div>
+
+            <div className="bg-white rounded-3xl shadow-xl p-8 lg:p-12 border border-gray-100">
+              <div className="flex items-center justify-center mb-8">
+                <div className="w-24 h-24 bg-gradient-to-br from-gold-100 to-gold-200 rounded-2xl flex items-center justify-center shadow-lg">
+                  <Heart className="h-12 w-12 text-gold-600" />
+                </div>
+              </div>
+              
+              <div className="text-center mb-8">
+                <h3 className="text-3xl font-bold text-gray-900 mb-2">Chaman Prakash Goyal</h3>
+                <p className="text-xl text-gold-600 font-semibold">Visionary Founder • 1975</p>
+              </div>
+              
+              <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed">
+                <p className="mb-6">
+                  In 1975, Chaman Prakash Goyal laid the foundation of Goyal Marriage Bureau, planting the roots of what has become one of the most trusted matchmaking services in India. His belief was simple yet powerful: every rishta deserves honesty, care, and blessings.
+                </p>
+                
+                <p className="mb-6">
+                  At a time when matchmaking was limited to biodatas and formalities, Chaman Prakash Goyal brought heart into the process. He personally met families, understood their values, and ensured that every match was built on trust and compatibility. His dedication turned countless dreams into successful marriages, earning him respect as one of India's most reliable matchmakers.
+                </p>
+                
+                <p className="mb-8">
+                  For him, shaadi was never just about two individuals, but about uniting families. With sincerity, blessings, and a personal touch, he created a legacy of meaningful connections—one that continues to inspire generations.
+                </p>
+                
+                <div className="bg-gradient-to-r from-primary-50 to-gold-50 rounded-2xl p-6 border-l-4 border-gold-400">
+                  <div className="text-center">
+                    <p className="text-lg font-medium text-primary-800 mb-2">His guiding philosophy that lives on today:</p>
+                    <p className="text-2xl font-bold text-primary-900 italic">"Matches Made with Mannat, Not Just Metrics"</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Timeline Section */}
         <section className="py-20 bg-white">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
