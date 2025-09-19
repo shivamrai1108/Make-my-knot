@@ -22,7 +22,7 @@ const countryCodes = [
 ]
 
 const steps = [
-  { id: 'online_dating_experience', question: 'Have you tried online dating before?', type: 'choice', options: ["I'm new to it", 'Once or twice', "I'm an online dating pro"] },
+  { id: 'online_dating_experience', question: 'Have you explored wedding matchmaking platforms before?', type: 'choice', options: ["I'm new to it", 'Once or twice', "I'm an online dating pro"] },
   { id: 'relationship_type', question: 'What kind of relationship are you looking for?', type: 'choice', options: ['Casual', 'Serious', 'Not sure, just browsing'] },
   { id: 'iam', question: 'I am', type: 'choice', options: ['a woman', 'a man', 'nonbinary'] },
   { id: 'looking_for', question: 'I am looking for', type: 'choice', options: ['a woman', 'a man', 'nonbinary', 'people'] },

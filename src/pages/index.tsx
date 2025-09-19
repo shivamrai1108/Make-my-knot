@@ -150,6 +150,7 @@ function ImageSlider() {
 // Success Stories Carousel Component
 function SuccessStoriesCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [isPaused, setIsPaused] = useState(false)
   
   // Success stories with couple testimonials
   const stories = [
@@ -176,8 +177,10 @@ function SuccessStoriesCarousel() {
     }
   ]
   
-  // Auto-advance slides
+  // Auto-advance slides - pause on hover
   useEffect(() => {
+    if (isPaused) return // Don't start timer if paused
+    
     const timer = setInterval(() => {
       setCurrentIndex((prevIndex) => 
         prevIndex === stories.length - 1 ? 0 : prevIndex + 1
@@ -185,7 +188,7 @@ function SuccessStoriesCarousel() {
     }, 6000)
     
     return () => clearInterval(timer)
-  }, [currentIndex, stories.length])
+  }, [currentIndex, stories.length, isPaused])
   
   const goToSlide = (index: number) => {
     setCurrentIndex(index)
@@ -206,7 +209,11 @@ function SuccessStoriesCarousel() {
   return (
     <div className="relative w-full">
       {/* Cards Grid Layout - Desktop Only */}
-      <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div 
+        className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+      >
         {stories.map((story, index) => (
           <div 
             key={index}
@@ -265,7 +272,11 @@ function SuccessStoriesCarousel() {
       
       {/* Mobile Carousel View */}
       <div className="md:hidden">
-        <div className="relative h-[500px] overflow-hidden rounded-2xl">
+        <div 
+          className="relative h-[500px] overflow-hidden rounded-2xl"
+          onTouchStart={() => setIsPaused(true)}
+          onTouchEnd={() => setIsPaused(false)}
+        >
           {stories.map((story, index) => (
             <div
               key={index}
