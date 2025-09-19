@@ -264,11 +264,6 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className="text-2xl md:text-3xl font-bold text-white mb-4 drop-shadow-lg">
-          Have you tried online dating before?
-        </h3>
-
       {step < steps.length ? (
         <div>
           <p className="text-2xl md:text-3xl font-bold text-white mb-6 drop-shadow-lg">{current.question}</p>
@@ -364,8 +359,8 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
                 ))}
               </select>
               <input
-                className={`flex-1 px-4 py-3 border border-l-0 rounded-r-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
-                  contact.phone && !validatePhone(contact.phone) ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                className={`flex-1 px-4 py-3 bg-white/20 border border-l-0 border-white/30 rounded-r-lg focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white placeholder-white/70 ${
+                  contact.phone && !validatePhone(contact.phone) ? 'border-red-300 bg-red-50/20' : ''
                 }`}
                 placeholder="10-digit phone number"
                 type="tel"
@@ -378,19 +373,19 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
               />
             </div>
             {contact.phone && !validatePhone(contact.phone) && (
-              <p className="text-red-500 text-xs mt-1">Please enter exactly 10 digits</p>
+              <p className="text-red-400 text-xs mt-1">Please enter exactly 10 digits</p>
             )}
           </div>
 
           {/* Date of Birth */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-white/90 mb-2">
               <Calendar className="w-4 h-4 inline mr-1" />
               Date of Birth *
             </label>
             <input
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
-                contact.dateOfBirth && !validateAge(contact.dateOfBirth) ? 'border-red-300 bg-red-50' : 'border-gray-300'
+              className={`w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white placeholder-white/70 ${
+                contact.dateOfBirth && !validateAge(contact.dateOfBirth) ? 'border-red-300 bg-red-50/20' : ''
               }`}
               type="date"
               value={contact.dateOfBirth}
@@ -398,17 +393,17 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
               max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split('T')[0]}
             />
             {contact.dateOfBirth && !validateAge(contact.dateOfBirth) && (
-              <p className="text-red-500 text-xs mt-1">You must be at least 18 years old</p>
+              <p className="text-red-400 text-xs mt-1">You must be at least 18 years old</p>
             )}
           </div>
 
           {/* Optional Biodata Upload */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-white/90 mb-2">
               <Upload className="w-4 h-4 inline mr-1" />
               Upload Biodata (Optional)
             </label>
-            <p className="text-xs text-gray-500 mb-3">
+            <p className="text-xs text-white/70 mb-3">
               Upload your biodata in PDF or JPEG format (max 5MB) to help us serve you better
             </p>
             
@@ -473,13 +468,12 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
             )}
           </button>
           
-          <div className="text-xs text-gray-500 mt-3 text-center">
+          <div className="text-xs text-white/70 mt-3 text-center">
             We&apos;ll contact you with curated matches. No spam, promise! 🤝
           </div>
-          <div className="text-sm text-gray-500 mt-2 text-center">
+          <div className="text-sm text-white/70 mt-2 text-center">
             Step {steps.length+1} of {steps.length+1}
           </div>
-        </div>
         </div>
       )}
     </div>
