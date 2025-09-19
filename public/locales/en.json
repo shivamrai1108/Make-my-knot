@@ -159,26 +159,25 @@
   },
   "questionnaire": {
     "questions": {
-      "onlineMatchmakingExperience": "Have you explored wedding matchmaking platforms before?",
-      "relationshipType": "What kind of relationship are you looking for?",
-      "iam": "I am",
-      "lookingFor": "I am looking for",
-      "location": "Where do you live?",
-      "ageRange": "What age range are you interested in?"
+      "matchmakingExperience": "Have you used matchmaking platforms or matrimonial services before?",
+      "genderIdentity": "Which gender(s) best describe you?",
+      "openToMeeting": "Who are you open to meeting?",
+      "preferredAgeRange": "What is your preferred age range for a partner?",
+      "currentLocation": "Where do you currently live?"
     },
     "options": {
-      "newToIt": "I'm new to it",
-      "onceOrTwice": "Once or twice",
-      "pro": "I'm an online dating pro",
-      "casual": "Casual",
-      "serious": "Serious",
-      "notSure": "Not sure, just browsing",
-      "woman": "a woman",
-      "man": "a man",
-      "nonbinary": "nonbinary",
-      "people": "people"
+      "yes": "Yes",
+      "no": "No",
+      "man": "Man",
+      "woman": "Woman",
+      "nonBinary": "Non-binary",
+      "preferNotToSay": "Prefer not to say",
+      "men": "Men",
+      "women": "Women",
+      "allGenders": "All genders"
     },
     "placeholders": {
+      "ageRange": "e.g., 25-35",
       "cityLocation": "City, State/Country"
     }
   },

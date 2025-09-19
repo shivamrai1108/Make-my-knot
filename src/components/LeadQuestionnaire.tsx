@@ -22,12 +22,11 @@ const countryCodes = [
 ]
 
 const steps = [
-  { id: 'online_dating_experience', question: 'Have you explored wedding matchmaking platforms before?', type: 'choice', options: ["I'm new to it", 'Once or twice', "I'm an online dating pro"] },
-  { id: 'relationship_type', question: 'What kind of relationship are you looking for?', type: 'choice', options: ['Casual', 'Serious', 'Not sure, just browsing'] },
-  { id: 'iam', question: 'I am', type: 'choice', options: ['a woman', 'a man', 'nonbinary'] },
-  { id: 'looking_for', question: 'I am looking for', type: 'choice', options: ['a woman', 'a man', 'nonbinary', 'people'] },
-  { id: 'location', question: 'Where do you live?', type: 'input', placeholder: 'City, State/Country' },
-  { id: 'age_range', question: 'What age range are you interested in?', type: 'choice', options: ['18-25', '26-30', '31-35', '36-40', '41-50', '50+'] },
+  { id: 'matchmaking_experience', question: 'Have you used matchmaking platforms or matrimonial services before?', type: 'choice', options: ['Yes', 'No'] },
+  { id: 'gender_identity', question: 'Which gender(s) best describe you?', type: 'choice', options: ['Man', 'Woman', 'Non-binary', 'Prefer not to say'] },
+  { id: 'open_to_meeting', question: 'Who are you open to meeting?', type: 'choice', options: ['Men', 'Women', 'Non-binary', 'All genders'] },
+  { id: 'preferred_age_range', question: 'What is your preferred age range for a partner?', type: 'input', placeholder: 'e.g., 25-35' },
+  { id: 'current_location', question: 'Where do you currently live?', type: 'input', placeholder: 'City, State/Country' },
 ]
 
 export default function LeadQuestionnaire({ onSubmitted }: Props) {
