@@ -150,24 +150,29 @@ function ImageSlider() {
 // Success Stories Carousel Component
 function SuccessStoriesCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0)
-  const slideRef = useRef<HTMLDivElement>(null)
   
   // Success stories with couple testimonials
   const stories = [
     {
       image: '/images/pic1.jpg',
       names: 'Rahul & Aishwarya',
-      testimonial: 'When we first connected on Make My Knot, it felt like our hearts recognized each other. Every conversation, every laugh, every shared dream brought us closer. Today, we know our knot isn\'t just a bond—it\'s forever.'
+      location: 'Mumbai, Maharashtra',
+      testimonial: 'When we first connected on Make My Knot, it felt like our hearts recognized each other. Every conversation, every laugh, every shared dream brought us closer. Today, we know our knot isn\'t just a bond—it\'s forever.',
+      rating: 5
     },
     {
       image: '/images/pic2.jpg',
       names: 'Nitin & Preeti',
-      testimonial: 'We were just looking for someone who really understood us. Make My Knot helped us meet each other, and our connection grew naturally into something meaningful.'
+      location: 'Delhi, India',
+      testimonial: 'We were just looking for someone who really understood us. Make My Knot helped us meet each other, and our connection grew naturally into something meaningful.',
+      rating: 5
     },
     {
       image: '/images/pic3.jpg',
       names: 'Aman & Muskan',
-      testimonial: 'We connected on Make My Knot and soon realized how much we had in common. What started with simple conversations slowly turned into something beautiful. Today, we feel lucky to have found each other.'
+      location: 'Bengaluru, Karnataka',
+      testimonial: 'We connected on Make My Knot and soon realized how much we had in common. What started with simple conversations slowly turned into something beautiful. Today, we feel lucky to have found each other.',
+      rating: 5
     }
   ]
   
@@ -177,7 +182,7 @@ function SuccessStoriesCarousel() {
       setCurrentIndex((prevIndex) => 
         prevIndex === stories.length - 1 ? 0 : prevIndex + 1
       )
-    }, 6000) // Change slide every 6 seconds
+    }, 6000)
     
     return () => clearInterval(timer)
   }, [currentIndex, stories.length])
@@ -199,82 +204,140 @@ function SuccessStoriesCarousel() {
   }
   
   return (
-    <div className="relative w-full h-[600px] overflow-hidden rounded-2xl">
-      {/* Main Slider Container */}
-      <div className="relative w-full h-full">
+    <div className="relative w-full">
+      {/* Cards Grid Layout */}
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {stories.map((story, index) => (
-          <div
+          <div 
             key={index}
-            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-              index === currentIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'
-            }`}
+            className="relative h-[500px] rounded-2xl overflow-hidden shadow-xl group cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-2xl"
           >
-            {/* Image */}
-            <div className="relative w-full h-full overflow-hidden">
+            {/* Background Image */}
+            <div className="absolute inset-0">
               <img
                 src={story.image}
                 alt={`${story.names} wedding photo`}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                 draggable={false}
               />
               
-              {/* Professional overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+              {/* Gradient Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20"></div>
+              
+              {/* Hover Overlay */}
+              <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </div>
             
             {/* Content Overlay */}
-            <div className="absolute bottom-0 left-0 right-0 p-8 z-20">
-              <div className="max-w-4xl mx-auto text-center text-white">
-                {/* Couple Names */}
-                <h3 className="text-2xl md:text-3xl font-bold mb-4 text-gold-300">
-                  {story.names}
-                </h3>
-                
-                {/* Testimonial */}
-                <div className="relative">
-                  <p className="text-lg md:text-xl leading-relaxed text-white/90 italic max-w-3xl mx-auto">
-                    "{story.testimonial}"
-                  </p>
-                </div>
+            <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
+              {/* Couple Names */}
+              <h3 className="text-2xl font-bold mb-2 text-center">
+                {story.names}
+              </h3>
+              
+              {/* Location */}
+              <p className="text-sm text-gray-200 mb-4 text-center font-medium">
+                {story.location}
+              </p>
+              
+              {/* Star Rating */}
+              <div className="flex justify-center mb-4">
+                {[...Array(story.rating)].map((_, i) => (
+                  <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                ))}
+              </div>
+              
+              {/* Testimonial */}
+              <div className="bg-black/30 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                <p className="text-sm leading-relaxed text-gray-100 text-center italic line-clamp-4">
+                  {story.testimonial}
+                </p>
               </div>
             </div>
           </div>
         ))}
       </div>
       
-      {/* Navigation Controls */}
-      <div className="absolute inset-0 flex items-center justify-between px-6 pointer-events-none z-30">
-        <button 
-          onClick={prevSlide}
-          className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white p-3 rounded-full transition-all duration-300 shadow-lg pointer-events-auto"
-          aria-label="Previous story"
-        >
-          &#10094;
-        </button>
-        
-        <button 
-          onClick={nextSlide}
-          className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white p-3 rounded-full transition-all duration-300 shadow-lg pointer-events-auto"
-          aria-label="Next story"
-        >
-          &#10095;
-        </button>
-      </div>
-      
-      {/* Dots Indicator */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-3 z-30">
-        {stories.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => goToSlide(index)}
-            className={`transition-all duration-300 ${
-              index === currentIndex 
-                ? 'w-10 h-3 bg-white rounded-full' 
-                : 'w-3 h-3 bg-white/50 hover:bg-white/70 rounded-full'
-            }`}
-            aria-label={`Go to story ${index + 1}`}
-          />
-        ))}
+      {/* Mobile Carousel View */}
+      <div className="md:hidden mt-8">
+        <div className="relative h-[500px] overflow-hidden rounded-2xl">
+          {stories.map((story, index) => (
+            <div
+              key={index}
+              className={`absolute inset-0 transition-all duration-500 ${
+                index === currentIndex 
+                  ? 'opacity-100 transform translate-x-0' 
+                  : index < currentIndex 
+                  ? 'opacity-0 transform -translate-x-full'
+                  : 'opacity-0 transform translate-x-full'
+              }`}
+            >
+              {/* Background Image */}
+              <div className="absolute inset-0">
+                <img
+                  src={story.image}
+                  alt={`${story.names} wedding photo`}
+                  className="w-full h-full object-cover"
+                  draggable={false}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20"></div>
+              </div>
+              
+              {/* Content */}
+              <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
+                <h3 className="text-2xl font-bold mb-2 text-center">{story.names}</h3>
+                <p className="text-sm text-gray-200 mb-4 text-center font-medium">{story.location}</p>
+                
+                <div className="flex justify-center mb-4">
+                  {[...Array(story.rating)].map((_, i) => (
+                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                  ))}
+                </div>
+                
+                <div className="bg-black/30 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                  <p className="text-sm leading-relaxed text-gray-100 text-center italic">
+                    {story.testimonial}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+          
+          {/* Mobile Navigation */}
+          <div className="absolute inset-0 flex items-center justify-between px-4 pointer-events-none z-30">
+            <button 
+              onClick={prevSlide}
+              className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white p-2 rounded-full transition-all duration-300 shadow-lg pointer-events-auto"
+              aria-label="Previous story"
+            >
+              &#10094;
+            </button>
+            
+            <button 
+              onClick={nextSlide}
+              className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white p-2 rounded-full transition-all duration-300 shadow-lg pointer-events-auto"
+              aria-label="Next story"
+            >
+              &#10095;
+            </button>
+          </div>
+          
+          {/* Mobile Dots */}
+          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-30">
+            {stories.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => goToSlide(index)}
+                className={`transition-all duration-300 ${
+                  index === currentIndex 
+                    ? 'w-8 h-2 bg-white rounded-full' 
+                    : 'w-2 h-2 bg-white/50 hover:bg-white/70 rounded-full'
+                }`}
+                aria-label={`Go to story ${index + 1}`}
+              />
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   )
