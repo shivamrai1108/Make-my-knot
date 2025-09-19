@@ -414,11 +414,12 @@ export default function About() {
 
             <div className="text-center mt-12">
               <div className="bg-gradient-to-r from-primary-600 to-gold-500 text-white rounded-2xl p-6 max-w-4xl mx-auto">
-                <h4 className="text-2xl font-bold mb-4">Three Generations, One Vision</h4>
+                <h4 className="text-2xl font-bold mb-4">Three Generations. One Wisdom. Infinite Connections.</h4>
                 <p className="text-primary-100 leading-relaxed">
-                  From Dadu's foundation of trust in 1975, to Anil's dedication to personal service, to Maulik's technological innovation - 
-                  each generation has contributed their unique expertise while maintaining our core philosophy of creating meaningful, 
-                  lasting relationships between families.
+                  For over 50 years, the Goyal family has turned dreams into lifelong rishtas. 
+                  From Chaman Prakash Goyal's trust, to Anil Goyal's personal care, to Moulik Goyal's AI-powered innovation — every generation carried the same belief: 
+                  "Shaadi sirf do logon ka milan nahi, do parivaron ka bandhan hota hai." 
+                  At Make My Knot, we combine traditional matchmaking values with advanced AI technology to create meaningful, lasting connections that go beyond profiles and biodatas.
                 </p>
               </div>
             </div>
