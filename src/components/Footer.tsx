@@ -1,7 +1,9 @@
 import { Heart, Mail, Phone, MapPin, Instagram, Twitter, Facebook, Smartphone, Monitor } from 'lucide-react'
 import Image from 'next/image'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 export default function Footer() {
+  const { t } = useLanguage()
   return (
     <footer className="bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -18,10 +20,10 @@ export default function Footer() {
                   className="w-full h-full object-contain"
                 />
               </div>
-              <span className="text-2xl font-bold">Make My Knot</span>
+              <span className="text-2xl font-bold">{t('footer.company', 'Make My Knot')}</span>
             </div>
             <p className="text-gray-400 mb-6">
-              AI-powered matchmaking platform connecting hearts through compatibility, not just chemistry.
+              {t('footer.tagline', 'Where Hearts Meet Intelligence')}
             </p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-primary-400 transition-colors">
@@ -38,12 +40,12 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('footer.quickLinks', 'Quick Links')}</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">How It Works</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Success Stories</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">{t('footer.links.howItWorks', 'How It Works')}</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">{t('footer.links.successStories', 'Success Stories')}</a></li>
               <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Safety</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Blog</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">{t('footer.links.blog', 'Blog')}</a></li>
             </ul>
           </div>
 

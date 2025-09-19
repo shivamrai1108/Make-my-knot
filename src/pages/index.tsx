@@ -150,6 +150,7 @@ function ImageSlider() {
 
 // Success Stories Carousel Component
 function SuccessStoriesCarousel() {
+  const { t } = useLanguage()
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
   
@@ -157,23 +158,23 @@ function SuccessStoriesCarousel() {
   const stories = [
     {
       image: '/images/pic1.jpg',
-      names: 'Rahul & Aishwarya',
-      location: 'Mumbai, Maharashtra',
-      testimonial: 'When we first connected on Make My Knot, it felt like our hearts recognized each other. Every conversation, every laugh, every shared dream brought us closer. Today, we know our knot isn\'t just a bond—it\'s forever.',
+      names: t('successStories.stories.0.names', 'Rahul & Aishwarya'),
+      location: t('successStories.stories.0.location', 'Mumbai, Maharashtra'),
+      testimonial: t('successStories.stories.0.testimonial', 'When we first connected on Make My Knot, it felt like our hearts recognized each other. Every conversation, every laugh, every shared dream brought us closer. Today, we know our knot isn\'t just a bond—it\'s forever.'),
       rating: 5
     },
     {
       image: '/images/pic2.jpg',
-      names: 'Nitin & Preeti',
-      location: 'Delhi, India',
-      testimonial: 'We were just looking for someone who really understood us. Make My Knot helped us meet each other, and our connection grew naturally into something meaningful.',
+      names: t('successStories.stories.1.names', 'Nitin & Preeti'),
+      location: t('successStories.stories.1.location', 'Delhi, India'),
+      testimonial: t('successStories.stories.1.testimonial', 'We were just looking for someone who really understood us. Make My Knot helped us meet each other, and our connection grew naturally into something meaningful.'),
       rating: 5
     },
     {
       image: '/images/pic3.jpg',
-      names: 'Aman & Muskan',
-      location: 'Bengaluru, Karnataka',
-      testimonial: 'We connected on Make My Knot and soon realized how much we had in common. What started with simple conversations slowly turned into something beautiful. Today, we feel lucky to have found each other.',
+      names: t('successStories.stories.2.names', 'Aman & Muskan'),
+      location: t('successStories.stories.2.location', 'Bengaluru, Karnataka'),
+      testimonial: t('successStories.stories.2.testimonial', 'We connected on Make My Knot and soon realized how much we had in common. What started with simple conversations slowly turned into something beautiful. Today, we feel lucky to have found each other.'),
       rating: 5
     }
   ]
@@ -367,33 +368,34 @@ function SuccessStoriesCarousel() {
 
 // Testimonials Section Component
 function TestimonialsSection() {
+  const { t } = useLanguage()
   const testimonials = [
     {
-      name: 'Priya Sharma',
-      age: '28, Marketing Manager',
+      name: t('testimonials.members.0.name', 'Priya Sharma'),
+      age: t('testimonials.members.0.age', '28, Marketing Manager'),
       image: '/images/profile1.jpg',
-      quote: 'I was skeptical about online matchmaking, but Make My Knot changed my perspective completely. The AI understood my preferences better than I did myself!',
+      quote: t('testimonials.members.0.quote', 'I was skeptical about online matchmaking, but Make My Knot changed my perspective completely. The AI understood my preferences better than I did myself!'),
       rating: 5
     },
     {
-      name: 'Arjun Patel',
-      age: '31, Software Engineer',
+      name: t('testimonials.members.1.name', 'Arjun Patel'),
+      age: t('testimonials.members.1.age', '31, Software Engineer'),
       image: '/images/profile2.jpg',
-      quote: 'The quality of matches was exceptional. Every profile I received was thoughtfully curated. Found my life partner within 3 months!',
+      quote: t('testimonials.members.1.quote', 'The quality of matches was exceptional. Every profile I received was thoughtfully curated. Found my life partner within 3 months!'),
       rating: 5
     },
     {
-      name: 'Kavya Reddy',
-      age: '26, Doctor',
+      name: t('testimonials.members.2.name', 'Kavya Reddy'),
+      age: t('testimonials.members.2.age', '26, Doctor'),
       image: '/images/profile3.jpg',
-      quote: 'The personalized approach made all the difference. My matchmaker understood my busy schedule and found someone who truly complements my lifestyle.',
+      quote: t('testimonials.members.2.quote', 'The personalized approach made all the difference. My matchmaker understood my busy schedule and found someone who truly complements my lifestyle.'),
       rating: 5
     },
     {
-      name: 'Rohit Gupta',
-      age: '29, Financial Analyst',
+      name: t('testimonials.members.3.name', 'Rohit Gupta'),
+      age: t('testimonials.members.3.age', '29, Financial Analyst'),
       image: '/images/profile1.jpg',
-      quote: 'Professional, efficient, and results-driven. The team at Make My Knot goes above and beyond to ensure successful matches.',
+      quote: t('testimonials.members.3.quote', 'Professional, efficient, and results-driven. The team at Make My Knot goes above and beyond to ensure successful matches.'),
       rating: 5
     }
   ]
@@ -411,9 +413,9 @@ function TestimonialsSection() {
       
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-6">What Our Members Say</h2>
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-6">{t('testimonials.title', 'What Our Members Say')}</h2>
           <p className="text-base md:text-lg lg:text-xl text-gray-700 max-w-3xl mx-auto">
-            Don't just take our word for it. Here's what our successful members have to say about their experience.
+            {t('testimonials.subtitle', 'Don\'t just take our word for it. Here\'s what our successful members have to say about their experience.')}
           </p>
         </div>
 
@@ -454,6 +456,7 @@ function TestimonialsSection() {
 }
 
 export default function Home() {
+  const { t } = useLanguage()
   const [showSplash, setShowSplash] = useState(true)
   const [isLoading, setIsLoading] = useState(true)
   
@@ -549,7 +552,7 @@ export default function Home() {
             >
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 drop-shadow-lg">
                 <span className="bg-gradient-to-r from-gold-300 to-gold-100 bg-clip-text text-transparent">
-                  Make My Knot
+                  {t('splash.title', 'Make My Knot')}
                 </span>
               </h1>
               <motion.div
@@ -609,7 +612,7 @@ export default function Home() {
                   <div className="w-3 h-3 bg-white/60 rounded-full animate-bounce"></div>
                   <div className="w-3 h-3 bg-white/60 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
                   <div className="w-3 h-3 bg-white/60 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                  <span className="ml-3 text-lg font-medium">Loading your journey...</span>
+                  <span className="ml-3 text-lg font-medium">{t('splash.loading', 'Loading your perfect matches...')}</span>
                 </div>
               ) : (
                 <motion.div
@@ -669,13 +672,13 @@ export default function Home() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
               <div className="max-w-lg">
                 <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 sm:mb-6 drop-shadow-lg">
-                  Start Your Journey
+                  {t('hero.title', 'Find Your Perfect Life Partner')}
                 </h1>
                 <p className="text-lg sm:text-xl text-white mb-6 sm:mb-8 italic leading-relaxed drop-shadow-md">
-                  "From <span className="font-bold text-yellow-300">handshake</span> to <span className="font-bold text-pink-300">pheras</span>, let us guide your journey to love and lifelong happiness."
+                  {t('splash.subtitle', 'Where Love Meets Intelligence')}
                 </p>
                 <p className="text-gray-200 mb-6 sm:mb-8 text-base sm:text-lg drop-shadow-sm">
-                  Answer a few questions to help us find your perfect match
+                  {t('hero.description', 'Join thousands who found love through our intelligent matching system. Quality matches, verified profiles, and personalized matchmaking services.')}
                 </p>
                 
                 {/* Questionnaire - Direct Style like eharmony */}
@@ -991,9 +994,9 @@ export default function Home() {
         <section id="how-it-works" className="py-20 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">How Make My Knot Works</h2>
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">{t('howItWorks.title', 'How Make My Knot Works')}</h2>
               <p className="text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">
-                Our intelligent matching process ensures you meet people who truly align with your values and life goals
+                {t('howItWorks.subtitle', 'Our intelligent matching process ensures you meet people who truly align with your values and life goals')}
               </p>
             </div>
 
@@ -1003,9 +1006,9 @@ export default function Home() {
                 <div className="w-16 h-16 bg-primary-600 rounded-2xl mx-auto mb-6 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
                   <MessageCircle className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-4">Meet Your Matchmaker</h3>
+                <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-4">{t('howItWorks.step1.title', 'Meet Your Matchmaker')}</h3>
                 <p className="text-gray-600">
-                  Have a conversation with your AI matchmaker about your values, lifestyle, and what you're looking for in a life partner.
+                  {t('howItWorks.step1.description', 'Have a conversation with your AI matchmaker about your values, lifestyle, and what you\'re looking for in a life partner.')}
                 </p>
               </div>
 
@@ -1014,9 +1017,9 @@ export default function Home() {
                 <div className="w-16 h-16 bg-gold-600 rounded-2xl mx-auto mb-6 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
                   <Users className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-4">Get Curated Matches</h3>
+                <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-4">{t('howItWorks.step2.title', 'Get Curated Matches')}</h3>
                 <p className="text-gray-600">
-                  Receive 3-5 carefully selected profiles each week, chosen based on deep compatibility rather than just photos.
+                  {t('howItWorks.step2.description', 'Receive 3-5 carefully selected profiles each week, chosen based on deep compatibility rather than just photos.')}
                 </p>
               </div>
 
@@ -1025,9 +1028,9 @@ export default function Home() {
                 <div className="w-16 h-16 bg-green-600 rounded-2xl mx-auto mb-6 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
                   <Heart className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-4">Connect & Meet</h3>
+                <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-4">{t('howItWorks.step3.title', 'Connect & Meet')}</h3>
                 <p className="text-gray-600">
-                  When both parties are interested, your matchmaker introduces you personally and helps facilitate your first meeting.
+                  {t('howItWorks.step3.description', 'When both parties are interested, your matchmaker introduces you personally and helps facilitate your first meeting.')}
                 </p>
               </div>
             </div>
@@ -1040,10 +1043,10 @@ export default function Home() {
             {/* Section Header */}
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
-                From First Hello to a Beautiful Knot
+                {t('successStories.title', 'From First Hello to a Beautiful Knot')}
               </h2>
               <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
-                Real stories from couples who found their perfect match through Make My Knot
+                {t('successStories.subtitle', 'Real stories from couples who found their perfect match through Make My Knot')}
               </p>
             </div>
             
@@ -1068,7 +1071,7 @@ export default function Home() {
             {/* Header */}
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-gray-900 mb-6 tracking-tight">
-                The Make My Knot Difference
+                {t('difference.title', 'The Make My Knot Difference')}
               </h2>
               <div className="w-24 h-1 bg-gray-900 mx-auto mt-4"></div>
             </div>
@@ -1080,9 +1083,9 @@ export default function Home() {
                 <div className="mb-6">
                   <div className="w-16 h-1 bg-gray-900 mb-4"></div>
                 </div>
-                <h3 className="text-xl font-serif font-bold text-gray-900 mb-4 leading-tight">Complete Support</h3>
+                <h3 className="text-xl font-serif font-bold text-gray-900 mb-4 leading-tight">{t('difference.completeSupport.title', 'Complete Support')}</h3>
                 <p className="text-gray-600 leading-relaxed flex-grow font-light text-base">
-                  We provide complete support throughout your matchmaking journey. From intelligent conversation starters to AI-generated interaction prompts, we make sure you always feel confident and comfortable, helping you connect naturally and build meaningful relationships.
+                  {t('difference.completeSupport.description', 'We provide complete support throughout your matchmaking journey. From intelligent conversation starters to AI-generated interaction prompts, we make sure you always feel confident and comfortable, helping you connect naturally and build meaningful relationships.')}
                 </p>
               </div>
 
@@ -1156,17 +1159,17 @@ export default function Home() {
           
           <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8 relative z-10">
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-6 text-shadow-lg">
-              Ready to Find Your
-              <span className="block mt-2 bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">Life Partner?</span>
+              {t('cta.title', 'Ready to Find Your')}
+              <span className="block mt-2 bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">{t('cta.titleHighlight', 'Life Partner?')}</span>
             </h2>
             <p className="text-base md:text-lg lg:text-xl text-slate-200 mb-8">
-              Join thousands of people who have found meaningful relationships through our premium matchmaking platform.
+              {t('cta.subtitle', 'Join thousands of people who have found meaningful relationships through our premium matchmaking platform.')}
             </p>
             <Link 
               href="/signup" 
               className="inline-flex items-center justify-center px-6 py-3 text-base md:text-lg font-semibold rounded-2xl text-white bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:from-pink-600 hover:via-purple-600 hover:to-indigo-600 transform hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-purple-500/25"
             >
-              Start Your Journey Today
+              {t('cta.button', 'Start Your Journey Today')}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </div>
