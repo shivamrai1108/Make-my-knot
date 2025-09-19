@@ -224,6 +224,29 @@ function SuccessStoriesCarousel() {
               {/* Gradient Overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20"></div>
               
+              {/* Wavy Border at Bottom */}
+              <div className="absolute bottom-0 left-0 w-full h-16 overflow-hidden">
+                <svg 
+                  className="absolute bottom-0 w-full h-full" 
+                  viewBox="0 0 400 100" 
+                  preserveAspectRatio="none"
+                  fill="none"
+                >
+                  <path 
+                    d="M0,50 C50,20 100,80 150,50 C200,20 250,80 300,50 C350,20 400,80 400,50 L400,100 L0,100 Z"
+                    fill="url(#waveGradient)"
+                    className="opacity-80"
+                  />
+                  <defs>
+                    <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#fbbf24" stopOpacity="0.8" />
+                      <stop offset="50%" stopColor="#f59e0b" stopOpacity="0.9" />
+                      <stop offset="100%" stopColor="#d97706" stopOpacity="0.8" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+              
               {/* Hover Overlay */}
               <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </div>
@@ -281,6 +304,29 @@ function SuccessStoriesCarousel() {
                   draggable={false}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20"></div>
+                
+                {/* Wavy Border at Bottom - Mobile */}
+                <div className="absolute bottom-0 left-0 w-full h-16 overflow-hidden">
+                  <svg 
+                    className="absolute bottom-0 w-full h-full" 
+                    viewBox="0 0 400 100" 
+                    preserveAspectRatio="none"
+                    fill="none"
+                  >
+                    <path 
+                      d="M0,50 C50,20 100,80 150,50 C200,20 250,80 300,50 C350,20 400,80 400,50 L400,100 L0,100 Z"
+                      fill="url(#waveGradientMobile)"
+                      className="opacity-80"
+                    />
+                    <defs>
+                      <linearGradient id="waveGradientMobile" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="#fbbf24" stopOpacity="0.8" />
+                        <stop offset="50%" stopColor="#f59e0b" stopOpacity="0.9" />
+                        <stop offset="100%" stopColor="#d97706" stopOpacity="0.8" />
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                </div>
               </div>
               
               {/* Content */}
