@@ -205,47 +205,29 @@ function SuccessStoriesCarousel() {
   
   return (
     <div className="relative w-full">
-      {/* Cards Grid Layout */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Cards Grid Layout - Desktop Only */}
+      <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {stories.map((story, index) => (
           <div 
             key={index}
             className="relative h-[500px] rounded-2xl overflow-hidden shadow-xl group cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-2xl"
           >
-            {/* Background Image */}
+            {/* Background Image with Wavy Crop */}
             <div className="absolute inset-0">
-              <img
-                src={story.image}
-                alt={`${story.names} wedding photo`}
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                draggable={false}
-              />
+              <div className="relative w-full h-full overflow-hidden">
+                <img
+                  src={story.image}
+                  alt={`${story.names} wedding photo`}
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                  draggable={false}
+                  style={{
+                    clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 60px), 95% calc(100% - 40px), 90% calc(100% - 60px), 80% calc(100% - 30px), 70% calc(100% - 50px), 60% calc(100% - 35px), 50% calc(100% - 55px), 40% calc(100% - 25px), 30% calc(100% - 45px), 20% calc(100% - 35px), 10% calc(100% - 50px), 5% calc(100% - 40px), 0 calc(100% - 60px))'
+                  }}
+                />
+              </div>
               
               {/* Gradient Overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20"></div>
-              
-              {/* Wavy Border at Bottom */}
-              <div className="absolute bottom-0 left-0 w-full h-16 overflow-hidden">
-                <svg 
-                  className="absolute bottom-0 w-full h-full" 
-                  viewBox="0 0 400 100" 
-                  preserveAspectRatio="none"
-                  fill="none"
-                >
-                  <path 
-                    d="M0,50 C50,20 100,80 150,50 C200,20 250,80 300,50 C350,20 400,80 400,50 L400,100 L0,100 Z"
-                    fill="url(#waveGradient)"
-                    className="opacity-80"
-                  />
-                  <defs>
-                    <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#fbbf24" stopOpacity="0.8" />
-                      <stop offset="50%" stopColor="#f59e0b" stopOpacity="0.9" />
-                      <stop offset="100%" stopColor="#d97706" stopOpacity="0.8" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-              </div>
               
               {/* Hover Overlay */}
               <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -282,7 +264,7 @@ function SuccessStoriesCarousel() {
       </div>
       
       {/* Mobile Carousel View */}
-      <div className="md:hidden mt-8">
+      <div className="md:hidden">
         <div className="relative h-[500px] overflow-hidden rounded-2xl">
           {stories.map((story, index) => (
             <div
@@ -295,38 +277,20 @@ function SuccessStoriesCarousel() {
                   : 'opacity-0 transform translate-x-full'
               }`}
             >
-              {/* Background Image */}
+              {/* Background Image with Wavy Crop - Mobile */}
               <div className="absolute inset-0">
-                <img
-                  src={story.image}
-                  alt={`${story.names} wedding photo`}
-                  className="w-full h-full object-cover"
-                  draggable={false}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20"></div>
-                
-                {/* Wavy Border at Bottom - Mobile */}
-                <div className="absolute bottom-0 left-0 w-full h-16 overflow-hidden">
-                  <svg 
-                    className="absolute bottom-0 w-full h-full" 
-                    viewBox="0 0 400 100" 
-                    preserveAspectRatio="none"
-                    fill="none"
-                  >
-                    <path 
-                      d="M0,50 C50,20 100,80 150,50 C200,20 250,80 300,50 C350,20 400,80 400,50 L400,100 L0,100 Z"
-                      fill="url(#waveGradientMobile)"
-                      className="opacity-80"
-                    />
-                    <defs>
-                      <linearGradient id="waveGradientMobile" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor="#fbbf24" stopOpacity="0.8" />
-                        <stop offset="50%" stopColor="#f59e0b" stopOpacity="0.9" />
-                        <stop offset="100%" stopColor="#d97706" stopOpacity="0.8" />
-                      </linearGradient>
-                    </defs>
-                  </svg>
+                <div className="relative w-full h-full overflow-hidden">
+                  <img
+                    src={story.image}
+                    alt={`${story.names} wedding photo`}
+                    className="w-full h-full object-cover"
+                    draggable={false}
+                    style={{
+                      clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 60px), 95% calc(100% - 40px), 90% calc(100% - 60px), 80% calc(100% - 30px), 70% calc(100% - 50px), 60% calc(100% - 35px), 50% calc(100% - 55px), 40% calc(100% - 25px), 30% calc(100% - 45px), 20% calc(100% - 35px), 10% calc(100% - 50px), 5% calc(100% - 40px), 0 calc(100% - 60px))'
+                    }}
+                  />
                 </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20"></div>
               </div>
               
               {/* Content */}
@@ -525,23 +489,23 @@ export default function Home() {
           <link rel="icon" href="/favicon.ico" />
         </Head>
         
-        <div className="min-h-screen bg-gradient-to-br from-red-900 via-red-800 to-purple-900 flex items-center justify-center relative overflow-hidden">
-          {/* Animated Wine Color Background */}
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-blue-50 flex items-center justify-center relative overflow-hidden">
+          {/* Glass-style Transparent Background */}
           <div className="absolute inset-0">
-            {/* Base animated gradient layers */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-red-800/80 via-red-700/60 to-red-900/90 animate-pulse" style={{animationDuration: '4s'}}></div>
-            <div className="absolute inset-0 bg-gradient-to-bl from-purple-800/70 via-red-600/50 to-red-800/80 animate-pulse" style={{animationDuration: '6s', animationDelay: '1s'}}></div>
+            {/* Subtle glass gradient layers */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-white/40 via-gray-50/30 to-blue-50/40 backdrop-blur-sm"></div>
+            <div className="absolute inset-0 bg-gradient-to-bl from-slate-100/20 via-white/10 to-gray-100/30 backdrop-blur-md"></div>
             
-            {/* Wine color animated elements */}
-            <div className="absolute top-20 left-20 w-40 h-40 bg-red-300/20 rounded-full blur-2xl animate-pulse" style={{animationDuration: '5s'}}></div>
-            <div className="absolute bottom-32 right-16 w-64 h-64 bg-red-400/15 rounded-full blur-3xl animate-bounce" style={{animationDuration: '4s'}}></div>
-            <div className="absolute top-1/3 right-1/3 w-32 h-32 bg-purple-300/20 rounded-full blur-xl animate-ping" style={{animationDelay: '1.5s', animationDuration: '3s'}}></div>
-            <div className="absolute bottom-1/4 left-1/4 w-48 h-48 bg-red-500/15 rounded-full blur-2xl animate-pulse" style={{animationDelay: '2s', animationDuration: '4s'}}></div>
-            <div className="absolute top-1/2 left-1/2 w-36 h-36 bg-red-600/10 rounded-full blur-xl animate-bounce" style={{animationDelay: '0.8s', animationDuration: '5s'}}></div>
+            {/* Subtle glass-style floating elements */}
+            <div className="absolute top-20 left-20 w-40 h-40 bg-white/20 rounded-full blur-2xl animate-pulse" style={{animationDuration: '6s'}}></div>
+            <div className="absolute bottom-32 right-16 w-64 h-64 bg-slate-200/15 rounded-full blur-3xl animate-float" style={{animationDuration: '8s'}}></div>
+            <div className="absolute top-1/3 right-1/3 w-32 h-32 bg-gray-200/20 rounded-full blur-xl animate-pulse" style={{animationDelay: '2s', animationDuration: '5s'}}></div>
+            <div className="absolute bottom-1/4 left-1/4 w-48 h-48 bg-blue-100/15 rounded-full blur-2xl animate-float" style={{animationDelay: '3s', animationDuration: '7s'}}></div>
+            <div className="absolute top-1/2 left-1/2 w-36 h-36 bg-white/10 rounded-full blur-xl animate-pulse" style={{animationDelay: '1s', animationDuration: '6s'}}></div>
             
-            {/* Additional wine-themed floating elements */}
-            <div className="absolute top-1/4 right-1/4 w-24 h-24 bg-purple-400/15 rounded-full blur-lg animate-pulse" style={{animationDelay: '3s', animationDuration: '3.5s'}}></div>
-            <div className="absolute bottom-1/3 right-1/3 w-20 h-20 bg-red-300/25 rounded-full blur-md animate-ping" style={{animationDelay: '2.5s', animationDuration: '4s'}}></div>
+            {/* Additional subtle glass elements */}
+            <div className="absolute top-1/4 right-1/4 w-24 h-24 bg-slate-100/15 rounded-full blur-lg animate-float" style={{animationDelay: '4s', animationDuration: '5s'}}></div>
+            <div className="absolute bottom-1/3 right-1/3 w-20 h-20 bg-gray-100/20 rounded-full blur-md animate-pulse" style={{animationDelay: '2.5s', animationDuration: '6s'}}></div>
           </div>
           
           <div className="relative z-10 text-center">
@@ -552,13 +516,13 @@ export default function Home() {
               transition={{ duration: 1, delay: 0.2, type: "spring", stiffness: 200 }}
               className="mb-8"
             >
-              <div className="w-32 h-32 bg-white rounded-2xl mx-auto flex items-center justify-center shadow-2xl p-4 hover:scale-105 transition-all duration-500">
+              <div className="w-32 h-32 bg-white/80 backdrop-blur-sm rounded-2xl mx-auto flex items-center justify-center shadow-2xl p-4 hover:scale-105 transition-all duration-500 border border-white/20">
                 <Image
                   src="/images/logo.png"
                   alt="Make My Knot Logo"
                   width={96}
                   height={96}
-                  className="w-full h-full object-contain animate-pulse"
+                  className="w-full h-full object-contain"
                   priority
                 />
               </div>
@@ -571,8 +535,8 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.8 }}
               className="mb-6"
             >
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 text-shadow-lg">
-                <span className="bg-gradient-to-r from-gold-300 to-gold-100 bg-clip-text text-transparent">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800 mb-2">
+                <span className="bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">
                   Make My Knot
                 </span>
               </h1>
@@ -580,7 +544,7 @@ export default function Home() {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8, delay: 1.2 }}
-                className="text-lg md:text-xl lg:text-2xl text-white/90 font-medium italic"
+                className="text-lg md:text-xl lg:text-2xl text-gray-700 font-medium italic"
               >
                 <motion.span
                   initial={{ opacity: 0, y: 20 }}
@@ -595,7 +559,7 @@ export default function Home() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.8, delay: 2.2 }}
-                  className="inline-block bg-gradient-to-r from-gold-300 to-gold-100 bg-clip-text text-transparent font-bold text-shadow-lg"
+                  className="inline-block bg-gradient-to-r from-gold-600 to-yellow-600 bg-clip-text text-transparent font-bold"
                 >
                   Handshake
                 </motion.span>
@@ -613,7 +577,7 @@ export default function Home() {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 1.0, delay: 3.0 }}
-                  className="inline-block bg-gradient-to-r from-red-300 to-pink-200 bg-clip-text text-transparent font-bold animate-pulse text-shadow-lg"
+                  className="inline-block bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent font-bold animate-pulse"
                   style={{ animationDelay: '4s', animationDuration: '2s' }}
                 >
                   Pheras
@@ -629,10 +593,10 @@ export default function Home() {
               className="mb-8"
             >
               {isLoading ? (
-                <div className="flex items-center justify-center space-x-2 text-white/80">
-                  <div className="w-3 h-3 bg-white/60 rounded-full animate-bounce"></div>
-                  <div className="w-3 h-3 bg-white/60 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                  <div className="w-3 h-3 bg-white/60 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                <div className="flex items-center justify-center space-x-2 text-gray-600">
+                  <div className="w-3 h-3 bg-primary-400 rounded-full animate-bounce"></div>
+                  <div className="w-3 h-3 bg-primary-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                  <div className="w-3 h-3 bg-primary-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
                   <span className="ml-3 text-lg font-medium">Loading your journey...</span>
                 </div>
               ) : (
@@ -640,10 +604,10 @@ export default function Home() {
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.5 }}
-                  className="text-white/90"
+                  className="text-gray-700"
                 >
                   <div className="flex items-center justify-center space-x-2 mb-4">
-                    <CheckCircle className="w-6 h-6 text-green-400" />
+                    <CheckCircle className="w-6 h-6 text-green-500" />
                     <span className="text-lg font-semibold">Ready to find your perfect match!</span>
                   </div>
                   <div className="w-16 h-1 bg-gradient-to-r from-green-400 to-gold-400 mx-auto rounded-full"></div>
