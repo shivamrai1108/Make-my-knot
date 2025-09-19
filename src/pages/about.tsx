@@ -70,52 +70,6 @@ export default function About() {
           </div>
         </section>
 
-        {/* Our Story Section - Dadu's Foundation */}
-        <section className="py-20 bg-gradient-to-br from-gray-50 via-white to-primary-50">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">Our Story Begins</h2>
-              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                The foundation of trust, care, and meaningful connections that started it all
-              </p>
-            </div>
-
-            <div className="bg-white rounded-3xl shadow-xl p-8 lg:p-12 border border-gray-100">
-              <div className="flex items-center justify-center mb-8">
-                <div className="w-24 h-24 bg-gradient-to-br from-gold-100 to-gold-200 rounded-2xl flex items-center justify-center shadow-lg">
-                  <Heart className="h-12 w-12 text-gold-600" />
-                </div>
-              </div>
-              
-              <div className="text-center mb-8">
-                <h3 className="text-3xl font-bold text-gray-900 mb-2">Chaman Prakash Goyal</h3>
-                <p className="text-xl text-gold-600 font-semibold">Visionary Founder • 1975</p>
-              </div>
-              
-              <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed">
-                <p className="mb-6">
-                  In 1975, Chaman Prakash Goyal laid the foundation of Goyal Marriage Bureau, planting the roots of what has become one of the most trusted matchmaking services in India. His belief was simple yet powerful: every rishta deserves honesty, care, and blessings.
-                </p>
-                
-                <p className="mb-6">
-                  At a time when matchmaking was limited to biodatas and formalities, Chaman Prakash Goyal brought heart into the process. He personally met families, understood their values, and ensured that every match was built on trust and compatibility. His dedication turned countless dreams into successful marriages, earning him respect as one of India's most reliable matchmakers.
-                </p>
-                
-                <p className="mb-8">
-                  For him, shaadi was never just about two individuals, but about uniting families. With sincerity, blessings, and a personal touch, he created a legacy of meaningful connections—one that continues to inspire generations.
-                </p>
-                
-                <div className="bg-gradient-to-r from-primary-50 to-gold-50 rounded-2xl p-6 border-l-4 border-gold-400">
-                  <div className="text-center">
-                    <p className="text-lg font-medium text-primary-800 mb-2">His guiding philosophy that lives on today:</p>
-                    <p className="text-2xl font-bold text-primary-900 italic">"Matches Made with Mannat, Not Just Metrics"</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* Timeline Section */}
         <section className="py-20 bg-white">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -371,6 +325,76 @@ export default function About() {
               <p className="text-xl text-gray-600">Three generations of matchmaking expertise driving innovation while preserving tradition</p>
             </div>
 
+            {/* Chaman Prakash Goyal - Featured with Full Story */}
+            <div className="bg-white rounded-3xl shadow-xl p-8 lg:p-12 mb-12 border border-gray-100">
+              <div className="flex items-center justify-center mb-8">
+                <div className="w-24 h-24 bg-gradient-to-br from-gold-100 to-gold-200 rounded-2xl flex items-center justify-center shadow-lg">
+                  <Heart className="h-12 w-12 text-gold-600" />
+                </div>
+              </div>
+              
+              <div className="text-center mb-8">
+                <h3 className="text-3xl font-bold text-gray-900 mb-2">Chaman Prakash Goyal</h3>
+                <p className="text-xl text-gold-600 font-semibold">Visionary Founder • 1975</p>
+              </div>
+              
+              <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed text-center">
+                <p className="mb-6">
+                  In 1975, Chaman Prakash Goyal laid the foundation of Goyal Marriage Bureau, planting the roots of what has become one of the most trusted matchmaking services in India. His belief was simple yet powerful: every rishta deserves honesty, care, and blessings.
+                </p>
+                
+                <p className="mb-6">
+                  At a time when matchmaking was limited to biodatas and formalities, Chaman Prakash Goyal brought heart into the process. He personally met families, understood their values, and ensured that every match was built on trust and compatibility. His dedication turned countless dreams into successful marriages, earning him respect as one of India's most reliable matchmakers.
+                </p>
+                
+                <p className="mb-8">
+                  For him, shaadi was never just about two individuals, but about uniting families. With sincerity, blessings, and a personal touch, he created a legacy of meaningful connections—one that continues to inspire generations.
+                </p>
+                
+                <div className="bg-gradient-to-r from-primary-50 to-gold-50 rounded-2xl p-6 border-l-4 border-gold-400">
+                  <div className="text-center">
+                    <p className="text-lg font-medium text-primary-800 mb-2">His guiding philosophy that lives on today:</p>
+                    <p className="text-2xl font-bold text-primary-900 italic">"Matches Made with Mannat, Not Just Metrics"</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Anil Goyal - Featured */}
+            <div className="bg-white rounded-2xl shadow-lg p-8 mb-12">
+              <div className="flex flex-col lg:flex-row items-center gap-8">
+                <div className="flex-shrink-0">
+                  <div className="w-32 h-32 bg-gradient-to-br from-green-100 to-green-200 rounded-2xl flex items-center justify-center mx-auto shadow-lg">
+                    <div className="text-4xl font-bold text-green-600">AG</div>
+                  </div>
+                </div>
+                <div className="flex-1 text-center lg:text-left">
+                  <h3 className="text-3xl font-bold text-gray-900 mb-2">Anil Goyal</h3>
+                  <div className="text-xl text-green-600 font-semibold mb-6">Managing Director</div>
+                  <p className="text-gray-600 leading-relaxed mb-6 text-lg">
+                    The bridge between tradition and modernity, Anil Goyal dedicated over 16 years to nurturing the family vision 
+                    with deep care and emotional understanding. He ensured every rishta was handled with love and sincerity, 
+                    continuing the legacy with personal attention to each family's needs.
+                  </p>
+                  <div className="grid md:grid-cols-2 gap-6 text-sm text-gray-600">
+                    <div>
+                      <strong className="text-gray-900">Experience:</strong><br />
+                      16+ years dedicated service<br />
+                      2nd generation leader
+                    </div>
+                    <div>
+                      <strong className="text-gray-900">Expertise:</strong><br />
+                      Relationship counseling<br />
+                      Family dynamics, Traditional values
+                    </div>
+                    <div className="md:col-span-2">
+                      <strong className="text-gray-900">Approach:</strong> Personal attention, Emotional understanding, Family-first mindset
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Maulik Goyal - Featured */}
             <div className="bg-white rounded-2xl shadow-lg p-8 mb-12">
               <div className="flex flex-col lg:flex-row items-center gap-8">
@@ -409,51 +433,6 @@ export default function About() {
                       <strong className="text-gray-900">Expertise:</strong> AI Matchmaking, Business Strategy, Technology Innovation, Digital Transformation
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Chaman Prakash Goyal & Anil Goyal - Side by Side */}
-            <div className="grid lg:grid-cols-2 gap-8">
-              {/* Chaman Prakash Goyal */}
-              <div className="bg-white rounded-2xl shadow-sm p-6">
-                <div className="text-center mb-6">
-                  <div className="w-32 h-32 bg-gradient-to-br from-gold-100 to-gold-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <div className="text-4xl font-bold text-gold-600">CG</div>
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-1">Chaman Prakash Goyal</h3>
-                  <div className="text-gold-600 font-semibold mb-4">Visionary Founder</div>
-                </div>
-                <p className="text-gray-600 leading-relaxed mb-6 text-sm">
-                  The visionary founder who established Goyal Marriage Bureau in 1975. Known as "Dadu" to thousands of families, 
-                  he built the foundation of trust and personal care that defines our approach to matchmaking. His philosophy of 
-                  "Mannat, not just metrics" continues to guide our mission.
-                </p>
-                <div className="space-y-2 text-xs text-gray-600">
-                  <div><strong className="text-gray-900">Legacy:</strong> Founded in 1975 | 50+ years of matchmaking</div>
-                  <div><strong className="text-gray-900">Achievements:</strong> 10,000+ successful matches | Trusted by 3 generations</div>
-                  <div><strong className="text-gray-900">Philosophy:</strong> "Shaadi sirf do logon ka milan nahi hota, do parivaron ka rishta hota hai"</div>
-                </div>
-              </div>
-
-              {/* Anil Goyal */}
-              <div className="bg-white rounded-2xl shadow-sm p-6">
-                <div className="text-center mb-6">
-                  <div className="w-32 h-32 bg-gradient-to-br from-green-100 to-green-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <div className="text-4xl font-bold text-green-600">AG</div>
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-1">Anil Goyal</h3>
-                  <div className="text-green-600 font-semibold mb-4">Managing Director</div>
-                </div>
-                <p className="text-gray-600 leading-relaxed mb-6 text-sm">
-                  The bridge between tradition and modernity, Anil Goyal dedicated over 16 years to nurturing the family vision 
-                  with deep care and emotional understanding. He ensured every rishta was handled with love and sincerity, 
-                  continuing the legacy with personal attention to each family's needs.
-                </p>
-                <div className="space-y-2 text-xs text-gray-600">
-                  <div><strong className="text-gray-900">Experience:</strong> 16+ years dedicated service | 2nd generation leader</div>
-                  <div><strong className="text-gray-900">Expertise:</strong> Relationship counseling, Family dynamics, Traditional values</div>
-                  <div><strong className="text-gray-900">Approach:</strong> Personal attention, Emotional understanding, Family-first mindset</div>
                 </div>
               </div>
             </div>
