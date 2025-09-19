@@ -1089,9 +1089,9 @@ export default function Home() {
                 <div className="mb-6">
                   <div className="w-16 h-1 bg-gray-900 mb-4"></div>
                 </div>
-                <h3 className="text-xl font-serif font-bold text-gray-900 mb-4 leading-tight">Verified Profiles</h3>
+                <h3 className="text-xl font-serif font-bold text-gray-900 mb-4 leading-tight">Complete Support</h3>
                 <p className="text-gray-600 leading-relaxed flex-grow font-light text-base">
-                  Every profile goes through AI-powered verification so you can feel confident that the people you meet are genuine, safe, and serious about finding meaningful connections.
+                  We provide complete support throughout your matchmaking journey. From intelligent conversation starters to AI-generated interaction prompts, we make sure you always feel confident and comfortable, helping you connect naturally and build meaningful relationships.
                 </p>
               </div>
 
