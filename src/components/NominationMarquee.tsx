@@ -3,6 +3,7 @@ import { Heart, ArrowRight, X, User, Mail, Phone, MessageCircle } from 'lucide-r
 
 export default function NominationMarquee() {
   const [showModal, setShowModal] = useState(false)
+  const [isPaused, setIsPaused] = useState(false)
   const [formData, setFormData] = useState({
     nominatorName: '',
     nominatorEmail: '',
@@ -77,8 +78,12 @@ export default function NominationMarquee() {
   return (
     <>
       {/* Marquee Section */}
-      <section className="bg-black text-white py-4 overflow-hidden relative">
-        <div className="flex items-center animate-marquee whitespace-nowrap">
+      <section 
+        className="bg-black text-white py-4 overflow-hidden relative"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+      >
+        <div className={`flex items-center whitespace-nowrap ${isPaused ? '' : 'animate-marquee'}`}>
           <div className="flex items-center space-x-8 mr-16">
             <span className="text-lg font-medium">
               ✨ Know someone who is a total catch?

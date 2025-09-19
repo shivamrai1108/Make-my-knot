@@ -263,32 +263,33 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
   }
 
   return (
-    <div className="backdrop-blur-md bg-white/90 border border-white/20 rounded-2xl shadow-2xl p-6 md:p-8">
-      <div className="flex items-center mb-4">
-        <Heart className="h-6 w-6 text-primary-600" />
-        <span className="ml-2 text-sm font-semibold text-primary-600 uppercase">Get started free</span>
-      </div>
-      <h3 className="text-2xl font-bold text-gray-900 mb-6">Answer a few quick questions</h3>
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-2xl md:text-3xl font-bold text-white mb-4 drop-shadow-lg">
+          Have you tried online dating before?
+        </h3>
 
       {step < steps.length ? (
         <div>
-          <p className="text-gray-800 font-medium mb-4">{current.question}</p>
+          <p className="text-2xl md:text-3xl font-bold text-white mb-6 drop-shadow-lg">{current.question}</p>
 
           {current.type === 'choice' && (
-            <div className="grid sm:grid-cols-2 gap-3">
-              {current.options?.map((opt) => (
-                <button 
+            <div className="space-y-3">
+              {current.options?.map((opt, index) => (
+                <label 
                   key={opt} 
-                  onClick={() => handleSelect(opt)} 
-                  className={`text-left p-4 border-2 rounded-lg hover:border-primary-600 transition-colors cursor-pointer ${
-                    answers[current.id] === opt 
-                      ? 'border-primary-600 bg-primary-50 text-primary-700' 
-                      : 'border-gray-300 bg-white hover:bg-gray-50'
-                  }`}
-                  type="button"
+                  className="flex items-center p-4 bg-white/10 backdrop-blur-sm rounded-xl hover:bg-white/20 transition-all duration-300 cursor-pointer border border-white/20 hover:border-white/40"
                 >
-                  {opt}
-                </button>
+                  <input
+                    type="radio"
+                    name={current.id}
+                    value={opt}
+                    checked={answers[current.id] === opt}
+                    onChange={() => handleSelect(opt)}
+                    className="w-5 h-5 text-white border-white/30 focus:ring-white/50 bg-transparent"
+                  />
+                  <span className="ml-3 text-white font-medium text-lg">{opt}</span>
+                </label>
               ))}
             </div>
           )}
@@ -320,17 +321,17 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
             </div>
           )}
 
-          <div className="text-sm text-gray-500 mt-3">Step {step+1} of {steps.length+1}</div>
+          <div className="text-sm text-white/70 mt-3">Step {step+1} of {steps.length+1}</div>
         </div>
       ) : (
-        <div>
-          <p className="text-gray-800 font-medium mb-6">Almost there! How can we reach you?</p>
+        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+          <p className="text-2xl font-bold text-white mb-6 drop-shadow-lg">Almost there! How can we reach you?</p>
           
           {/* Name and Email */}
           <div className="grid md:grid-cols-2 gap-4 mb-4">
             <div>
               <input
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent"
+                className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white placeholder-white/70"
                 placeholder="Full name *"
                 value={contact.name}
                 onChange={(e)=>setContact({...contact, name: e.target.value})}
@@ -338,7 +339,7 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
             </div>
             <div>
               <input
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent"
+                className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white placeholder-white/70"
                 placeholder="Email address *"
                 type="email"
                 value={contact.email}
@@ -349,10 +350,10 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
 
           {/* Phone Number with Country Code */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number *</label>
+            <label className="block text-sm font-medium text-white/90 mb-2">Phone Number *</label>
             <div className="flex">
               <select
-                className="px-3 py-3 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent bg-white"
+                className="px-3 py-3 bg-white/20 border border-white/30 rounded-l-lg focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white"
                 value={contact.countryCode}
                 onChange={(e) => setContact({...contact, countryCode: e.target.value})}
               >
@@ -478,6 +479,7 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
           <div className="text-sm text-gray-500 mt-2 text-center">
             Step {steps.length+1} of {steps.length+1}
           </div>
+        </div>
         </div>
       )}
     </div>

@@ -489,23 +489,23 @@ export default function Home() {
           <link rel="icon" href="/favicon.ico" />
         </Head>
         
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-blue-50 flex items-center justify-center relative overflow-hidden">
-          {/* Glass-style Transparent Background */}
-          <div className="absolute inset-0">
-            {/* Subtle glass gradient layers */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-white/40 via-gray-50/30 to-blue-50/40 backdrop-blur-sm"></div>
-            <div className="absolute inset-0 bg-gradient-to-bl from-slate-100/20 via-white/10 to-gray-100/30 backdrop-blur-md"></div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Wine Glass Background with Blur */}
+          <div className="absolute inset-0 bg-gradient-to-br from-red-900/80 via-red-800/70 to-purple-900/80 backdrop-blur-md">
+            {/* Additional glass layers for depth */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-red-700/60 via-transparent to-red-900/50 backdrop-blur-sm"></div>
+            <div className="absolute inset-0 bg-gradient-to-bl from-purple-800/40 via-red-600/30 to-red-800/60 backdrop-blur-lg"></div>
             
-            {/* Subtle glass-style floating elements */}
-            <div className="absolute top-20 left-20 w-40 h-40 bg-white/20 rounded-full blur-2xl animate-pulse" style={{animationDuration: '6s'}}></div>
-            <div className="absolute bottom-32 right-16 w-64 h-64 bg-slate-200/15 rounded-full blur-3xl animate-float" style={{animationDuration: '8s'}}></div>
-            <div className="absolute top-1/3 right-1/3 w-32 h-32 bg-gray-200/20 rounded-full blur-xl animate-pulse" style={{animationDelay: '2s', animationDuration: '5s'}}></div>
-            <div className="absolute bottom-1/4 left-1/4 w-48 h-48 bg-blue-100/15 rounded-full blur-2xl animate-float" style={{animationDelay: '3s', animationDuration: '7s'}}></div>
-            <div className="absolute top-1/2 left-1/2 w-36 h-36 bg-white/10 rounded-full blur-xl animate-pulse" style={{animationDelay: '1s', animationDuration: '6s'}}></div>
+            {/* Wine-colored glass floating elements */}
+            <div className="absolute top-20 left-20 w-40 h-40 bg-red-300/20 rounded-full blur-2xl animate-pulse" style={{animationDuration: '6s'}}></div>
+            <div className="absolute bottom-32 right-16 w-64 h-64 bg-red-400/15 rounded-full blur-3xl animate-float" style={{animationDuration: '8s'}}></div>
+            <div className="absolute top-1/3 right-1/3 w-32 h-32 bg-purple-300/20 rounded-full blur-xl animate-pulse" style={{animationDelay: '2s', animationDuration: '5s'}}></div>
+            <div className="absolute bottom-1/4 left-1/4 w-48 h-48 bg-red-500/15 rounded-full blur-2xl animate-float" style={{animationDelay: '3s', animationDuration: '7s'}}></div>
+            <div className="absolute top-1/2 left-1/2 w-36 h-36 bg-red-600/10 rounded-full blur-xl animate-pulse" style={{animationDelay: '1s', animationDuration: '6s'}}></div>
             
-            {/* Additional subtle glass elements */}
-            <div className="absolute top-1/4 right-1/4 w-24 h-24 bg-slate-100/15 rounded-full blur-lg animate-float" style={{animationDelay: '4s', animationDuration: '5s'}}></div>
-            <div className="absolute bottom-1/3 right-1/3 w-20 h-20 bg-gray-100/20 rounded-full blur-md animate-pulse" style={{animationDelay: '2.5s', animationDuration: '6s'}}></div>
+            {/* Additional wine glass elements */}
+            <div className="absolute top-1/4 right-1/4 w-24 h-24 bg-purple-400/15 rounded-full blur-lg animate-float" style={{animationDelay: '4s', animationDuration: '5s'}}></div>
+            <div className="absolute bottom-1/3 right-1/3 w-20 h-20 bg-red-300/25 rounded-full blur-md animate-pulse" style={{animationDelay: '2.5s', animationDuration: '6s'}}></div>
           </div>
           
           <div className="relative z-10 text-center">
@@ -516,7 +516,7 @@ export default function Home() {
               transition={{ duration: 1, delay: 0.2, type: "spring", stiffness: 200 }}
               className="mb-8"
             >
-              <div className="w-32 h-32 bg-white/80 backdrop-blur-sm rounded-2xl mx-auto flex items-center justify-center shadow-2xl p-4 hover:scale-105 transition-all duration-500 border border-white/20">
+              <div className="w-32 h-32 bg-white/90 backdrop-blur-sm rounded-2xl mx-auto flex items-center justify-center shadow-2xl p-4 hover:scale-105 transition-all duration-500 border border-white/30">
                 <Image
                   src="/images/logo.png"
                   alt="Make My Knot Logo"
@@ -535,8 +535,8 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.8 }}
               className="mb-6"
             >
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800 mb-2">
-                <span className="bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 drop-shadow-lg">
+                <span className="bg-gradient-to-r from-gold-300 to-gold-100 bg-clip-text text-transparent">
                   Make My Knot
                 </span>
               </h1>
@@ -544,7 +544,7 @@ export default function Home() {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8, delay: 1.2 }}
-                className="text-lg md:text-xl lg:text-2xl text-gray-700 font-medium italic"
+                className="text-lg md:text-xl lg:text-2xl text-white/90 font-medium italic"
               >
                 <motion.span
                   initial={{ opacity: 0, y: 20 }}
@@ -593,10 +593,10 @@ export default function Home() {
               className="mb-8"
             >
               {isLoading ? (
-                <div className="flex items-center justify-center space-x-2 text-gray-600">
-                  <div className="w-3 h-3 bg-primary-400 rounded-full animate-bounce"></div>
-                  <div className="w-3 h-3 bg-primary-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                  <div className="w-3 h-3 bg-primary-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                <div className="flex items-center justify-center space-x-2 text-white/80">
+                  <div className="w-3 h-3 bg-white/60 rounded-full animate-bounce"></div>
+                  <div className="w-3 h-3 bg-white/60 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                  <div className="w-3 h-3 bg-white/60 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
                   <span className="ml-3 text-lg font-medium">Loading your journey...</span>
                 </div>
               ) : (
@@ -604,10 +604,10 @@ export default function Home() {
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.5 }}
-                  className="text-gray-700"
+                  className="text-white/90"
                 >
                   <div className="flex items-center justify-center space-x-2 mb-4">
-                    <CheckCircle className="w-6 h-6 text-green-500" />
+                    <CheckCircle className="w-6 h-6 text-green-400" />
                     <span className="text-lg font-semibold">Ready to find your perfect match!</span>
                   </div>
                   <div className="w-16 h-1 bg-gradient-to-r from-green-400 to-gold-400 mx-auto rounded-full"></div>
@@ -666,10 +666,8 @@ export default function Home() {
                   Answer a few questions to help us find your perfect match
                 </p>
                 
-                {/* Questionnaire Container */}
-                <div className="glass rounded-2xl p-4 sm:p-6 shadow-2xl border border-white/30 mb-8 sm:mb-12 md:mb-16">
-                  <LeadQuestionnaire />
-                </div>
+                {/* Questionnaire - Direct Style like eharmony */}
+                <LeadQuestionnaire />
               </div>
             </div>
           </div>
