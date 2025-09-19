@@ -1,0 +1,203 @@
+{
+  "navigation": {
+    "home": "Home",
+    "about": "About",
+    "pricing": "Pricing",
+    "login": "Login",
+    "signup": "Sign Up",
+    "dashboard": "Dashboard",
+    "matches": "Matches",
+    "conversations": "Conversations"
+  },
+  "hero": {
+    "title": "Find Your Perfect Life Partner",
+    "subtitle": "AI-Powered Wedding Matchmaking",
+    "description": "Join thousands who found love through our intelligent matching system. Quality matches, verified profiles, and personalized matchmaking services.",
+    "getStarted": "Get Started Today",
+    "watchStory": "Watch Our Story",
+    "joinToday": "Join Today"
+  },
+  "splash": {
+    "title": "Make My Knot",
+    "subtitle": "Where Love Meets Intelligence",
+    "loading": "Loading your perfect matches..."
+  },
+  "features": {
+    "aiMatching": {
+      "title": "AI-Powered Matching",
+      "description": "Our advanced AI analyzes compatibility factors beyond the surface to find your perfect match."
+    },
+    "verifiedProfiles": {
+      "title": "Verified Profiles",
+      "description": "Every profile is thoroughly verified to ensure authenticity and serious matrimonial intentions."
+    },
+    "personalizedService": {
+      "title": "Personalized Service",
+      "description": "Get dedicated support from our expert matchmakers throughout your journey."
+    }
+  },
+  "howItWorks": {
+    "title": "How Make My Knot Works",
+    "subtitle": "Our intelligent matching process ensures you meet people who truly align with your values and life goals",
+    "step1": {
+      "title": "Meet Your Matchmaker",
+      "description": "Have a conversation with your AI matchmaker about your values, lifestyle, and what you're looking for in a life partner."
+    },
+    "step2": {
+      "title": "Get Curated Matches",
+      "description": "Receive 3-5 carefully selected profiles each week, chosen based on deep compatibility rather than just photos."
+    },
+    "step3": {
+      "title": "Connect & Meet",
+      "description": "When both parties are interested, your matchmaker introduces you personally and helps facilitate your first meeting."
+    }
+  },
+  "successStories": {
+    "title": "From First Hello to a Beautiful Knot",
+    "subtitle": "Real stories from couples who found their perfect match through Make My Knot",
+    "stories": [
+      {
+        "names": "Rahul & Aishwarya",
+        "location": "Mumbai, Maharashtra",
+        "testimonial": "When we first connected on Make My Knot, it felt like our hearts recognized each other. Every conversation, every laugh, every shared dream brought us closer. Today, we know our knot isn't just a bond—it's forever."
+      },
+      {
+        "names": "Nitin & Preeti",
+        "location": "Delhi, India",
+        "testimonial": "We were just looking for someone who really understood us. Make My Knot helped us meet each other, and our connection grew naturally into something meaningful."
+      },
+      {
+        "names": "Aman & Muskan",
+        "location": "Bengaluru, Karnataka",
+        "testimonial": "We connected on Make My Knot and soon realized how much we had in common. What started with simple conversations slowly turned into something beautiful. Today, we feel lucky to have found each other."
+      }
+    ]
+  },
+  "difference": {
+    "title": "The Make My Knot Difference",
+    "completeSupport": {
+      "title": "Complete Support",
+      "description": "We provide complete support throughout your matchmaking journey. From intelligent conversation starters to AI-generated interaction prompts, we make sure you always feel confident and comfortable, helping you connect naturally and build meaningful relationships."
+    },
+    "meaningfulConnections": {
+      "title": "Meaningful Connections",
+      "description": "Connections on Make My Knot aren't random interactions—they're thoughtful. You can send voice notes, reactions, or thoughtful comments, so every connection feels personal and genuine."
+    },
+    "aiCompatibility": {
+      "title": "AI Compatibility Analysis",
+      "description": "Our proprietary AI engine calculates compatibility not just between two people, but also considers family expectations, lifestyle choices, and values—making every match more meaningful and lasting."
+    },
+    "transparentIntentions": {
+      "title": "Transparent Intentions",
+      "description": "No guessing games. Profiles highlight key details like education, family background, and optional income visibility—so you know exactly who you're connecting with from the start."
+    },
+    "personalizedGuidance": {
+      "title": "Personalized Guidance",
+      "description": "We provide comprehensive support throughout your journey. From intelligent conversation starters to AI-generated interaction prompts, we ensure you never feel uncertain about how to connect naturally."
+    },
+    "premiumServices": {
+      "title": "Premium Services",
+      "description": "Access exclusive experiences beyond standard matchmaking. Our premium services include numerology insights, curated private events, and AI-powered relationship counseling through our expert advisors."
+    }
+  },
+  "testimonials": {
+    "title": "What Our Members Say",
+    "subtitle": "Don't just take our word for it. Here's what our successful members have to say about their experience.",
+    "members": [
+      {
+        "name": "Priya Sharma",
+        "age": "28, Marketing Manager",
+        "quote": "I was skeptical about online matchmaking, but Make My Knot changed my perspective completely. The AI understood my preferences better than I did myself!"
+      },
+      {
+        "name": "Arjun Patel",
+        "age": "31, Software Engineer",
+        "quote": "The quality of matches was exceptional. Every profile I received was thoughtfully curated. Found my life partner within 3 months!"
+      },
+      {
+        "name": "Kavya Reddy",
+        "age": "26, Doctor",
+        "quote": "The personalized approach made all the difference. My matchmaker understood my busy schedule and found someone who truly complements my lifestyle."
+      },
+      {
+        "name": "Rohit Gupta",
+        "age": "29, Financial Analyst",
+        "quote": "Professional, efficient, and results-driven. The team at Make My Knot goes above and beyond to ensure successful matches."
+      }
+    ]
+  },
+  "cta": {
+    "title": "Ready to Find Your",
+    "titleHighlight": "Life Partner?",
+    "subtitle": "Join thousands of people who have found meaningful relationships through our premium matchmaking platform.",
+    "button": "Start Your Journey Today"
+  },
+  "footer": {
+    "company": "Make My Knot",
+    "tagline": "Where Hearts Meet Intelligence",
+    "quickLinks": "Quick Links",
+    "support": "Support",
+    "connect": "Connect With Us",
+    "newsletter": "Stay Updated",
+    "newsletterText": "Get the latest updates and success stories delivered to your inbox.",
+    "enterEmail": "Enter your email",
+    "subscribe": "Subscribe",
+    "rights": "All rights reserved.",
+    "links": {
+      "home": "Home",
+      "about": "About Us",
+      "howItWorks": "How It Works",
+      "pricing": "Pricing",
+      "successStories": "Success Stories",
+      "blog": "Blog",
+      "help": "Help Center",
+      "contact": "Contact Us",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "faq": "FAQ"
+    }
+  },
+  "questionnaire": {
+    "questions": {
+      "onlineMatchmakingExperience": "Have you explored wedding matchmaking platforms before?",
+      "relationshipType": "What kind of relationship are you looking for?",
+      "iam": "I am",
+      "lookingFor": "I am looking for",
+      "location": "Where do you live?",
+      "ageRange": "What age range are you interested in?"
+    },
+    "options": {
+      "newToIt": "I'm new to it",
+      "onceOrTwice": "Once or twice",
+      "pro": "I'm an online dating pro",
+      "casual": "Casual",
+      "serious": "Serious",
+      "notSure": "Not sure, just browsing",
+      "woman": "a woman",
+      "man": "a man",
+      "nonbinary": "nonbinary",
+      "people": "people"
+    },
+    "placeholders": {
+      "cityLocation": "City, State/Country"
+    }
+  },
+  "about": {
+    "hero": {
+      "title": "About Make My Knot",
+      "subtitle": "Where Technology Meets Tradition in the Art of Matchmaking"
+    },
+    "threeGenerations": {
+      "title": "50 Years of Trust, Three Generations of Love",
+      "description": "For five decades, the Goyal family has been weaving love stories across India. What began as a traditional matchmaking service has evolved into a pioneering AI-powered platform, but our core values remain unchanged: authentic connections, family harmony, and lasting relationships built on deep compatibility."
+    },
+    "meetExperts": {
+      "title": "Meet Our Experts",
+      "ourStory": {
+        "title": "Our Story",
+        "content": "It was 1974 when Dadu, Chaman Prakash Goyal, first realized his calling. A young man in his village couldn't find a suitable match despite being from a good family. Dadu spent weeks traveling from village to village, meeting families, understanding their values, and finally found the perfect match. The wedding was celebrated for days, and both families blessed Dadu for bringing such joy into their lives. That day, he knew his purpose: to unite hearts that were meant to be together.",
+        "philosophy": "\"A good marriage isn't about finding the perfect person, but about becoming the perfect match for each other.\" - Chaman Prakash Goyal"
+      }
+    }
+  }
+}

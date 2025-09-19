@@ -1,5 +1,7 @@
 import Link from 'next/link'
 import BrandLogo from '@/components/BrandLogo'
+import LanguageSelector from '@/components/LanguageSelector'
+import { useLanguage } from '@/contexts/LanguageContext'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import { Menu, X } from 'lucide-react'
@@ -11,6 +13,7 @@ interface NavigationProps {
 }
 
 export default function Navigation({ variant = 'transparent', className = '' }: NavigationProps) {
+  const { t } = useLanguage()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isScrollingUp, setIsScrollingUp] = useState(true)
   const [lastScrollY, setLastScrollY] = useState(0)
@@ -100,21 +103,23 @@ export default function Navigation({ variant = 'transparent', className = '' }: 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
             <Link href="/" className={`${linkColor} transition-colors duration-200 px-3 py-2 rounded-md hover:bg-white/20 active:bg-white/30 font-semibold text-sm cursor-pointer pointer-events-auto`}>
-              Home
+              {t('navigation.home', 'Home')}
             </Link>
             <Link href="/#how-it-works" className={`${linkColor} transition-colors duration-200 px-3 py-2 rounded-md hover:bg-white/20 active:bg-white/30 font-semibold text-sm cursor-pointer pointer-events-auto whitespace-nowrap`}>
-              How It Works
+              {t('footer.links.howItWorks', 'How It Works')}
             </Link>
             <Link href="/about" className={`${linkColor} transition-colors duration-200 px-3 py-2 rounded-md hover:bg-white/20 active:bg-white/30 font-semibold text-sm cursor-pointer pointer-events-auto`}>
-              Our Story
+              {t('footer.links.about', 'Our Story')}
             </Link>
             <Link href="/#testimonials" className={`${linkColor} transition-colors duration-200 px-3 py-2 rounded-md hover:bg-white/20 active:bg-white/30 font-semibold text-sm cursor-pointer pointer-events-auto whitespace-nowrap`}>
-              Success Stories
+              {t('footer.links.successStories', 'Success Stories')}
             </Link>
             <Link href="/webinars" className={`${linkColor} transition-colors duration-200 px-3 py-2 rounded-md hover:bg-white/20 active:bg-white/30 font-semibold text-sm cursor-pointer pointer-events-auto`}>
               Webinars
             </Link>
             
+            {/* Language Selector */}
+            <LanguageSelector className="ml-2" />
           </div>
 
           {/* Mobile menu button */}
@@ -137,28 +142,28 @@ export default function Navigation({ variant = 'transparent', className = '' }: 
                 className={`${linkColor} transition-all duration-200 px-4 py-3 rounded-md hover:bg-white/10 active:bg-white/20 font-semibold text-sm block touch-manipulation`}
                 onClick={() => setIsMenuOpen(false)}
               >
-                Home
+                {t('navigation.home', 'Home')}
               </Link>
               <Link 
                 href="/#how-it-works" 
                 className={`${linkColor} transition-all duration-200 px-4 py-3 rounded-md hover:bg-white/10 active:bg-white/20 font-semibold text-sm block touch-manipulation`}
                 onClick={() => setIsMenuOpen(false)}
               >
-                How It Works
+                {t('footer.links.howItWorks', 'How It Works')}
               </Link>
               <Link 
                 href="/about" 
                 className={`${linkColor} transition-all duration-200 px-4 py-3 rounded-md hover:bg-white/10 active:bg-white/20 font-semibold text-sm block touch-manipulation`}
                 onClick={() => setIsMenuOpen(false)}
               >
-                Our Story
+                {t('footer.links.about', 'Our Story')}
               </Link>
               <Link 
                 href="/#testimonials" 
                 className={`${linkColor} transition-all duration-200 px-4 py-3 rounded-md hover:bg-white/10 active:bg-white/20 font-semibold text-sm block touch-manipulation`}
                 onClick={() => setIsMenuOpen(false)}
               >
-                Success Stories
+                {t('footer.links.successStories', 'Success Stories')}
               </Link>
               <Link 
                 href="/webinars" 
@@ -167,6 +172,11 @@ export default function Navigation({ variant = 'transparent', className = '' }: 
               >
                 Webinars
               </Link>
+              
+              {/* Mobile Language Selector */}
+              <div className="px-4 py-2">
+                <LanguageSelector variant="mobile" />
+              </div>
             </div>
           </div>
         </div>

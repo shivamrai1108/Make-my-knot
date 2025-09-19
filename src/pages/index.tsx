@@ -7,6 +7,7 @@ import Footer from '@/components/Footer'
 import LeadQuestionnaire from '@/components/LeadQuestionnaire'
 import Navigation from '@/components/Navigation'
 import NominationMarquee from '@/components/NominationMarquee'
+import { useLanguage } from '@/contexts/LanguageContext'
 import { NAVIGATION_CONSTANTS } from '@/lib/constants/navigation'
 import { useState, useEffect, useRef } from 'react'
 
