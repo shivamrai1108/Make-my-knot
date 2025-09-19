@@ -25,171 +25,160 @@ export interface QuestionnaireQuestion {
   order: number
 }
 
-// Essential questionnaire questions for AI matching (15 questions)
+// Essential questionnaire questions for AI matching - Values & Lifestyle focused
 export const essentialQuestions: QuestionnaireQuestion[] = [
-  // 1. Basic Demographics
+  // 1. Spirituality/Religion
   {
-    id: 'relationship_type',
-    category: 'Basic Info',
-    question: 'What type of relationship are you seeking?',
+    id: 'spirituality_importance',
+    category: 'Values & Lifestyle',
+    question: 'How important is spirituality or religion in your life?',
     type: 'single_choice',
-    options: ['Marriage', 'Long-term relationship leading to marriage', 'Serious relationship', 'Dating to see where it goes'],
+    options: ['Very important', 'Somewhat important', 'Not important'],
     required: true,
     order: 1
   },
   
-  // 2. Personality
+  // 2. Pre-marital Counseling
   {
-    id: 'personality_type',
-    category: 'Personality',
-    question: 'How would you describe your personality?',
+    id: 'premarital_counseling',
+    category: 'Values & Lifestyle',
+    question: 'What are your thoughts on pre-marital counseling?',
     type: 'single_choice',
-    options: ['Very outgoing and social', 'Somewhat outgoing', 'Balanced - depends on situation', 'Prefer smaller groups', 'More introverted and private'],
+    options: ['I\'m open to it.', 'I prefer not to.', 'I\'m not sure.'],
     required: true,
     order: 2
   },
 
-  // 3. Lifestyle
+  // 3. Shared Interests
   {
-    id: 'ideal_weekend',
-    category: 'Lifestyle',
-    question: 'What does your ideal weekend look like?',
+    id: 'shared_interests_importance',
+    category: 'Values & Lifestyle',
+    question: 'How important is it for you to have a partner who shares your interests?',
     type: 'single_choice',
-    options: ['Adventure and outdoor activities', 'Social gatherings with friends', 'Quiet time at home with loved ones', 'Exploring new places and experiences', 'Mix of social and alone time'],
+    options: ['Very important', 'Somewhat important', 'Not important'],
     required: true,
     order: 3
   },
 
-  // 4. Values - Religion
+  // 4. Relocation After Marriage
   {
-    id: 'religious_importance',
-    category: 'Values',
-    question: 'How important is religion/spirituality in your life?',
-    type: 'scale',
-    options: ['Not important at all', 'Slightly important', 'Moderately important', 'Very important', 'Extremely important'],
+    id: 'relocation_openness',
+    category: 'Values & Lifestyle',
+    question: 'Are you open to relocating for a partner after marriage?',
+    type: 'single_choice',
+    options: ['Yes, I\'m fully open to relocating.', 'Yes, but only within a specific region or country.', 'No, I would prefer to stay in my current location.'],
     required: true,
     order: 4
   },
 
-  // 5. Values - Family
+  // 5. Children Perspective
   {
-    id: 'family_values',
-    category: 'Values',
-    question: 'How important is family in your life?',
-    type: 'scale',
-    options: ['Not very important', 'Somewhat important', 'Important', 'Very important', 'Most important thing'],
+    id: 'children_perspective',
+    category: 'Values & Lifestyle',
+    question: 'What is your perspective on having children?',
+    type: 'single_choice',
+    options: ['I definitely want children.', 'I am open to it, but it\'s not a priority.', 'I prefer not to have children.', 'I\'m still undecided.'],
     required: true,
     order: 5
   },
 
-  // 6. Career Ambitions
+  // 6. Caste Importance
   {
-    id: 'career_ambition',
-    category: 'Values',
-    question: 'How would you describe your career ambitions?',
+    id: 'caste_importance',
+    category: 'Values & Lifestyle',
+    question: 'Does caste matter to you in a partner?',
     type: 'single_choice',
-    options: ['Work to live - value work-life balance', 'Moderately ambitious', 'Very career-focused and ambitious', 'Entrepreneurial mindset', 'Flexible - depends on life stage'],
+    options: ['Yes, very much', 'Yes, somewhat', 'Not at all'],
     required: true,
     order: 6
   },
 
-  // 7. Communication Style
+  // 7. Weekend Preferences
   {
-    id: 'communication_style',
-    category: 'Personality',
-    question: 'How do you prefer to communicate in relationships?',
-    type: 'single_choice',
-    options: ['Very direct and straightforward', 'Gentle and considerate', 'Mix of both depending on situation', 'Through actions more than words', 'Need time to process before discussing'],
+    id: 'weekend_preferences',
+    category: 'Personal Preferences',
+    question: 'How do you prefer to spend a typical weekend? (Select up to 3)',
+    type: 'multiple_choice',
+    options: ['Staying in and relaxing', 'Going out for drinks or dinner', 'Engaging in hobbies', 'Spending time with family', 'Exercising or being outdoors', 'Socializing with friends'],
     required: true,
     order: 7
   },
 
-  // 8. Lifestyle - Exercise
+  // 8. Family vs Independence Scenario
   {
-    id: 'exercise_frequency',
-    category: 'Lifestyle',
-    question: 'How often do you exercise or stay physically active?',
+    id: 'family_independence_scenario',
+    category: 'Personal Preferences',
+    question: 'You and your partner are serious about getting married. Your parents believe it is very important that you live with them after marriage to continue family traditions and care for them. Your partner, however, is accustomed to an independent lifestyle and feels it\'s important for you to have your own space. How do you approach this situation?',
     type: 'single_choice',
-    options: ['Daily - fitness is very important', '3-4 times per week', '1-2 times per week', 'Occasionally when motivated', 'Rarely - prefer other activities'],
+    options: ['I would speak with both my parents and my partner to find a compromise, perhaps by living nearby or making a clear plan for how we can all be together.', 'I would prioritize my parents\' wishes and explain to my partner that living with my family is a non-negotiable part of my life and values.', 'I would stand by my partner and politely explain to my parents that we have decided to live independently after marriage.', 'I would make it clear to both sides that we, as a couple, will make the decision that is best for our future, and we would not allow family pressure to influence it.'],
     required: true,
     order: 8
   },
 
-  // 9. Travel Preferences
+  // 9. Hobbies and Activities
   {
-    id: 'travel_enthusiasm',
-    category: 'Lifestyle',
-    question: 'How much do you enjoy traveling?',
-    type: 'single_choice',
-    options: ['Love frequent travel and adventures', 'Enjoy occasional trips', 'Prefer familiar places', 'Homebody - travel less important', 'Travel for specific purposes only'],
+    id: 'hobbies_activities',
+    category: 'Personal Preferences',
+    question: 'What are some of your favorite hobbies or activities? (Select all that apply)',
+    type: 'multiple_choice',
+    options: ['Sports', 'Cooking', 'Reading', 'Listening to music', 'Traveling', 'Art or crafts', 'Trekking', 'Watching movies/shows'],
     required: true,
     order: 9
   },
 
-  // 10. Love Language
+  // 10. Drinking Habits
   {
-    id: 'affection_style',
-    category: 'Relationship',
-    question: 'How do you prefer to show and receive affection?',
-    type: 'multiple_choice',
-    options: ['Physical touch and hugs', 'Words of affirmation', 'Quality time together', 'Acts of service', 'Gift giving'],
+    id: 'drinking_habits',
+    category: 'Personal Preferences',
+    question: 'Do you drink?',
+    type: 'single_choice',
+    options: ['Yes, socially', 'Yes, regularly', 'No'],
     required: true,
     order: 10
   },
 
-  // 11. Future Goals - Children
+  // 11. Smoking Habits
   {
-    id: 'children_desire',
-    category: 'Future',
-    question: 'Do you want to have children?',
+    id: 'smoking_habits',
+    category: 'Personal Preferences',
+    question: 'Do you smoke?',
     type: 'single_choice',
-    options: ['Definitely want children', 'Probably want children', 'Not sure yet', 'Probably do not want children', 'Definitely do not want children'],
+    options: ['Yes', 'No', 'Sometimes'],
     required: true,
     order: 11
   },
 
-  // 12. Living Preferences
+  // 12. Relationship Reasons
   {
-    id: 'living_situation_preference',
-    category: 'Future',
-    question: 'Where would you prefer to live long-term?',
-    type: 'single_choice',
-    options: ['Big city center', 'Suburban area near city', 'Small town or rural area', 'Flexible based on opportunities', 'International/willing to relocate'],
+    id: 'relationship_reasons',
+    category: 'Personal Preferences',
+    question: 'In addition to love and affection, what are your main reasons for wanting a relationship? (Select up to 3)',
+    type: 'multiple_choice',
+    options: ['Emotional security', 'Having a partner I can trust', 'Someone to share my free time with', 'To build a family', 'Life is easier with a partner', 'To not be alone'],
     required: true,
     order: 12
   },
 
-  // 13. Social Circle Importance
+  // 13. Career Opportunity Scenario
   {
-    id: 'social_circle_importance',
-    category: 'Social',
-    question: 'How important is it that your partner fits in with your friends/family?',
-    type: 'scale',
-    options: ['Not important', 'Somewhat important', 'Important', 'Very important', 'Essential'],
+    id: 'career_opportunity_scenario',
+    category: 'Personal Preferences',
+    question: 'Your partner is presented with a once-in-a-lifetime career opportunity that would require them to relocate to another country for two years. They are excited but also hesitant because it would mean a significant change to your life together. How do you respond to this?',
+    type: 'single_choice',
+    options: ['I would fully support them, no questions asked. Their dream is our dream, and we would figure out a way to make it work together.', 'I\'d be supportive but would want to have a serious conversation about the practical details, like our jobs, finances, and how we\'d maintain the relationship long-distance.', 'I would want to discuss whether this is the right time. I\'d need to feel confident that this big change won\'t negatively impact our relationship.', 'I would be willing to put my own life on hold to move with them, because being together is what\'s most important to me.'],
     required: true,
     order: 13
   },
 
-  // 14. Deal Breakers
+  // 14. Family Gathering vs Private Time Scenario
   {
-    id: 'deal_breakers',
-    category: 'Compatibility',
-    question: 'Select any absolute deal-breakers for you:',
-    type: 'multiple_choice',
-    options: ['Smoking', 'Heavy drinking', 'No desire for children', 'Very different religious views', 'Poor financial habits', 'Lack of ambition', 'Different political views', 'Poor communication', 'None of these'],
+    id: 'family_gathering_scenario',
+    category: 'Personal Preferences',
+    question: 'You and your partner have a rare free weekend. You want to spend it quietly together at home, relaxing and reconnecting. However, your family has planned a large gathering with relatives for the same weekend and expects you both to attend. How do you handle this?',
+    type: 'single_choice',
+    options: ['The Compromiser: "I would attend the family gathering for a few hours and then politely excuse ourselves to spend some private time together."', 'The Dutiful Relative: "I would prioritize the family gathering, as it is an important obligation, and explain to my partner that we can have our private time later."', 'The Partner-First Person: "I would politely decline the family invitation, explaining that we have other plans, and prioritize my partner and our time together."', 'The Boundary Setter: "I would communicate to my family that while we love them, we need our personal time, and suggest another time for the gathering that works for everyone."'],
     required: true,
     order: 14
-  },
-
-  // 15. Marriage Timeline
-  {
-    id: 'marriage_timeline',
-    category: 'Marriage',
-    question: 'When are you looking to get married?',
-    type: 'single_choice',
-    options: ['Within 6 months', 'Within 1 year', '1-2 years', '2-3 years', 'No specific timeline', 'Just exploring options'],
-    required: true,
-    order: 15
   }
 ]
 
