@@ -91,6 +91,15 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
     // Save to localStorage
     saveQuestionnaireResponse(response)
     
+    // Mark assessment as completed immediately to prevent any race conditions
+    const effectiveLeadId = leadId || (typeof window !== 'undefined' ? sessionStorage.getItem('leadId') : null)
+    if (effectiveLeadId) {
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem(`assessment_completed_${effectiveLeadId}`, 'true')
+        console.log('Marked assessment as completed for leadId:', effectiveLeadId)
+      }
+    }
+    
     // If user is authenticated, also save to UserContext and update questionnaireComplete flag
     if (user && userId === user.id) {
       try {
@@ -419,6 +428,31 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
             {/* Okay Button */}
             <button
               onClick={() => {
+                // Clear all lead-related session storage to ensure fresh home page experience
+                const sessionLeadId = sessionStorage.getItem('leadId')
+                if (sessionLeadId) {
+                  // Keep the assessment completed flag for future reference
+                  const assessmentCompletedFlag = sessionStorage.getItem(`assessment_completed_${sessionLeadId}`)
+                  
+                  // Clear all lead flow related storage
+                  sessionStorage.removeItem('leadSubmitted')
+                  sessionStorage.removeItem('leadId')
+                  
+                  // Re-set the assessment completed flag if it was there
+                  if (assessmentCompletedFlag) {
+                    sessionStorage.setItem(`assessment_completed_${sessionLeadId}`, 'true')
+                  }
+                }
+                
+                // Also clear any other lead-related storage items
+                Object.keys(sessionStorage).forEach(key => {
+                  if (key.startsWith('lead_') && !key.includes('assessment_completed_')) {
+                    sessionStorage.removeItem(key)
+                  }
+                })
+                
+                console.log('Cleared lead session storage, redirecting to fresh home page')
+                
                 // Redirect to home page
                 window.location.href = '/'
               }}

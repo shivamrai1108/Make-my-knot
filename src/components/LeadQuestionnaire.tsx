@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { saveLead, Lead } from '@/lib/leadStore'
-import { Heart, ArrowRight, CheckCircle, Calendar, Upload, X } from 'lucide-react'
+import { Heart, ArrowRight, CheckCircle, Calendar, Upload, X, Lock } from 'lucide-react'
 
 interface Props {
   onSubmitted?: () => void
@@ -38,6 +38,7 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
     email: '', 
     phone: '', 
     dateOfBirth: '',
+    password: '',
     countryCode: '+91' // Default to India
   })
   const [biodataFile, setBiodataFile] = useState<File | null>(null)
@@ -52,21 +53,40 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
     const alreadySubmitted = sessionStorage.getItem('leadSubmitted')
     const storedLeadId = sessionStorage.getItem('leadId')
     
+    console.log('LeadQuestionnaire useEffect - Checking submission state:', {
+      alreadySubmitted,
+      storedLeadId
+    })
+    
     // Check if assessment was already completed for this lead
     if (alreadySubmitted && storedLeadId) {
       const assessmentCompleted = sessionStorage.getItem(`assessment_completed_${storedLeadId}`)
       
+      console.log('Found existing submission:', {
+        leadId: storedLeadId,
+        assessmentCompleted
+      })
+      
       if (assessmentCompleted === 'true') {
         // Assessment is completed, clear the lead submission state to allow fresh start
-        console.log('Assessment already completed, clearing lead submission state')
+        console.log('Assessment already completed, clearing lead submission state and staying on fresh home page')
         sessionStorage.removeItem('leadSubmitted')
         sessionStorage.removeItem('leadId')
-        return // Don't show the countdown screen
+        // Clear any other lead-related session items except the completed flag
+        Object.keys(sessionStorage).forEach(key => {
+          if (key.startsWith('lead_') && !key.includes('assessment_completed_')) {
+            sessionStorage.removeItem(key)
+          }
+        })
+        return // Don't show the countdown screen - stay on normal home page
       }
       
       // Assessment not completed yet, show countdown
+      console.log('Assessment not completed, showing countdown screen')
       setSubmitted(true)
       setLeadId(storedLeadId)
+    } else {
+      console.log('No existing lead submission found, showing fresh questionnaire')
     }
   }, [])
 
@@ -146,6 +166,62 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
     return age >= 18
   }
 
+  // Password validation - at least 8 characters, one uppercase, one lowercase, one number
+  const validatePassword = (password: string) => {
+    if (!password) return false
+    const minLength = password.length >= 8
+    const hasUppercase = /[A-Z]/.test(password)
+    const hasLowercase = /[a-z]/.test(password)
+    const hasNumber = /\d/.test(password)
+    return minLength && hasUppercase && hasLowercase && hasNumber
+  }
+
+  const getPasswordStrength = (password: string) => {
+    let strength = 0
+    if (password.length >= 8) strength++
+    if (/[A-Z]/.test(password)) strength++
+    if (/[a-z]/.test(password)) strength++
+    if (/\d/.test(password)) strength++
+    if (/[^A-Za-z0-9]/.test(password)) strength++
+    return strength
+  }
+
+  const getPasswordStrengthText = (strength: number) => {
+    switch (strength) {
+      case 0:
+      case 1:
+        return 'Very Weak'
+      case 2:
+        return 'Weak'
+      case 3:
+        return 'Fair'
+      case 4:
+        return 'Good'
+      case 5:
+        return 'Strong'
+      default:
+        return ''
+    }
+  }
+
+  const getPasswordStrengthColor = (strength: number) => {
+    switch (strength) {
+      case 0:
+      case 1:
+        return 'text-red-400'
+      case 2:
+        return 'text-orange-400'
+      case 3:
+        return 'text-yellow-400'
+      case 4:
+        return 'text-blue-400'
+      case 5:
+        return 'text-green-400'
+      default:
+        return 'text-gray-400'
+    }
+  }
+
   // File validation for biodata
   const validateBiodataFile = (file: File) => {
     const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg']
@@ -181,7 +257,7 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
     setUploadError('')
   }
 
-  const canSubmitContact = contact.name && contact.email && validatePhone(contact.phone) && validateAge(contact.dateOfBirth)
+  const canSubmitContact = contact.name && contact.email && validatePhone(contact.phone) && validateAge(contact.dateOfBirth) && validatePassword(contact.password)
 
   const handleSubmitLead = async () => {
     if (!canSubmitContact || isProcessing) return
@@ -196,7 +272,8 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
       countryCode: contact.countryCode,
       fullPhoneNumber: contact.countryCode + contact.phone,
       biodataFileName: biodataFile?.name || null,
-      hasBiodata: !!biodataFile
+      hasBiodata: !!biodataFile,
+      hasPassword: true // Password will be saved separately for security
     }
     
     const lead: Lead = {
@@ -206,6 +283,7 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
       name: contact.name,
       email: contact.email,
       phone: contact.countryCode + contact.phone, // Store full international phone number
+      password: contact.password, // Store password for account creation
       answers: enhancedAnswers,
       status: 'new',
       biodataFile: biodataFile // Store file for admin access
@@ -237,17 +315,17 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
         <div className="w-16 h-16 bg-primary-100 rounded-full mx-auto mb-4 flex items-center justify-center">
           <CheckCircle className="h-8 w-8 text-primary-600" />
         </div>
-        <h3 className="text-2xl font-bold text-gray-900 mb-2">Great start! 🎉</h3>
-        <p className="text-gray-600 mb-6">Thanks {contact.name.split(' ')[0]}! Ready for your comprehensive assessment?</p>
+        <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-2">Great start! 🎉</h3>
+        <p className="text-sm sm:text-base text-gray-600 mb-6">Thanks {contact.name.split(' ')[0]}! Ready for your comprehensive assessment?</p>
         
         <div className="bg-primary-50 rounded-lg p-4 mb-6">
-          <p className="text-primary-800 text-sm mb-2">Starting assessment in...</p>
-          <div className="text-3xl font-bold text-primary-600">{countdown}</div>
+          <p className="text-primary-800 text-xs sm:text-sm mb-2">Starting assessment in...</p>
+          <div className="text-2xl sm:text-3xl font-bold text-primary-600">{countdown}</div>
         </div>
         
         <button
           onClick={redirectToAssessment}
-          className="w-full bg-gradient-to-r from-primary-600 to-gold-500 text-white py-3 px-6 rounded-lg hover:from-primary-700 hover:to-gold-600 transition-all duration-200 font-semibold mb-4"
+          className="w-full bg-gradient-to-r from-primary-600 to-gold-500 text-white py-2 sm:py-3 px-4 sm:px-6 rounded-lg hover:from-primary-700 hover:to-gold-600 transition-all duration-200 font-semibold mb-4 text-sm sm:text-base"
         >
           Continue Now
           <ArrowRight className="h-5 w-5 ml-2 inline" />
@@ -262,10 +340,10 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 mb-12">
       {step < steps.length ? (
         <div>
-          <p className="text-2xl md:text-3xl font-bold text-white mb-6 drop-shadow-lg">{current.question}</p>
+          <p className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-6 drop-shadow-lg">{current.question}</p>
 
           {current.type === 'choice' && (
             <div className="space-y-3">
@@ -282,7 +360,7 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
                     onChange={() => handleSelect(opt)}
                     className="w-5 h-5 text-white border-white/30 focus:ring-white/50 bg-transparent"
                   />
-                  <span className="ml-3 text-white font-medium text-lg">{opt}</span>
+                  <span className="ml-3 text-white font-medium text-sm sm:text-base">{opt}</span>
                 </label>
               ))}
             </div>
@@ -315,26 +393,28 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
             </div>
           )}
 
-          <div className="text-sm text-white/70 mt-3">Step {step+1} of {steps.length+1}</div>
+          <div className="text-xs sm:text-sm text-white/70 mt-3">Step {step+1} of {steps.length+1}</div>
         </div>
       ) : (
-        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-          <p className="text-2xl font-bold text-white mb-6 drop-shadow-lg">Almost there! How can we reach you?</p>
+        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 md:p-8 border border-white/20 mb-8 max-w-2xl mx-auto">
+          <p className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-6 sm:mb-8 drop-shadow-lg">Almost there! How can we reach you?</p>
           
           {/* Name and Email */}
-          <div className="grid md:grid-cols-2 gap-4 mb-4">
+          <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
             <div>
+              <label className="block text-xs sm:text-sm font-medium text-white/90 mb-2">Full Name *</label>
               <input
-                className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white placeholder-white/70"
-                placeholder="Full name *"
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/20 border border-white/30 rounded-lg focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white placeholder-white/70 text-sm sm:text-base"
+                placeholder="Enter your full name"
                 value={contact.name}
                 onChange={(e)=>setContact({...contact, name: e.target.value})}
               />
             </div>
             <div>
+              <label className="block text-xs sm:text-sm font-medium text-white/90 mb-2">Email Address *</label>
               <input
-                className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white placeholder-white/70"
-                placeholder="Email address *"
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/20 border border-white/30 rounded-lg focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white placeholder-white/70 text-sm sm:text-base"
+                placeholder="Enter your email"
                 type="email"
                 value={contact.email}
                 onChange={(e)=>setContact({...contact, email: e.target.value})}
@@ -342,48 +422,94 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
             </div>
           </div>
 
-          {/* Phone Number with Country Code */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-white/90 mb-2">Phone Number *</label>
-            <div className="flex">
-              <select
-                className="px-3 py-3 bg-white/20 border border-white/30 rounded-l-lg focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white"
-                value={contact.countryCode}
-                onChange={(e) => setContact({...contact, countryCode: e.target.value})}
-              >
-                {countryCodes.map((country) => (
-                  <option key={country.code} value={country.code}>
-                    {country.flag} {country.code} {country.country}
-                  </option>
-                ))}
-              </select>
+          {/* Password and Phone Number */}
+          <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
+            {/* Password Field */}
+            <div>
+              <label className="block text-xs sm:text-sm font-medium text-white/90 mb-2">
+                <Lock className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
+                Create Password *
+              </label>
               <input
-                className={`flex-1 px-4 py-3 bg-white/20 border border-l-0 border-white/30 rounded-r-lg focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white placeholder-white/70 ${
-                  contact.phone && !validatePhone(contact.phone) ? 'border-red-300 bg-red-50/20' : ''
+                className={`w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/20 border border-white/30 rounded-lg focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white placeholder-white/70 text-sm sm:text-base ${
+                  contact.password && !validatePassword(contact.password) ? 'border-red-300 bg-red-50/20' : ''
                 }`}
-                placeholder="10-digit phone number"
-                type="tel"
-                value={contact.phone}
-                onChange={(e) => {
-                  const formatted = formatPhone(e.target.value)
-                  setContact({...contact, phone: formatted})
-                }}
-                maxLength={10}
+                placeholder="Create a secure password"
+                type="password"
+                value={contact.password}
+                onChange={(e) => setContact({...contact, password: e.target.value})}
               />
+              {contact.password && (
+                <div className="mt-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-white/70">Password strength:</span>
+                    <span className={`text-xs font-medium ${getPasswordStrengthColor(getPasswordStrength(contact.password))}`}>
+                      {getPasswordStrengthText(getPasswordStrength(contact.password))}
+                    </span>
+                  </div>
+                  <div className="w-full bg-white/20 rounded-full h-2 mt-1">
+                    <div 
+                      className={`h-2 rounded-full transition-all duration-300 ${
+                        getPasswordStrength(contact.password) <= 1 ? 'bg-red-400' :
+                        getPasswordStrength(contact.password) === 2 ? 'bg-orange-400' :
+                        getPasswordStrength(contact.password) === 3 ? 'bg-yellow-400' :
+                        getPasswordStrength(contact.password) === 4 ? 'bg-blue-400' : 'bg-green-400'
+                      }`}
+                      style={{ width: `${(getPasswordStrength(contact.password) / 5) * 100}%` }}
+                    ></div>
+                  </div>
+                </div>
+              )}
+              {contact.password && !validatePassword(contact.password) && (
+                <p className="text-red-400 text-xs mt-1">
+                  Password must have 8+ chars, uppercase, lowercase, and number
+                </p>
+              )}
             </div>
-            {contact.phone && !validatePhone(contact.phone) && (
-              <p className="text-red-400 text-xs mt-1">Please enter exactly 10 digits</p>
-            )}
+            
+            {/* Phone Number */}
+            <div>
+              <label className="block text-xs sm:text-sm font-medium text-white/90 mb-2">Phone Number *</label>
+              <div className="flex">
+                <select
+                  className="px-2 sm:px-3 py-2 sm:py-3 bg-white/20 border border-white/30 rounded-l-lg focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white text-xs sm:text-sm"
+                  value={contact.countryCode}
+                  onChange={(e) => setContact({...contact, countryCode: e.target.value})}
+                >
+                  {countryCodes.map((country) => (
+                    <option key={country.code} value={country.code} className="text-gray-900">
+                      {country.flag} {country.code} {country.country}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  className={`flex-1 px-3 sm:px-4 py-2 sm:py-3 bg-white/20 border border-l-0 border-white/30 rounded-r-lg focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white placeholder-white/70 text-sm sm:text-base ${
+                    contact.phone && !validatePhone(contact.phone) ? 'border-red-300 bg-red-50/20' : ''
+                  }`}
+                  placeholder="10-digit phone number"
+                  type="tel"
+                  value={contact.phone}
+                  onChange={(e) => {
+                    const formatted = formatPhone(e.target.value)
+                    setContact({...contact, phone: formatted})
+                  }}
+                  maxLength={10}
+                />
+              </div>
+              {contact.phone && !validatePhone(contact.phone) && (
+                <p className="text-red-400 text-xs mt-1">Please enter exactly 10 digits</p>
+              )}
+            </div>
           </div>
 
           {/* Date of Birth */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-white/90 mb-2">
-              <Calendar className="w-4 h-4 inline mr-1" />
+          <div className="mb-4 sm:mb-6">
+            <label className="block text-xs sm:text-sm font-medium text-white/90 mb-2">
+              <Calendar className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
               Date of Birth *
             </label>
             <input
-              className={`w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white placeholder-white/70 ${
+              className={`w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/20 border border-white/30 rounded-lg focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white placeholder-white/70 text-sm sm:text-base ${
                 contact.dateOfBirth && !validateAge(contact.dateOfBirth) ? 'border-red-300 bg-red-50/20' : ''
               }`}
               type="date"
@@ -397,9 +523,9 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
           </div>
 
           {/* Optional Biodata Upload */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-white/90 mb-2">
-              <Upload className="w-4 h-4 inline mr-1" />
+          <div className="mb-4 sm:mb-6">
+            <label className="block text-xs sm:text-sm font-medium text-white/90 mb-2">
+              <Upload className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
               Upload Biodata (Optional)
             </label>
             <p className="text-xs text-white/70 mb-3">
@@ -417,7 +543,7 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
                 />
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary-400 hover:bg-primary-50 transition-colors">
                   <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                  <p className="text-sm text-gray-600 mb-1">Click to upload biodata</p>
+                  <p className="text-xs sm:text-sm text-gray-600 mb-1">Click to upload biodata</p>
                   <p className="text-xs text-gray-500">PDF or JPEG files only</p>
                 </div>
               </div>
@@ -426,7 +552,7 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
                 <div className="flex items-center">
                   <CheckCircle className="h-5 w-5 text-primary-600 mr-2" />
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{biodataFile.name}</p>
+                    <p className="text-xs sm:text-sm font-medium text-gray-900">{biodataFile.name}</p>
                     <p className="text-xs text-gray-500">{(biodataFile.size / 1024 / 1024).toFixed(1)} MB</p>
                   </div>
                 </div>
@@ -448,7 +574,7 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
           <button 
             disabled={!canSubmitContact || isProcessing} 
             onClick={handleSubmitLead} 
-            className={`w-full py-4 rounded-lg font-semibold transition-all duration-200 ${
+            className={`w-full py-3 sm:py-4 rounded-lg font-semibold transition-all duration-200 text-sm sm:text-base ${
               canSubmitContact && !isProcessing
                 ? 'bg-gradient-to-r from-primary-600 to-gold-500 text-white hover:from-primary-700 hover:to-gold-600 transform hover:scale-105 shadow-lg'
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
@@ -467,10 +593,10 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
             )}
           </button>
           
-          <div className="text-xs text-white/70 mt-3 text-center">
+          <div className="text-xs text-white/70 mt-4 text-center">
             We&apos;ll contact you with curated matches. No spam, promise! 🤝
           </div>
-          <div className="text-sm text-white/70 mt-2 text-center">
+          <div className="text-xs sm:text-sm text-white/70 mt-2 text-center">
             Step {steps.length+1} of {steps.length+1}
           </div>
         </div>

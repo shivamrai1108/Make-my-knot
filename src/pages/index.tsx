@@ -505,22 +505,22 @@ export default function Home() {
         </Head>
         
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          {/* Wine Glass Background with Blur */}
-          <div className="absolute inset-0 bg-gradient-to-br from-red-900/80 via-red-800/70 to-purple-900/80 backdrop-blur-md">
-            {/* Additional glass layers for depth */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-red-700/60 via-transparent to-red-900/50 backdrop-blur-sm"></div>
-            <div className="absolute inset-0 bg-gradient-to-bl from-purple-800/40 via-red-600/30 to-red-800/60 backdrop-blur-lg"></div>
+          {/* Transparent Wine Glass Background with Light Blur */}
+          <div className="absolute inset-0 bg-gradient-to-br from-red-900/20 via-red-800/15 to-purple-900/25 backdrop-blur-sm">
+            {/* Additional glass layers for depth - much more transparent */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-red-700/10 via-transparent to-red-900/15 backdrop-blur-[1px]"></div>
+            <div className="absolute inset-0 bg-gradient-to-bl from-purple-800/8 via-red-600/5 to-red-800/12 backdrop-blur-[2px]"></div>
             
-            {/* Wine-colored glass floating elements */}
-            <div className="absolute top-20 left-20 w-40 h-40 bg-red-300/20 rounded-full blur-2xl animate-pulse" style={{animationDuration: '6s'}}></div>
-            <div className="absolute bottom-32 right-16 w-64 h-64 bg-red-400/15 rounded-full blur-3xl animate-float" style={{animationDuration: '8s'}}></div>
-            <div className="absolute top-1/3 right-1/3 w-32 h-32 bg-purple-300/20 rounded-full blur-xl animate-pulse" style={{animationDelay: '2s', animationDuration: '5s'}}></div>
-            <div className="absolute bottom-1/4 left-1/4 w-48 h-48 bg-red-500/15 rounded-full blur-2xl animate-float" style={{animationDelay: '3s', animationDuration: '7s'}}></div>
-            <div className="absolute top-1/2 left-1/2 w-36 h-36 bg-red-600/10 rounded-full blur-xl animate-pulse" style={{animationDelay: '1s', animationDuration: '6s'}}></div>
+            {/* Subtle wine-colored floating elements */}
+            <div className="absolute top-20 left-20 w-40 h-40 bg-red-300/5 rounded-full blur-2xl animate-pulse" style={{animationDuration: '6s'}}></div>
+            <div className="absolute bottom-32 right-16 w-64 h-64 bg-red-400/3 rounded-full blur-3xl animate-float" style={{animationDuration: '8s'}}></div>
+            <div className="absolute top-1/3 right-1/3 w-32 h-32 bg-purple-300/4 rounded-full blur-xl animate-pulse" style={{animationDelay: '2s', animationDuration: '5s'}}></div>
+            <div className="absolute bottom-1/4 left-1/4 w-48 h-48 bg-red-500/3 rounded-full blur-2xl animate-float" style={{animationDelay: '3s', animationDuration: '7s'}}></div>
+            <div className="absolute top-1/2 left-1/2 w-36 h-36 bg-red-600/2 rounded-full blur-xl animate-pulse" style={{animationDelay: '1s', animationDuration: '6s'}}></div>
             
-            {/* Additional wine glass elements */}
-            <div className="absolute top-1/4 right-1/4 w-24 h-24 bg-purple-400/15 rounded-full blur-lg animate-float" style={{animationDelay: '4s', animationDuration: '5s'}}></div>
-            <div className="absolute bottom-1/3 right-1/3 w-20 h-20 bg-red-300/25 rounded-full blur-md animate-pulse" style={{animationDelay: '2.5s', animationDuration: '6s'}}></div>
+            {/* Additional subtle elements */}
+            <div className="absolute top-1/4 right-1/4 w-24 h-24 bg-purple-400/4 rounded-full blur-lg animate-float" style={{animationDelay: '4s', animationDuration: '5s'}}></div>
+            <div className="absolute bottom-1/3 right-1/3 w-20 h-20 bg-red-300/6 rounded-full blur-md animate-pulse" style={{animationDelay: '2.5s', animationDuration: '6s'}}></div>
           </div>
           
           <div className="relative z-10 text-center">
@@ -531,7 +531,7 @@ export default function Home() {
               transition={{ duration: 1, delay: 0.2, type: "spring", stiffness: 200 }}
               className="mb-8"
             >
-              <div className="w-32 h-32 bg-white/90 backdrop-blur-sm rounded-2xl mx-auto flex items-center justify-center shadow-2xl p-4 hover:scale-105 transition-all duration-500 border border-white/30">
+              <div className="w-32 h-32 bg-white/60 backdrop-blur-sm rounded-2xl mx-auto flex items-center justify-center shadow-2xl p-4 hover:scale-105 transition-all duration-500 border border-white/40">
                 <Image
                   src="/images/logo.png"
                   alt="Make My Knot Logo"
@@ -550,8 +550,8 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.8 }}
               className="mb-6"
             >
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 drop-shadow-lg">
-                <span className="bg-gradient-to-r from-gold-300 to-gold-100 bg-clip-text text-transparent">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)]" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8), 0px 0px 12px rgba(0,0,0,0.6)'}}>
+                <span className="bg-gradient-to-r from-gold-300 to-gold-100 bg-clip-text text-transparent drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
                   {t('splash.title', 'Make My Knot')}
                 </span>
               </h1>
@@ -559,13 +559,15 @@ export default function Home() {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8, delay: 1.2 }}
-                className="text-lg md:text-xl lg:text-2xl text-white/90 font-medium italic"
+                className="text-lg md:text-xl lg:text-2xl text-white/95 font-medium italic"
+                style={{textShadow: '1px 1px 3px rgba(0,0,0,0.9), 0px 0px 8px rgba(0,0,0,0.7)'}}
               >
                 <motion.span
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 1.8 }}
                   className="inline-block"
+                  style={{textShadow: '1px 1px 3px rgba(0,0,0,0.9)'}}
                 >
                   From
                 </motion.span>
@@ -575,6 +577,7 @@ export default function Home() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.8, delay: 2.2 }}
                   className="inline-block bg-gradient-to-r from-gold-600 to-yellow-600 bg-clip-text text-transparent font-bold"
+                  style={{filter: 'drop-shadow(1px 1px 3px rgba(0,0,0,0.9))'}}
                 >
                   Handshake
                 </motion.span>
@@ -584,6 +587,7 @@ export default function Home() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 2.6 }}
                   className="inline-block"
+                  style={{textShadow: '1px 1px 3px rgba(0,0,0,0.9)'}}
                 >
                   to
                 </motion.span>
@@ -593,7 +597,7 @@ export default function Home() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 1.0, delay: 3.0 }}
                   className="inline-block bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent font-bold animate-pulse"
-                  style={{ animationDelay: '4s', animationDuration: '2s' }}
+                  style={{ animationDelay: '4s', animationDuration: '2s', filter: 'drop-shadow(1px 1px 3px rgba(0,0,0,0.9))' }}
                 >
                   Pheras
                 </motion.span>
@@ -612,7 +616,7 @@ export default function Home() {
                   <div className="w-3 h-3 bg-white/60 rounded-full animate-bounce"></div>
                   <div className="w-3 h-3 bg-white/60 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
                   <div className="w-3 h-3 bg-white/60 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                  <span className="ml-3 text-lg font-medium">{t('splash.loading', 'Loading your perfect matches...')}</span>
+                  <span className="ml-3 text-lg font-medium" style={{textShadow: '1px 1px 2px rgba(0,0,0,0.9)'}}>{t('splash.loading', 'Loading your perfect matches...')}</span>
                 </div>
               ) : (
                 <motion.div
@@ -623,18 +627,18 @@ export default function Home() {
                 >
                   <div className="flex items-center justify-center space-x-2 mb-4">
                     <CheckCircle className="w-6 h-6 text-green-400" />
-                    <span className="text-lg font-semibold">Ready to find your perfect match!</span>
+                    <span className="text-lg font-semibold" style={{textShadow: '1px 1px 2px rgba(0,0,0,0.9)'}}>Ready to find your perfect match!</span>
                   </div>
                   <div className="w-16 h-1 bg-gradient-to-r from-green-400 to-gold-400 mx-auto rounded-full"></div>
                 </motion.div>
               )}
             </motion.div>
             
-            {/* Wine-themed Floating Elements */}
-            <div className="absolute -top-10 -left-10 w-20 h-20 border border-red-200/30 rounded-full animate-spin" style={{animationDuration: '8s'}}></div>
-            <div className="absolute -bottom-10 -right-10 w-16 h-16 border-2 border-red-300/40 rounded-full animate-ping"></div>
-            <div className="absolute top-2/3 left-10 w-12 h-12 border border-purple-200/25 rounded-full animate-pulse" style={{animationDuration: '6s', animationDelay: '1s'}}></div>
-            <div className="absolute bottom-1/3 right-20 w-8 h-8 border-2 border-red-400/35 rounded-full animate-bounce" style={{animationDuration: '3s', animationDelay: '2s'}}></div>
+            {/* Subtle Wine-themed Floating Elements */}
+            <div className="absolute -top-10 -left-10 w-20 h-20 border border-red-200/10 rounded-full animate-spin" style={{animationDuration: '8s'}}></div>
+            <div className="absolute -bottom-10 -right-10 w-16 h-16 border-2 border-red-300/15 rounded-full animate-ping"></div>
+            <div className="absolute top-2/3 left-10 w-12 h-12 border border-purple-200/8 rounded-full animate-pulse" style={{animationDuration: '6s', animationDelay: '1s'}}></div>
+            <div className="absolute bottom-1/3 right-20 w-8 h-8 border-2 border-red-400/12 rounded-full animate-bounce" style={{animationDuration: '3s', animationDelay: '2s'}}></div>
           </div>
         </div>
       </>

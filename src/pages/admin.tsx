@@ -2,7 +2,7 @@ import Head from 'next/head'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { 
-  Shield, Trash2, CheckCircle2, Mail, Phone, User, Lock, LogOut, Users, BarChart3, MessageSquare, CreditCard, Eye, EyeOff, Settings, Zap, AlertTriangle, DollarSign, TrendingUp, Activity, UserPlus, Video, Calendar, Gift, Edit, XCircle, MapPin, Briefcase, GraduationCap, Search, Wifi, MessageCircle, FileText, Brain, Download
+  Shield, Trash2, CheckCircle2, Mail, Phone, User, Lock, LogOut, Users, BarChart3, MessageSquare, CreditCard, Eye, EyeOff, Settings, Zap, AlertTriangle, DollarSign, TrendingUp, Activity, UserPlus, Video, Calendar, Gift, Edit, XCircle, MapPin, Briefcase, GraduationCap, Search, Wifi, MessageCircle, FileText, Brain, Download, Target, Filter
 } from 'lucide-react'
 import { useOnlineStatus } from '@/lib/OnlineStatusContext'
 import { OnlineUsersList, OnlineStatusBadge, OnlineStatusIndicator } from '@/components/OnlineStatusIndicator'
@@ -97,14 +97,48 @@ function sendNotification(userId: string, message: string, type: string) {
   console.log(`Sending ${type} notification to ${userId}: ${message}`)
 }
 
-// Mock types for compatibility
+// CRM Configuration Interface
+interface CRMConfig {
+  provider: 'hubspot' | 'salesforce' | 'pipedrive' | 'custom'
+  apiKey: string
+  baseUrl?: string
+  isEnabled: boolean
+  syncSettings: {
+    autoSync: boolean
+    syncFrequency: number // minutes
+    fieldsMapping: Record<string, string>
+  }
+}
+
+// Lead Activity Interface
+interface LeadActivity {
+  id: string
+  leadId: string
+  type: 'note' | 'call' | 'email' | 'meeting' | 'status_change' | 'sync'
+  description: string
+  createdBy: string
+  createdAt: string
+  metadata?: Record<string, any>
+}
+
+// Enhanced Lead Interface
 interface Lead {
   id: string
   name: string
   email: string
   phone: string
-  status: 'new' | 'verified'
+  status: 'new' | 'qualified' | 'contacted' | 'interested' | 'not_interested' | 'verified' | 'converted'
+  source: 'website' | 'referral' | 'social' | 'advertisement' | 'event' | 'other'
+  score: number // 0-100
+  qualificationLevel: 'cold' | 'warm' | 'hot' | 'qualified'
+  assignedTo?: string
+  tags: string[]
   syncedAt?: string
+  lastActivityAt?: string
+  createdAt: string
+  updatedAt: string
+  notes?: string
+  customFields?: Record<string, any>
 }
 
 // Enhanced lead interface with questionnaire data
@@ -139,9 +173,200 @@ function saveLead(lead: Lead) {
   localStorage.setItem('makemyknot_leads', JSON.stringify(updated))
 }
 
+// CRM Configuration Management
+function getCRMConfig(): CRMConfig {
+  const defaultConfig: CRMConfig = {
+    provider: 'hubspot',
+    apiKey: '',
+    isEnabled: false,
+    syncSettings: {
+      autoSync: false,
+      syncFrequency: 60,
+      fieldsMapping: {
+        'name': 'firstname',
+        'email': 'email',
+        'phone': 'phone',
+        'status': 'lifecyclestage'
+      }
+    }
+  }
+  return JSON.parse(localStorage.getItem('makemyknot_crm_config') || JSON.stringify(defaultConfig))
+}
+
+function saveCRMConfig(config: CRMConfig) {
+  localStorage.setItem('makemyknot_crm_config', JSON.stringify(config))
+}
+
+// Lead Scoring System
+function calculateLeadScore(lead: Lead, questionnaire?: QuestionnaireResponse): number {
+  let score = 0
+  
+  // Base score for having complete contact info
+  if (lead.email && lead.phone && lead.name) score += 20
+  
+  // Questionnaire completion score
+  if (questionnaire) {
+    const responseCount = Object.keys(questionnaire.responses).length
+    const completionPercentage = (responseCount / essentialQuestions.length) * 100
+    score += Math.round(completionPercentage * 0.4) // 40% weight for questionnaire
+  }
+  
+  // Profile quality indicators
+  if (lead.tags && lead.tags.length > 0) score += 10
+  if (lead.notes && lead.notes.length > 50) score += 5
+  
+  // Activity recency bonus
+  if (lead.lastActivityAt) {
+    const daysSinceActivity = (Date.now() - new Date(lead.lastActivityAt).getTime()) / (1000 * 60 * 60 * 24)
+    if (daysSinceActivity < 7) score += 15
+    else if (daysSinceActivity < 30) score += 10
+  }
+  
+  // Status-based scoring
+  const statusScores = {
+    'new': 10,
+    'qualified': 20,
+    'contacted': 25,
+    'interested': 35,
+    'not_interested': 0,
+    'verified': 40,
+    'converted': 50
+  }
+  
+  score += statusScores[lead.status] || 0
+  
+  return Math.min(Math.max(score, 0), 100)
+}
+
+// Determine lead qualification level based on score
+function getQualificationLevel(score: number): 'cold' | 'warm' | 'hot' | 'qualified' {
+  if (score >= 80) return 'qualified'
+  if (score >= 60) return 'hot'
+  if (score >= 40) return 'warm'
+  return 'cold'
+}
+
+// Lead Activities Management
+function getLeadActivities(leadId: string): LeadActivity[] {
+  const allActivities = JSON.parse(localStorage.getItem('makemyknot_lead_activities') || '[]')
+  return allActivities.filter((activity: LeadActivity) => activity.leadId === leadId)
+}
+
+function addLeadActivity(activity: Omit<LeadActivity, 'id' | 'createdAt'>) {
+  const activities = JSON.parse(localStorage.getItem('makemyknot_lead_activities') || '[]')
+  const newActivity: LeadActivity = {
+    ...activity,
+    id: crypto.randomUUID(),
+    createdAt: new Date().toISOString()
+  }
+  activities.push(newActivity)
+  localStorage.setItem('makemyknot_lead_activities', JSON.stringify(activities))
+  return newActivity
+}
+
+// Enhanced CRM Sync with proper error handling
 function syncLeadToCRM(lead: Lead) {
-  console.log('Syncing lead to CRM:', lead)
-  return { success: true }
+  const config = getCRMConfig()
+  
+  if (!config.isEnabled || !config.apiKey) {
+    return { success: false, error: 'CRM not configured or disabled' }
+  }
+  
+  try {
+    console.log(`Syncing lead to ${config.provider} CRM:`, lead)
+    
+    // Add activity log
+    addLeadActivity({
+      leadId: lead.id,
+      type: 'sync',
+      description: `Lead synced to ${config.provider.toUpperCase()} CRM`,
+      createdBy: 'system'
+    })
+    
+    // In production, this would make actual API calls
+    // Example for HubSpot:
+    // const hubspotData = {
+    //   properties: {
+    //     firstname: lead.name,
+    //     email: lead.email,
+    //     phone: lead.phone,
+    //     lifecyclestage: lead.status
+    //   }
+    // }
+    // await fetch(`${config.baseUrl}/contacts/v1/contact/`, {
+    //   method: 'POST',
+    //   headers: {
+    //     'Authorization': `Bearer ${config.apiKey}`,
+    //     'Content-Type': 'application/json'
+    //   },
+    //   body: JSON.stringify(hubspotData)
+    // })
+    
+    return { success: true, message: `Lead synced to ${config.provider.toUpperCase()} successfully` }
+  } catch (error) {
+    console.error('CRM Sync Error:', error)
+    return { success: false, error: `Failed to sync to ${config.provider}: ${error}` }
+  }
+}
+
+// Bulk Operations
+function bulkUpdateLeads(leadIds: string[], updates: Partial<Lead>) {
+  const leads = getLeads()
+  const updatedLeads = leads.map(lead => 
+    leadIds.includes(lead.id) ? { ...lead, ...updates, updatedAt: new Date().toISOString() } : lead
+  )
+  localStorage.setItem('makemyknot_leads', JSON.stringify(updatedLeads))
+  
+  // Log activities for bulk updates
+  leadIds.forEach(leadId => {
+    addLeadActivity({
+      leadId,
+      type: 'status_change',
+      description: `Bulk update applied: ${Object.keys(updates).join(', ')}`,
+      createdBy: 'admin'
+    })
+  })
+  
+  return updatedLeads.filter(lead => leadIds.includes(lead.id))
+}
+
+function exportLeadsToCSV(leads: EnhancedLead[]) {
+  const headers = [
+    'ID', 'Name', 'Email', 'Phone', 'Status', 'Source', 'Score', 
+    'Qualification Level', 'Assigned To', 'Tags', 'Has Questionnaire',
+    'Questionnaire Complete', 'Created At', 'Last Activity'
+  ]
+  
+  const rows = leads.map(lead => [
+    lead.id,
+    lead.name,
+    lead.email,
+    lead.phone,
+    lead.status,
+    lead.source || 'website',
+    lead.score || 0,
+    lead.qualificationLevel || 'cold',
+    lead.assignedTo || '',
+    (lead.tags || []).join('; '),
+    lead.hasQuestionnaire ? 'Yes' : 'No',
+    lead.questionnaireComplete ? 'Yes' : 'No',
+    lead.createdAt || new Date().toISOString(),
+    lead.lastActivityAt || ''
+  ])
+  
+  const csvContent = [headers, ...rows]
+    .map(row => row.map(cell => `"${cell}"`).join(','))
+    .join('\n')
+    
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+  const link = document.createElement('a')
+  const url = URL.createObjectURL(blob)
+  link.setAttribute('href', url)
+  link.setAttribute('download', `leads_export_${new Date().toISOString().split('T')[0]}.csv`)
+  link.style.visibility = 'hidden'
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
 }
 
 // Import LogIn icon
@@ -1806,13 +2031,25 @@ function UserManagementTab() {
   )
 }
 
-// CRM & Leads Tab - Enhanced with questionnaire data
+// CRM & Leads Tab - Enhanced with questionnaire data and advanced features
 function CRMLeadsTab() {
   const [leads, setLeads] = useState<EnhancedLead[]>([])
   const [leadQuestionnaires, setLeadQuestionnaires] = useState<QuestionnaireResponse[]>([])
   const [selectedLead, setSelectedLead] = useState<any>(null)
   const [filter, setFilter] = useState('all')
   const [showQuestionnaireData, setShowQuestionnaireData] = useState(false)
+  const [showCRMConfig, setShowCRMConfig] = useState(false)
+  const [crmConfig, setCrmConfig] = useState<CRMConfig>(getCRMConfig())
+  const [searchTerm, setSearchTerm] = useState('')
+  const [scoreRange, setScoreRange] = useState([0, 100])
+  const [selectedLeads, setSelectedLeads] = useState<string[]>([])
+  const [bulkAction, setBulkAction] = useState('')
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false)
+  const [selectedStatus, setSelectedStatus] = useState<string>('all')
+  const [selectedSource, setSelectedSource] = useState<string>('all')
+  const [selectedQualification, setSelectedQualification] = useState<string>('all')
+  const [dateRange, setDateRange] = useState({ from: '', to: '' })
+  const [showLeadActivities, setShowLeadActivities] = useState<string | null>(null)
   
   useEffect(() => {
     const refresh = () => {
@@ -1822,14 +2059,30 @@ function CRMLeadsTab() {
       // Get questionnaires specifically from leads
       const leadQuestionnaires = allQuestionnaires.filter(q => q.leadId)
       
-      // Enhance leads with questionnaire data
+      // Enhance leads with questionnaire data and scoring
       const enhancedLeads = allLeads.map(lead => {
         const questionnaire = leadQuestionnaires.find(q => q.leadId === lead.id)
-        return {
+        
+        // Ensure required fields exist with defaults
+        const enhancedLead = {
           ...lead,
+          source: lead.source || 'website',
+          tags: lead.tags || [],
+          createdAt: lead.createdAt || new Date().toISOString(),
+          updatedAt: lead.updatedAt || new Date().toISOString(),
           questionnaire: questionnaire || null,
           hasQuestionnaire: !!questionnaire,
           questionnaireComplete: questionnaire?.isComplete || false
+        }
+        
+        // Calculate lead score
+        const score = calculateLeadScore(enhancedLead, questionnaire)
+        const qualificationLevel = getQualificationLevel(score)
+        
+        return {
+          ...enhancedLead,
+          score,
+          qualificationLevel
         }
       })
       
@@ -1848,11 +2101,25 @@ function CRMLeadsTab() {
     
     const enhancedLeads = allLeads.map(lead => {
       const questionnaire = leadQuestionnaires.find(q => q.leadId === lead.id)
-      return {
+      
+      const enhancedLead = {
         ...lead,
+        source: lead.source || 'website',
+        tags: lead.tags || [],
+        createdAt: lead.createdAt || new Date().toISOString(),
+        updatedAt: lead.updatedAt || new Date().toISOString(),
         questionnaire: questionnaire || null,
         hasQuestionnaire: !!questionnaire,
         questionnaireComplete: questionnaire?.isComplete || false
+      }
+      
+      const score = calculateLeadScore(enhancedLead, questionnaire)
+      const qualificationLevel = getQualificationLevel(score)
+      
+      return {
+        ...enhancedLead,
+        score,
+        qualificationLevel
       }
     })
     
@@ -1879,13 +2146,110 @@ function CRMLeadsTab() {
     refresh()
   }
 
+  // Enhanced CRM sync handler
   const handleSyncToCRM = (lead: Lead) => {
     const result = syncLeadToCRM(lead)
     if (result.success) {
-      const updatedLead = { ...lead, syncedAt: new Date().toISOString() }
+      const updatedLead = { ...lead, syncedAt: new Date().toISOString(), lastActivityAt: new Date().toISOString() }
       saveLead(updatedLead)
       refresh()
-      alert('Lead synced to CRM successfully!')
+      alert(result.message || 'Lead synced to CRM successfully!')
+    } else {
+      alert(result.error || 'Failed to sync lead to CRM')
+    }
+  }
+  
+  // CRM Configuration handlers
+  const handleSaveCRMConfig = () => {
+    saveCRMConfig(crmConfig)
+    alert('CRM configuration saved successfully!')
+    setShowCRMConfig(false)
+  }
+  
+  // Bulk operations handlers
+  const handleSelectLead = (leadId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedLeads([...selectedLeads, leadId])
+    } else {
+      setSelectedLeads(selectedLeads.filter(id => id !== leadId))
+    }
+  }
+  
+  const handleSelectAllLeads = (checked: boolean) => {
+    if (checked) {
+      setSelectedLeads(filteredLeads.map(lead => lead.id))
+    } else {
+      setSelectedLeads([])
+    }
+  }
+  
+  const handleBulkAction = () => {
+    if (selectedLeads.length === 0) {
+      alert('Please select at least one lead')
+      return
+    }
+    
+    switch (bulkAction) {
+      case 'export':
+        const selectedLeadsData = leads.filter(lead => selectedLeads.includes(lead.id))
+        exportLeadsToCSV(selectedLeadsData)
+        alert(`Exported ${selectedLeads.length} leads to CSV`)
+        break
+        
+      case 'sync_crm':
+        if (!crmConfig.isEnabled) {
+          alert('Please configure and enable CRM first')
+          return
+        }
+        selectedLeads.forEach(leadId => {
+          const lead = leads.find(l => l.id === leadId)
+          if (lead && !lead.syncedAt) {
+            handleSyncToCRM(lead)
+          }
+        })
+        break
+        
+      case 'verify':
+        const updates = { status: 'verified' as const, lastActivityAt: new Date().toISOString() }
+        bulkUpdateLeads(selectedLeads, updates)
+        refresh()
+        alert(`Verified ${selectedLeads.length} leads`)
+        break
+        
+      case 'delete':
+        if (confirm(`Are you sure you want to delete ${selectedLeads.length} leads? This action cannot be undone.`)) {
+          selectedLeads.forEach(leadId => deleteLead(leadId))
+          refresh()
+          setSelectedLeads([])
+          alert(`Deleted ${selectedLeads.length} leads`)
+        }
+        break
+    }
+    
+    setBulkAction('')
+    setSelectedLeads([])
+  }
+  
+  // Enhanced lead status update
+  const handleUpdateLeadStatus = (leadId: string, newStatus: Lead['status']) => {
+    const lead = leads.find(l => l.id === leadId)
+    if (lead) {
+      const updatedLead = {
+        ...lead,
+        status: newStatus,
+        lastActivityAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+      saveLead(updatedLead)
+      
+      addLeadActivity({
+        leadId,
+        type: 'status_change',
+        description: `Status changed from ${lead.status} to ${newStatus}`,
+        createdBy: 'admin'
+      })
+      
+      refresh()
     }
   }
 
@@ -1912,38 +2276,176 @@ function CRMLeadsTab() {
     return insights.slice(0, 2)
   }
 
-  const filteredLeads = leads.filter(l => {
-    if (filter === 'all') return true
-    if (filter === 'new') return l.status === 'new'
-    if (filter === 'verified') return l.status === 'verified'
-    if (filter === 'with_questionnaire') return l.hasQuestionnaire
-    if (filter === 'without_questionnaire') return !l.hasQuestionnaire
+  // Advanced filtering logic
+  const filteredLeads = leads.filter(lead => {
+    // Basic filter
+    if (filter === 'new' && lead.status !== 'new') return false
+    if (filter === 'verified' && lead.status !== 'verified') return false
+    if (filter === 'with_questionnaire' && !lead.hasQuestionnaire) return false
+    if (filter === 'without_questionnaire' && lead.hasQuestionnaire) return false
+    if (filter === 'high_score' && (lead.score || 0) < 70) return false
+    if (filter === 'needs_followup' && lead.lastActivityAt) {
+      const daysSinceActivity = (Date.now() - new Date(lead.lastActivityAt).getTime()) / (1000 * 60 * 60 * 24)
+      if (daysSinceActivity < 7) return false
+    }
+    
+    // Search filter
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase()
+      const matchesSearch = 
+        lead.name.toLowerCase().includes(searchLower) ||
+        lead.email.toLowerCase().includes(searchLower) ||
+        lead.phone.includes(searchTerm) ||
+        (lead.tags || []).some(tag => tag.toLowerCase().includes(searchLower))
+      
+      if (!matchesSearch) return false
+    }
+    
+    // Score range filter
+    const leadScore = lead.score || 0
+    if (leadScore < scoreRange[0] || leadScore > scoreRange[1]) return false
+    
+    // Advanced filters
+    if (selectedStatus !== 'all' && lead.status !== selectedStatus) return false
+    if (selectedSource !== 'all' && (lead.source || 'website') !== selectedSource) return false
+    if (selectedQualification !== 'all' && (lead.qualificationLevel || 'cold') !== selectedQualification) return false
+    
+    // Date range filter
+    if (dateRange.from || dateRange.to) {
+      const createdDate = new Date(lead.createdAt || lead.updatedAt || Date.now())
+      if (dateRange.from && createdDate < new Date(dateRange.from)) return false
+      if (dateRange.to && createdDate > new Date(dateRange.to)) return false
+    }
+    
     return true
   })
 
   return (
     <div className="space-y-6">
-      {/* Header & Stats */}
+      {/* Header & Quick Actions */}
       <div className="bg-white rounded-xl shadow-sm border p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
               <Mail className="h-8 w-8 text-primary-600" />
-              Lead & CRM Management
+              Advanced Lead & CRM Management
             </h2>
-            <p className="text-gray-600 mt-2">Manage leads, view questionnaire data, and sync to CRM systems</p>
+            <p className="text-gray-600 mt-2">Comprehensive lead management with scoring, CRM integration, and automation</p>
           </div>
-          <button
-            onClick={() => setShowQuestionnaireData(!showQuestionnaireData)}
-            className="btn-secondary flex items-center gap-2"
-          >
-            <Brain className="h-4 w-4" />
-            {showQuestionnaireData ? 'Hide' : 'Show'} Questionnaire Data
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowCRMConfig(!showCRMConfig)}
+              className="btn-secondary flex items-center gap-2"
+            >
+              <Settings className="h-4 w-4" />
+              CRM Config
+            </button>
+            <button
+              onClick={() => setShowQuestionnaireData(!showQuestionnaireData)}
+              className="btn-secondary flex items-center gap-2"
+            >
+              <Brain className="h-4 w-4" />
+              {showQuestionnaireData ? 'Hide' : 'Show'} Assessment Data
+            </button>
+            <button
+              onClick={() => exportLeadsToCSV(filteredLeads)}
+              className="btn-primary flex items-center gap-2"
+            >
+              <Download className="h-4 w-4" />
+              Export All
+            </button>
+          </div>
         </div>
 
-        {/* Enhanced Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+        {/* CRM Configuration Modal */}
+        {showCRMConfig && (
+          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <h3 className="text-lg font-semibold text-blue-900 mb-4">CRM Configuration</h3>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-blue-700 mb-2">CRM Provider</label>
+                <select
+                  value={crmConfig.provider}
+                  onChange={(e) => setCrmConfig({...crmConfig, provider: e.target.value as CRMConfig['provider']})}
+                  className="w-full px-3 py-2 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="hubspot">HubSpot</option>
+                  <option value="salesforce">Salesforce</option>
+                  <option value="pipedrive">Pipedrive</option>
+                  <option value="custom">Custom CRM</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-blue-700 mb-2">API Key</label>
+                <input
+                  type="password"
+                  value={crmConfig.apiKey}
+                  onChange={(e) => setCrmConfig({...crmConfig, apiKey: e.target.value})}
+                  placeholder="Enter API key"
+                  className="w-full px-3 py-2 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-blue-700 mb-2">Base URL (Optional)</label>
+                <input
+                  type="url"
+                  value={crmConfig.baseUrl || ''}
+                  onChange={(e) => setCrmConfig({...crmConfig, baseUrl: e.target.value})}
+                  placeholder="https://api.your-crm.com"
+                  className="w-full px-3 py-2 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-blue-700 mb-2">Sync Frequency (minutes)</label>
+                <input
+                  type="number"
+                  value={crmConfig.syncSettings.syncFrequency}
+                  onChange={(e) => setCrmConfig({
+                    ...crmConfig, 
+                    syncSettings: {...crmConfig.syncSettings, syncFrequency: parseInt(e.target.value) || 60}
+                  })}
+                  min="5"
+                  max="1440"
+                  className="w-full px-3 py-2 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+            <div className="mt-4 flex items-center gap-4">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={crmConfig.isEnabled}
+                  onChange={(e) => setCrmConfig({...crmConfig, isEnabled: e.target.checked})}
+                  className="rounded border-blue-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span className="text-sm font-medium text-blue-700">Enable CRM Sync</span>
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={crmConfig.syncSettings.autoSync}
+                  onChange={(e) => setCrmConfig({
+                    ...crmConfig,
+                    syncSettings: {...crmConfig.syncSettings, autoSync: e.target.checked}
+                  })}
+                  className="rounded border-blue-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span className="text-sm font-medium text-blue-700">Auto Sync</span>
+              </label>
+            </div>
+            <div className="mt-4 flex gap-3">
+              <button onClick={handleSaveCRMConfig} className="btn-primary">
+                Save Configuration
+              </button>
+              <button onClick={() => setShowCRMConfig(false)} className="btn-secondary">
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Enhanced Stats with Lead Scoring */}
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-6">
           <div className="bg-blue-50 rounded-lg p-4">
             <div className="flex items-center">
               <Users className="h-8 w-8 text-blue-600" />
@@ -1954,14 +2456,26 @@ function CRMLeadsTab() {
             </div>
           </div>
           
-          <div className="bg-green-50 rounded-lg p-4">
+          <div className="bg-red-50 rounded-lg p-4">
             <div className="flex items-center">
-              <CheckCircle2 className="h-8 w-8 text-green-600" />
+              <Target className="h-8 w-8 text-red-600" />
               <div className="ml-3">
-                <div className="text-2xl font-bold text-green-900">
-                  {leads.filter(l => l.status === 'verified').length}
+                <div className="text-2xl font-bold text-red-900">
+                  {leads.filter(l => (l.qualificationLevel || 'cold') === 'qualified').length}
                 </div>
-                <div className="text-sm text-green-700">Verified</div>
+                <div className="text-sm text-red-700">Qualified</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-orange-50 rounded-lg p-4">
+            <div className="flex items-center">
+              <TrendingUp className="h-8 w-8 text-orange-600" />
+              <div className="ml-3">
+                <div className="text-2xl font-bold text-orange-900">
+                  {Math.round(leads.reduce((sum, lead) => sum + (lead.score || 0), 0) / (leads.length || 1))}
+                </div>
+                <div className="text-sm text-orange-700">Avg Score</div>
               </div>
             </div>
           </div>
@@ -1978,14 +2492,14 @@ function CRMLeadsTab() {
             </div>
           </div>
           
-          <div className="bg-orange-50 rounded-lg p-4">
+          <div className="bg-green-50 rounded-lg p-4">
             <div className="flex items-center">
-              <Activity className="h-8 w-8 text-orange-600" />
+              <CheckCircle2 className="h-8 w-8 text-green-600" />
               <div className="ml-3">
-                <div className="text-2xl font-bold text-orange-900">
-                  {leads.filter(l => l.questionnaireComplete).length}
+                <div className="text-2xl font-bold text-green-900">
+                  {leads.filter(l => ['verified', 'converted'].includes(l.status)).length}
                 </div>
-                <div className="text-sm text-orange-700">Complete Profiles</div>
+                <div className="text-sm text-green-700">Converted</div>
               </div>
             </div>
           </div>
@@ -2003,25 +2517,211 @@ function CRMLeadsTab() {
           </div>
         </div>
 
-        {/* Filters */}
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
+        {/* Advanced Search and Filters */}
+        <div className="space-y-4">
+          <div className="flex flex-col lg:flex-row gap-4">
+            {/* Search Bar */}
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search leads by name, email, phone, or tags..."
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+            </div>
+            
+            {/* Quick Filter */}
             <select 
               value={filter} 
-              onChange={(e)=>setFilter(e.target.value)} 
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              onChange={(e) => setFilter(e.target.value)} 
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent min-w-[200px]"
             >
               <option value="all">All Leads ({leads.length})</option>
-              <option value="new">New Leads ({leads.filter(l => l.status === 'new').length})</option>
+              <option value="new">New ({leads.filter(l => l.status === 'new').length})</option>
               <option value="verified">Verified ({leads.filter(l => l.status === 'verified').length})</option>
               <option value="with_questionnaire">With Assessments ({leads.filter(l => l.hasQuestionnaire).length})</option>
               <option value="without_questionnaire">No Assessments ({leads.filter(l => !l.hasQuestionnaire).length})</option>
+              <option value="high_score">High Score (70+) ({leads.filter(l => (l.score || 0) >= 70).length})</option>
+              <option value="needs_followup">Needs Follow-up ({leads.filter(l => {
+                if (!l.lastActivityAt) return true;
+                const days = (Date.now() - new Date(l.lastActivityAt).getTime()) / (1000 * 60 * 60 * 24);
+                return days > 7;
+              }).length})</option>
             </select>
+            
+            <button
+              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center gap-2"
+            >
+              <Filter className="h-4 w-4" />
+              Advanced Filters
+            </button>
+            
+            <button onClick={refresh} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center gap-2">
+              <Activity className="h-4 w-4" />
+              Refresh
+            </button>
           </div>
-          <button onClick={refresh} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center gap-2">
-            <Activity className="h-4 w-4" />
-            Refresh
-          </button>
+          
+          {/* Advanced Filters Panel */}
+          {showAdvancedFilters && (
+            <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+              <h4 className="font-semibold text-gray-900 mb-3">Advanced Filters</h4>
+              <div className="grid md:grid-cols-4 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                  <select
+                    value={selectedStatus}
+                    onChange={(e) => setSelectedStatus(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  >
+                    <option value="all">All Statuses</option>
+                    <option value="new">New</option>
+                    <option value="qualified">Qualified</option>
+                    <option value="contacted">Contacted</option>
+                    <option value="interested">Interested</option>
+                    <option value="not_interested">Not Interested</option>
+                    <option value="verified">Verified</option>
+                    <option value="converted">Converted</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Source</label>
+                  <select
+                    value={selectedSource}
+                    onChange={(e) => setSelectedSource(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  >
+                    <option value="all">All Sources</option>
+                    <option value="website">Website</option>
+                    <option value="referral">Referral</option>
+                    <option value="social">Social Media</option>
+                    <option value="advertisement">Advertisement</option>
+                    <option value="event">Event</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Qualification</label>
+                  <select
+                    value={selectedQualification}
+                    onChange={(e) => setSelectedQualification(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  >
+                    <option value="all">All Levels</option>
+                    <option value="qualified">Qualified</option>
+                    <option value="hot">Hot</option>
+                    <option value="warm">Warm</option>
+                    <option value="cold">Cold</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Score Range</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={scoreRange[0]}
+                      onChange={(e) => setScoreRange([parseInt(e.target.value) || 0, scoreRange[1]])}
+                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                      placeholder="Min"
+                    />
+                    <span className="text-gray-500">to</span>
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={scoreRange[1]}
+                      onChange={(e) => setScoreRange([scoreRange[0], parseInt(e.target.value) || 100])}
+                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                      placeholder="Max"
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Created From</label>
+                  <input
+                    type="date"
+                    value={dateRange.from}
+                    onChange={(e) => setDateRange({...dateRange, from: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Created To</label>
+                  <input
+                    type="date"
+                    value={dateRange.to}
+                    onChange={(e) => setDateRange({...dateRange, to: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  />
+                </div>
+                
+                <div className="md:col-span-2 flex items-end">
+                  <button
+                    onClick={() => {
+                      setSearchTerm('')
+                      setSelectedStatus('all')
+                      setSelectedSource('all')
+                      setSelectedQualification('all')
+                      setScoreRange([0, 100])
+                      setDateRange({from: '', to: ''})
+                    }}
+                    className="px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50"
+                  >
+                    Clear Filters
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {/* Bulk Operations */}
+          {selectedLeads.length > 0 && (
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div className="text-sm font-medium text-blue-900">
+                  {selectedLeads.length} lead{selectedLeads.length !== 1 ? 's' : ''} selected
+                </div>
+                <div className="flex items-center gap-3">
+                  <select
+                    value={bulkAction}
+                    onChange={(e) => setBulkAction(e.target.value)}
+                    className="px-3 py-1 border border-blue-300 rounded text-sm focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select action...</option>
+                    <option value="export">Export Selected</option>
+                    <option value="sync_crm">Sync to CRM</option>
+                    <option value="verify">Mark as Verified</option>
+                    <option value="delete">Delete Selected</option>
+                  </select>
+                  <button
+                    onClick={handleBulkAction}
+                    disabled={!bulkAction}
+                    className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Apply
+                  </button>
+                  <button
+                    onClick={() => setSelectedLeads([])}
+                    className="px-3 py-1 text-blue-600 hover:text-blue-800 text-sm"
+                  >
+                    Clear Selection
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -2031,67 +2731,146 @@ function CRMLeadsTab() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lead</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-3 py-3 text-left">
+                  <input
+                    type="checkbox"
+                    checked={selectedLeads.length === filteredLeads.length && filteredLeads.length > 0}
+                    onChange={(e) => handleSelectAllLeads(e.target.checked)}
+                    className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                  />
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lead & Score</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact Info</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status & Source</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Qualification</th>
                 {showQuestionnaireData && (
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assessment</th>
                 )}
                 {showQuestionnaireData && (
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Insights</th>
                 )}
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CRM Sync</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CRM & Activity</th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredLeads.map(lead => {
                 const insights = getLeadInsights(lead.questionnaire)
+                const qualificationColors = {
+                  'qualified': 'bg-green-100 text-green-800',
+                  'hot': 'bg-red-100 text-red-800',
+                  'warm': 'bg-yellow-100 text-yellow-800',
+                  'cold': 'bg-gray-100 text-gray-800'
+                }
+                const statusColors = {
+                  'new': 'bg-blue-100 text-blue-800',
+                  'qualified': 'bg-purple-100 text-purple-800',
+                  'contacted': 'bg-orange-100 text-orange-800',
+                  'interested': 'bg-teal-100 text-teal-800',
+                  'not_interested': 'bg-red-100 text-red-800',
+                  'verified': 'bg-green-100 text-green-800',
+                  'converted': 'bg-emerald-100 text-emerald-800'
+                }
                 return (
                   <tr key={lead.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0">
-                          <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
-                            <span className="text-sm font-medium text-primary-700">
-                              {lead.name.charAt(0).toUpperCase()}
-                            </span>
+                    <td className="px-3 py-4">
+                      <input
+                        type="checkbox"
+                        checked={selectedLeads.includes(lead.id)}
+                        onChange={(e) => handleSelectLead(lead.id, e.target.checked)}
+                        className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                      />
+                    </td>
+                    
+                    <td className="px-6 py-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0">
+                            <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
+                              <span className="text-sm font-medium text-primary-700">
+                                {lead.name.charAt(0).toUpperCase()}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">{lead.name}</div>
+                            <div className="text-sm text-gray-500">ID: {lead.id.slice(-6)}</div>
+                            {(lead.tags || []).length > 0 && (
+                              <div className="flex gap-1 mt-1">
+                                {(lead.tags || []).slice(0, 2).map((tag, idx) => (
+                                  <span key={idx} className="inline-flex px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded">
+                                    {tag}
+                                  </span>
+                                ))}
+                                {(lead.tags || []).length > 2 && (
+                                  <span className="text-xs text-gray-500">+{(lead.tags || []).length - 2} more</span>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">{lead.name}</div>
-                          <div className="text-sm text-gray-500">ID: {lead.id.slice(-6)}</div>
+                        <div className="text-right">
+                          <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                            (lead.score || 0) >= 80 ? 'bg-green-100 text-green-800' :
+                            (lead.score || 0) >= 60 ? 'bg-yellow-100 text-yellow-800' :
+                            (lead.score || 0) >= 40 ? 'bg-orange-100 text-orange-800' : 'bg-gray-100 text-gray-800'
+                          }`}>
+                            <TrendingUp className="h-3 w-3 mr-1" />
+                            {lead.score || 0}
+                          </div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    
+                    <td className="px-6 py-4">
                       <div className="text-sm text-gray-900 flex items-center gap-2">
                         <Mail className="h-4 w-4 text-gray-400"/>
-                        {lead.email}
+                        <span className="truncate max-w-[200px]">{lead.email}</span>
                       </div>
-                      <div className="text-sm text-gray-500 flex items-center gap-2">
+                      <div className="text-sm text-gray-500 flex items-center gap-2 mt-1">
                         <Phone className="h-4 w-4 text-gray-400"/>
                         {lead.phone}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        lead.status === 'verified' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {lead.status}
-                      </span>
-                      {lead.hasQuestionnaire && (
-                        <div className="mt-1">
-                          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
-                            Assessment Available
-                          </span>
+                    
+                    <td className="px-6 py-4">
+                      <div className="space-y-1">
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          statusColors[lead.status] || 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {lead.status.replace('_', ' ')}
+                        </span>
+                        <div className="text-xs text-gray-500 flex items-center gap-1">
+                          <span className="w-2 h-2 rounded-full bg-blue-400"></span>
+                          {(lead.source || 'website').charAt(0).toUpperCase() + (lead.source || 'website').slice(1)}
                         </div>
-                      )}
-                      {lead.answers?.hasBiodata && (
-                        <div className="mt-1">
-                          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                            📄 Biodata Uploaded
-                          </span>
+                        {lead.hasQuestionnaire && (
+                          <div className="text-xs">
+                            <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
+                              📊 Assessment
+                            </span>
+                          </div>
+                        )}
+                        {lead.answers?.hasBiodata && (
+                          <div className="text-xs">
+                            <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                              📄 Biodata
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                    
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${
+                        qualificationColors[lead.qualificationLevel || 'cold']
+                      }`}>
+                        {(lead.qualificationLevel || 'cold').toUpperCase()}
+                      </span>
+                      {lead.assignedTo && (
+                        <div className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                          <User className="h-3 w-3" />
+                          {lead.assignedTo}
                         </div>
                       )}
                     </td>

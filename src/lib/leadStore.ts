@@ -5,6 +5,7 @@ export interface Lead {
   name: string
   email: string
   phone: string
+  password?: string // Optional password for account creation
   answers: Record<string, any>
   status: 'new' | 'verified' | 'deleted' | 'contacted'
   syncedAt?: string
