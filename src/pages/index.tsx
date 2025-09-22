@@ -164,17 +164,17 @@ function SuccessStoriesCarousel() {
       rating: 5
     },
     {
-      image: '/images/pic2.jpg',
-      names: t('successStories.stories.1.names', 'Nitin & Preeti'),
-      location: t('successStories.stories.1.location', 'Delhi, India'),
-      testimonial: t('successStories.stories.1.testimonial', 'We were just looking for someone who really understood us. Make My Knot helped us meet each other, and our connection grew naturally into something meaningful.'),
+      image: '/images/aman-muskan.svg',
+      names: t('successStories.stories.1.names', 'Aman & Muskan'),
+      location: t('successStories.stories.1.location', 'Bengaluru, Karnataka'),
+      testimonial: t('successStories.stories.1.testimonial', 'We connected on Make My Knot and soon realized how much we had in common. What started with simple conversations slowly turned into something beautiful. Today, we feel lucky to have found each other.'),
       rating: 5
     },
     {
-      image: '/images/pic3.jpg',
-      names: t('successStories.stories.2.names', 'Aman & Muskan'),
-      location: t('successStories.stories.2.location', 'Bengaluru, Karnataka'),
-      testimonial: t('successStories.stories.2.testimonial', 'We connected on Make My Knot and soon realized how much we had in common. What started with simple conversations slowly turned into something beautiful. Today, we feel lucky to have found each other.'),
+      image: '/images/naveen-mampi.svg',
+      names: t('successStories.stories.2.names', 'Naveen & Mampi'),
+      location: t('successStories.stories.2.location', 'Delhi, India'),
+      testimonial: t('successStories.stories.2.testimonial', 'We were just looking for someone who really understood us. Make My Knot helped us meet each other, and our connection grew naturally into something meaningful.'),
       rating: 5
     }
   ]
