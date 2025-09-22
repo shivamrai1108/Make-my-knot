@@ -328,8 +328,15 @@ export default function About() {
             {/* Chaman Prakash Goyal - Featured with Full Story */}
             <div className="bg-white rounded-3xl shadow-xl p-8 lg:p-12 mb-12 border border-gray-100">
               <div className="flex items-center justify-center mb-8">
-                <div className="w-24 h-24 bg-gradient-to-br from-gold-100 to-gold-200 rounded-2xl flex items-center justify-center shadow-lg">
-                  <Heart className="h-12 w-12 text-gold-600" />
+                <div className="w-32 h-32 rounded-2xl overflow-hidden shadow-lg">
+                  <Image
+                    src="/images/chaman-prakash-goyal.jpg"
+                    alt="Chaman Prakash Goyal - Visionary Founder"
+                    width={128}
+                    height={128}
+                    className="w-full h-full object-cover"
+                    priority
+                  />
                 </div>
               </div>
               
@@ -401,7 +408,7 @@ export default function About() {
                 <div className="flex-shrink-0">
                   <div className="w-80 h-96 rounded-2xl overflow-hidden shadow-lg">
                     <Image
-                      src="/images/ceo.JPG"
+                      src="/images/maulik-goyal.jpg"
                       alt="Maulik Goyal - Chief Executive Officer"
                       width={320}
                       height={384}
