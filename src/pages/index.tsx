@@ -501,143 +501,121 @@ export default function Home() {
           <link rel="icon" href="/favicon.ico" />
         </Head>
         
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          {/* Transparent Wine Glass Background with Light Blur */}
-          <div className="absolute inset-0 bg-gradient-to-br from-red-900/20 via-red-800/15 to-purple-900/25 backdrop-blur-sm">
-            {/* Additional glass layers for depth - much more transparent */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-red-700/10 via-transparent to-red-900/15 backdrop-blur-[1px]"></div>
-            <div className="absolute inset-0 bg-gradient-to-bl from-purple-800/8 via-red-600/5 to-red-800/12 backdrop-blur-[2px]"></div>
+        <div className="fixed inset-0 z-50 overflow-hidden">
+          {/* Beautiful Mobile-First Background */}
+          <div className="absolute inset-0">
+            {/* Base gradient - more vibrant but elegant */}
+            <div className="absolute inset-0 bg-gradient-to-br from-rose-600 via-purple-700 to-indigo-800"></div>
             
-            {/* Subtle wine-colored floating elements */}
-            <div className="absolute top-20 left-20 w-40 h-40 bg-red-300/5 rounded-full blur-2xl animate-pulse" style={{animationDuration: '6s'}}></div>
-            <div className="absolute bottom-32 right-16 w-64 h-64 bg-red-400/3 rounded-full blur-3xl animate-float" style={{animationDuration: '8s'}}></div>
-            <div className="absolute top-1/3 right-1/3 w-32 h-32 bg-purple-300/4 rounded-full blur-xl animate-pulse" style={{animationDelay: '2s', animationDuration: '5s'}}></div>
-            <div className="absolute bottom-1/4 left-1/4 w-48 h-48 bg-red-500/3 rounded-full blur-2xl animate-float" style={{animationDelay: '3s', animationDuration: '7s'}}></div>
-            <div className="absolute top-1/2 left-1/2 w-36 h-36 bg-red-600/2 rounded-full blur-xl animate-pulse" style={{animationDelay: '1s', animationDuration: '6s'}}></div>
+            {/* Overlay patterns for mobile */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-purple-900/20"></div>
             
-            {/* Additional subtle elements */}
-            <div className="absolute top-1/4 right-1/4 w-24 h-24 bg-purple-400/4 rounded-full blur-lg animate-float" style={{animationDelay: '4s', animationDuration: '5s'}}></div>
-            <div className="absolute bottom-1/3 right-1/3 w-20 h-20 bg-red-300/6 rounded-full blur-md animate-pulse" style={{animationDelay: '2.5s', animationDuration: '6s'}}></div>
+            {/* Mobile-optimized floating elements */}
+            <div className="absolute top-10 left-8 w-20 h-20 bg-white/5 rounded-full blur-xl animate-pulse" style={{animationDuration: '4s'}}></div>
+            <div className="absolute top-32 right-12 w-32 h-32 bg-rose-300/10 rounded-full blur-2xl animate-float" style={{animationDuration: '6s'}}></div>
+            <div className="absolute bottom-40 left-12 w-24 h-24 bg-purple-300/8 rounded-full blur-xl animate-pulse" style={{animationDelay: '2s', animationDuration: '5s'}}></div>
+            <div className="absolute bottom-20 right-16 w-16 h-16 bg-pink-300/12 rounded-full blur-lg animate-float" style={{animationDelay: '3s', animationDuration: '4s'}}></div>
+            
+            {/* Elegant sparkle effects for mobile */}
+            <div className="absolute top-16 right-8 w-2 h-2 bg-white/40 rounded-full animate-ping" style={{animationDelay: '1s'}}></div>
+            <div className="absolute top-1/3 left-6 w-1 h-1 bg-yellow-200/60 rounded-full animate-pulse" style={{animationDelay: '2.5s'}}></div>
+            <div className="absolute bottom-1/3 right-6 w-1.5 h-1.5 bg-rose-200/50 rounded-full animate-ping" style={{animationDelay: '4s'}}></div>
           </div>
           
-          <div className="relative z-10 text-center">
-            {/* Logo Animation */}
-            <motion.div
-              initial={{ scale: 0, rotate: -180 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ duration: 1, delay: 0.2, type: "spring", stiffness: 200 }}
-              className="mb-8"
-            >
-              <div className="w-32 h-32 bg-white/60 backdrop-blur-sm rounded-2xl mx-auto flex items-center justify-center shadow-2xl p-4 hover:scale-105 transition-all duration-500 border border-white/40">
-                <Image
-                  src="/images/logo.png"
-                  alt="Make My Knot Logo"
-                  width={96}
-                  height={96}
-                  className="w-full h-full object-contain"
-                  priority
-                />
-              </div>
-            </motion.div>
-            
-            {/* Brand Name */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.8 }}
-              className="mb-6 px-4"
-            >
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)]" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8), 0px 0px 12px rgba(0,0,0,0.6)'}}>
-                <span className="bg-gradient-to-r from-gold-300 to-gold-100 bg-clip-text text-transparent drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-                  {t('splash.title', 'Make My Knot')}
-                </span>
-              </h1>
+          <div className="relative z-10 h-full flex items-center justify-center px-6">
+            <div className="text-center max-w-sm mx-auto">
+              {/* Logo Animation */}
               <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8, delay: 1.2 }}
-                className="text-sm sm:text-lg md:text-xl lg:text-2xl text-white/95 font-medium italic leading-tight"
-                style={{textShadow: '1px 1px 3px rgba(0,0,0,0.9), 0px 0px 8px rgba(0,0,0,0.7)'}}
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ duration: 1, delay: 0.2, type: "spring", stiffness: 200 }}
+                className="mb-6 sm:mb-8"
               >
-                <motion.span
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 1.8 }}
-                  className="inline-block"
-                  style={{textShadow: '1px 1px 3px rgba(0,0,0,0.9)'}}
-                >
-                  From
-                </motion.span>
-                {' '}
-                <motion.span
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.8, delay: 2.2 }}
-                  className="inline-block bg-gradient-to-r from-gold-600 to-yellow-600 bg-clip-text text-transparent font-bold"
-                  style={{filter: 'drop-shadow(1px 1px 3px rgba(0,0,0,0.9))'}}
-                >
-                  Handshake
-                </motion.span>
-                {' '}
-                <motion.span
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 2.6 }}
-                  className="inline-block"
-                  style={{textShadow: '1px 1px 3px rgba(0,0,0,0.9)'}}
-                >
-                  to
-                </motion.span>
-                {' '}
-                <motion.span
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 1.0, delay: 3.0 }}
-                  className="inline-block bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent font-bold animate-pulse"
-                  style={{ animationDelay: '4s', animationDuration: '2s', filter: 'drop-shadow(1px 1px 3px rgba(0,0,0,0.9))' }}
-                >
-                  Pheras
-                </motion.span>
-              </motion.div>
-            </motion.div>
-            
-            {/* Loading Animation */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 1.6 }}
-              className="mb-8"
-            >
-              {isLoading ? (
-                <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-2 text-white/80 px-4">
-                  <div className="flex space-x-2">
-                    <div className="w-3 h-3 bg-white/60 rounded-full animate-bounce"></div>
-                    <div className="w-3 h-3 bg-white/60 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                    <div className="w-3 h-3 bg-white/60 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                  </div>
-                  <span className="text-sm sm:text-lg font-medium text-center" style={{textShadow: '1px 1px 2px rgba(0,0,0,0.9)'}}>{t('splash.loading', 'Loading your perfect matches...')}</span>
+                <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 bg-white/20 backdrop-blur-md rounded-3xl mx-auto flex items-center justify-center shadow-2xl p-3 sm:p-4 transition-all duration-500 border border-white/30">
+                  <Image
+                    src="/images/logo.png"
+                    alt="Make My Knot Logo"
+                    width={96}
+                    height={96}
+                    className="w-full h-full object-contain drop-shadow-lg"
+                    priority
+                  />
                 </div>
-              ) : (
+              </motion.div>
+            
+              {/* Brand Name */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.8 }}
+                className="mb-6"
+              >
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 drop-shadow-lg">
+                  <span className="bg-gradient-to-r from-yellow-300 via-yellow-200 to-yellow-100 bg-clip-text text-transparent">
+                    {t('splash.title', 'Make My Knot')}
+                  </span>
+                </h1>
                 <motion.div
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5 }}
-                  className="text-white/90"
+                  transition={{ duration: 0.8, delay: 1.2 }}
+                  className="text-sm sm:text-base md:text-lg text-white/90 font-medium leading-relaxed"
                 >
-                  <div className="flex items-center justify-center space-x-2 mb-4">
-                    <CheckCircle className="w-6 h-6 text-green-400" />
-                    <span className="text-lg font-semibold" style={{textShadow: '1px 1px 2px rgba(0,0,0,0.9)'}}>Ready to find your perfect match!</span>
-                  </div>
-                  <div className="w-16 h-1 bg-gradient-to-r from-green-400 to-gold-400 mx-auto rounded-full"></div>
-                </motion.div>
-              )}
+                  <motion.span
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 1.8 }}
+                    className="block text-center"
+                  >
+                    Where Love Meets Technology
+                  </motion.span>
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 2.4 }}
+                    className="flex items-center justify-center mt-2 space-x-1 text-yellow-300"
+                  >
+                    <span className="text-lg">💝</span>
+                    <span className="font-semibold">AI-Powered Matchmaking</span>
+                    <span className="text-lg">💝</span>
+                  </motion.div>
+              </motion.div>
             </motion.div>
             
-            {/* Subtle Wine-themed Floating Elements */}
-            <div className="absolute -top-10 -left-10 w-20 h-20 border border-red-200/10 rounded-full animate-spin" style={{animationDuration: '8s'}}></div>
-            <div className="absolute -bottom-10 -right-10 w-16 h-16 border-2 border-red-300/15 rounded-full animate-ping"></div>
-            <div className="absolute top-2/3 left-10 w-12 h-12 border border-purple-200/8 rounded-full animate-pulse" style={{animationDuration: '6s', animationDelay: '1s'}}></div>
-            <div className="absolute bottom-1/3 right-20 w-8 h-8 border-2 border-red-400/12 rounded-full animate-bounce" style={{animationDuration: '3s', animationDelay: '2s'}}></div>
+              {/* Loading Animation */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 1.6 }}
+                className="mt-8"
+              >
+                {isLoading ? (
+                  <div className="text-center">
+                    <div className="flex justify-center space-x-1 mb-3">
+                      <div className="w-2 h-2 bg-yellow-300 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-pink-300 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                      <div className="w-2 h-2 bg-purple-300 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                    </div>
+                    <p className="text-xs sm:text-sm text-white/80 font-medium">
+                      {t('splash.loading', 'Loading your perfect matches...')}
+                    </p>
+                  </div>
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5 }}
+                    className="text-center"
+                  >
+                    <div className="flex items-center justify-center space-x-2 mb-3">
+                      <CheckCircle className="w-5 h-5 text-green-400" />
+                      <span className="text-sm font-semibold text-white/90">Ready to find love!</span>
+                    </div>
+                    <div className="w-12 h-1 bg-gradient-to-r from-green-400 to-yellow-400 mx-auto rounded-full"></div>
+                  </motion.div>
+                )}
+              </motion.div>
+            </div>
           </div>
         </div>
       </>
