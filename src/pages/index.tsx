@@ -164,17 +164,31 @@ function SuccessStoriesCarousel() {
       rating: 5
     },
     {
+      image: '/images/pic2.jpg',
+      names: t('successStories.stories.1.names', 'Nitin & Preeti'),
+      location: t('successStories.stories.1.location', 'Delhi, India'),
+      testimonial: t('successStories.stories.1.testimonial', 'We were just looking for someone who really understood us. Make My Knot helped us meet each other, and our connection grew naturally into something meaningful.'),
+      rating: 5
+    },
+    {
+      image: '/images/pic3.jpg',
+      names: t('successStories.stories.2.names', 'Ravi & Anjali'),
+      location: t('successStories.stories.2.location', 'Pune, Maharashtra'),
+      testimonial: t('successStories.stories.2.testimonial', 'The personalized matchmaking approach at Make My Knot made all the difference. We found not just love, but a true life partnership built on shared values and mutual respect.'),
+      rating: 5
+    },
+    {
       image: '/images/aman-muskan.svg',
-      names: t('successStories.stories.1.names', 'Aman & Muskan'),
-      location: t('successStories.stories.1.location', 'Bengaluru, Karnataka'),
-      testimonial: t('successStories.stories.1.testimonial', 'We connected on Make My Knot and soon realized how much we had in common. What started with simple conversations slowly turned into something beautiful. Today, we feel lucky to have found each other.'),
+      names: t('successStories.stories.3.names', 'Aman & Muskan'),
+      location: t('successStories.stories.3.location', 'Bengaluru, Karnataka'),
+      testimonial: t('successStories.stories.3.testimonial', 'We connected on Make My Knot and soon realized how much we had in common. What started with simple conversations slowly turned into something beautiful. Today, we feel lucky to have found each other.'),
       rating: 5
     },
     {
       image: '/images/naveen-mampi.svg',
-      names: t('successStories.stories.2.names', 'Naveen & Mampi'),
-      location: t('successStories.stories.2.location', 'Delhi, India'),
-      testimonial: t('successStories.stories.2.testimonial', 'We were just looking for someone who really understood us. Make My Knot helped us meet each other, and our connection grew naturally into something meaningful.'),
+      names: t('successStories.stories.4.names', 'Naveen & Mampi'),
+      location: t('successStories.stories.4.location', 'Delhi, India'),
+      testimonial: t('successStories.stories.4.testimonial', 'The AI-powered matching was incredible. We both felt an instant connection that has only grown stronger. Make My Knot helped us find our perfect match in ways we never imagined.'),
       rating: 5
     }
   ]
