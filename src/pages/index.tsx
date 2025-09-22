@@ -115,17 +115,17 @@ function ImageSlider() {
         ))}
       </div>
       
-      {/* Navigation Buttons */}
+      {/* Navigation Buttons - Hidden on Mobile */}
       <button 
         onClick={prevSlide}
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-3 rounded-full transition-all duration-200 z-30"
+        className="hidden md:block absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-3 rounded-full transition-all duration-200 z-30"
         aria-label="Previous slide"
       >
         &#10094;
       </button>
       <button 
         onClick={nextSlide}
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-3 rounded-full transition-all duration-200 z-30"
+        className="hidden md:block absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-3 rounded-full transition-all duration-200 z-30"
         aria-label="Next slide"
       >
         &#10095;
@@ -340,24 +340,7 @@ function SuccessStoriesCarousel() {
             </div>
           ))}
           
-          {/* Mobile Navigation */}
-          <div className="absolute inset-0 flex items-center justify-between px-4 pointer-events-none z-30">
-            <button 
-              onClick={prevSlide}
-              className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white p-2 rounded-full transition-all duration-300 shadow-lg pointer-events-auto"
-              aria-label="Previous story"
-            >
-              &#10094;
-            </button>
-            
-            <button 
-              onClick={nextSlide}
-              className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white p-2 rounded-full transition-all duration-300 shadow-lg pointer-events-auto"
-              aria-label="Next story"
-            >
-              &#10095;
-            </button>
-          </div>
+          {/* Mobile Navigation - Removed for cleaner touch interface */}
           
           {/* Mobile Dots */}
           <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-30">
@@ -562,9 +545,9 @@ export default function Home() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.8 }}
-              className="mb-6"
+              className="mb-6 px-4"
             >
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)]" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8), 0px 0px 12px rgba(0,0,0,0.6)'}}>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)]" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8), 0px 0px 12px rgba(0,0,0,0.6)'}}>
                 <span className="bg-gradient-to-r from-gold-300 to-gold-100 bg-clip-text text-transparent drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
                   {t('splash.title', 'Make My Knot')}
                 </span>
@@ -573,7 +556,7 @@ export default function Home() {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8, delay: 1.2 }}
-                className="text-lg md:text-xl lg:text-2xl text-white/95 font-medium italic"
+                className="text-sm sm:text-lg md:text-xl lg:text-2xl text-white/95 font-medium italic leading-tight"
                 style={{textShadow: '1px 1px 3px rgba(0,0,0,0.9), 0px 0px 8px rgba(0,0,0,0.7)'}}
               >
                 <motion.span
@@ -626,11 +609,13 @@ export default function Home() {
               className="mb-8"
             >
               {isLoading ? (
-                <div className="flex items-center justify-center space-x-2 text-white/80">
-                  <div className="w-3 h-3 bg-white/60 rounded-full animate-bounce"></div>
-                  <div className="w-3 h-3 bg-white/60 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                  <div className="w-3 h-3 bg-white/60 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                  <span className="ml-3 text-lg font-medium" style={{textShadow: '1px 1px 2px rgba(0,0,0,0.9)'}}>{t('splash.loading', 'Loading your perfect matches...')}</span>
+                <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-2 text-white/80 px-4">
+                  <div className="flex space-x-2">
+                    <div className="w-3 h-3 bg-white/60 rounded-full animate-bounce"></div>
+                    <div className="w-3 h-3 bg-white/60 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                    <div className="w-3 h-3 bg-white/60 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                  </div>
+                  <span className="text-sm sm:text-lg font-medium text-center" style={{textShadow: '1px 1px 2px rgba(0,0,0,0.9)'}}>{t('splash.loading', 'Loading your perfect matches...')}</span>
                 </div>
               ) : (
                 <motion.div
@@ -686,16 +671,16 @@ export default function Home() {
           <div className="absolute inset-0 bg-black bg-opacity-40 z-10"></div>
           
           {/* Overlapping Content */}
-          <div className="absolute inset-0 flex items-start justify-start z-20 pt-24 sm:pt-28 md:pt-32 lg:pt-36 xl:pt-32">
+          <div className="absolute inset-0 flex items-start justify-start z-20 pt-20 sm:pt-24 md:pt-32 lg:pt-36 xl:pt-32">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
               <div className="max-w-lg">
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 sm:mb-6 drop-shadow-lg">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 sm:mb-4 md:mb-6 drop-shadow-lg leading-tight">
                   {t('hero.title', 'Find Your Perfect Life Partner')}
                 </h1>
-                <p className="text-lg sm:text-xl text-white mb-6 sm:mb-8 italic leading-relaxed drop-shadow-md">
+                <p className="text-base sm:text-lg md:text-xl text-white mb-4 sm:mb-6 md:mb-8 italic leading-relaxed drop-shadow-md">
                   {t('splash.subtitle', 'Where Love Meets Intelligence')}
                 </p>
-                <p className="text-gray-200 mb-6 sm:mb-8 text-base sm:text-lg drop-shadow-sm">
+                <p className="text-gray-200 mb-4 sm:mb-6 md:mb-8 text-sm sm:text-base md:text-lg drop-shadow-sm leading-relaxed">
                   {t('hero.description', 'Join thousands who found love through our intelligent matching system. Quality matches, verified profiles, and personalized matchmaking services.')}
                 </p>
                 
@@ -726,22 +711,22 @@ export default function Home() {
                   Launch Offer
                 </div>
                 
-                <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-6 leading-tight">
+                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6 leading-tight">
                   15 Days Free
                   <span className="block">Membership! 🎉</span>
                 </h2>
                 
-                <p className="text-base md:text-lg lg:text-xl text-white/90 mb-8 leading-relaxed">
+                <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/90 mb-6 sm:mb-8 leading-relaxed">
                   Be among the first 100 customers to experience our premium matchmaking service. 
                   Get 15 days of complete access to find your perfect match!
                 </p>
                 
-                <div className="flex flex-col sm:flex-row gap-4 mb-6">
-                  <Link href="/signup" className="bg-white text-purple-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-all duration-200 transform hover:scale-105 shadow-lg text-center">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4 sm:mb-6">
+                  <Link href="/signup" className="bg-white text-purple-600 px-6 py-3 sm:px-8 sm:py-4 rounded-lg font-semibold hover:bg-gray-100 transition-all duration-200 transform hover:scale-105 shadow-lg text-center text-sm sm:text-base">
                     Claim Free 15 Days
                   </Link>
-                  <div className="flex items-center text-white/90 text-sm">
-                    <Users className="h-5 w-5 mr-2" />
+                  <div className="flex items-center justify-center sm:justify-start text-white/90 text-xs sm:text-sm">
+                    <Users className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                     <span>Only 100 spots available</span>
                   </div>
                 </div>

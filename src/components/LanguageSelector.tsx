@@ -5,9 +5,10 @@ import { useLanguage, LANGUAGES, LanguageCode } from '@/contexts/LanguageContext
 interface LanguageSelectorProps {
   className?: string
   variant?: 'default' | 'mobile'
+  theme?: 'light' | 'dark' | 'wine-glass'
 }
 
-export default function LanguageSelector({ className = '', variant = 'default' }: LanguageSelectorProps) {
+export default function LanguageSelector({ className = '', variant = 'default', theme = 'light' }: LanguageSelectorProps) {
   const { currentLanguage, setLanguage, isLoading } = useLanguage()
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -50,6 +51,19 @@ export default function LanguageSelector({ className = '', variant = 'default' }
   }
 
   const currentLang = LANGUAGES[currentLanguage]
+  
+  // Theme-based styling
+  const getButtonClasses = () => {
+    const base = "flex items-center space-x-2 px-3 py-2 transition-all duration-200 text-sm font-medium touch-manipulation"
+    switch (theme) {
+      case 'wine-glass':
+        return `${base} text-gray-100 hover:text-white hover:bg-white/10 active:bg-white/20 rounded-md`
+      case 'dark':
+        return `${base} text-gray-300 hover:text-white hover:bg-white/10 rounded-md`
+      default:
+        return `${base} text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-md`
+    }
+  }
 
   if (variant === 'mobile') {
     return (
@@ -57,7 +71,7 @@ export default function LanguageSelector({ className = '', variant = 'default' }
         <button
           ref={buttonRef}
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center space-x-2 px-3 py-2 text-gray-700 hover:text-primary-600 transition-colors duration-200 text-sm font-medium"
+          className={getButtonClasses()}
           aria-haspopup="listbox"
           aria-expanded={isOpen}
           disabled={isLoading}
@@ -70,7 +84,7 @@ export default function LanguageSelector({ className = '', variant = 'default' }
         {isOpen && (
           <div
             ref={dropdownRef}
-            className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 py-1"
+            className="absolute top-full left-0 right-0 mt-1 bg-white/95 backdrop-blur-md border border-gray-200/50 rounded-lg shadow-lg z-[200] py-1"
             role="listbox"
           >
             {Object.entries(LANGUAGES).map(([code, lang]) => (
@@ -78,7 +92,7 @@ export default function LanguageSelector({ className = '', variant = 'default' }
                 key={code}
                 onClick={() => handleLanguageSelect(code as LanguageCode)}
                 onKeyDown={(e) => handleKeyDown(e, code as LanguageCode)}
-                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors duration-150 flex items-center space-x-3 ${
+                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 active:bg-gray-100 transition-colors duration-150 flex items-center space-x-3 touch-manipulation ${
                   currentLanguage === code ? 'bg-primary-50 text-primary-600' : 'text-gray-700'
                 }`}
                 role="option"

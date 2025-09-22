@@ -119,7 +119,7 @@ export default function Navigation({ variant = 'transparent', className = '' }: 
             </Link>
             
             {/* Language Selector */}
-            <LanguageSelector className="ml-2" />
+            <LanguageSelector className="ml-2" theme={variant === 'wine-glass' ? 'wine-glass' : variant === 'dark' ? 'dark' : 'light'} />
           </div>
 
           {/* Mobile menu button */}
@@ -175,7 +175,7 @@ export default function Navigation({ variant = 'transparent', className = '' }: 
               
               {/* Mobile Language Selector */}
               <div className="px-4 py-2">
-                <LanguageSelector variant="mobile" />
+                <LanguageSelector variant="mobile" theme={variant === 'wine-glass' ? 'wine-glass' : variant === 'dark' ? 'dark' : 'light'} />
               </div>
             </div>
           </div>

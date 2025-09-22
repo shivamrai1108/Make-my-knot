@@ -169,9 +169,8 @@ export default function About() {
 
                 {/* 2000 */}
                 <div className="relative flex items-center">
-                  <div className="flex-1 pr-8"></div>
-                  <div className="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-primary-600 rounded-full border-4 border-white"></div>
-                  <div className="flex-1 pl-8">
+                  {/* Mobile Layout */}
+                  <div className="md:hidden pl-12 w-full">
                     <div className="mb-4">
                       <div className="relative w-48 h-32 rounded-lg overflow-hidden shadow-lg">
                         <Image
@@ -182,18 +181,47 @@ export default function About() {
                         />
                       </div>
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-900">2000</h3>
-                    <h4 className="text-lg font-semibold text-primary-600 mb-2">Second Generation Leadership</h4>
-                    <div className="bg-gradient-to-r from-primary-50 to-gold-50 rounded-lg p-4 mb-4">
-                      <h5 className="font-bold text-primary-800 mb-2">Carrying Forward a Legacy of Love</h5>
+                    <h3 className="text-xl font-bold text-gray-900">2000</h3>
+                    <h4 className="text-base font-semibold text-primary-600 mb-2">Second Generation Leadership</h4>
+                    <div className="bg-gradient-to-r from-primary-50 to-gold-50 rounded-lg p-3 mb-3">
+                      <h5 className="font-bold text-primary-800 mb-1 text-sm">Carrying Forward a Legacy of Love</h5>
                     </div>
-                    <p className="text-gray-600 mb-3">
+                    <p className="text-gray-600 mb-3 text-sm">
                       In 2000, <strong>Shri Anil Goyal</strong> carried forward this legacy of matchmaking with the same passion and integrity. With over 16 years of experience, he emphasized personal attention, emotional understanding, and sincerity.
                     </p>
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 text-sm">
                       Every rishta was nurtured with care, guided by his belief that marriages are not transactions—they are lifelong commitments.
                     </p>
                   </div>
+                  {/* Desktop Layout */}
+                  <div className="hidden md:flex md:items-center md:w-full">
+                    <div className="flex-1 pr-8"></div>
+                    <div className="flex-1 pl-8">
+                      <div className="mb-4">
+                        <div className="relative w-48 h-32 rounded-lg overflow-hidden shadow-lg">
+                          <Image
+                            src="https://images.unsplash.com/photo-1606800052052-a08af7148866?w=400&h=300&fit=crop&auto=format"
+                            alt="Second generation leadership in 2000"
+                            fill
+                            className="object-cover sepia"
+                          />
+                        </div>
+                      </div>
+                      <h3 className="text-2xl font-bold text-gray-900">2000</h3>
+                      <h4 className="text-lg font-semibold text-primary-600 mb-2">Second Generation Leadership</h4>
+                      <div className="bg-gradient-to-r from-primary-50 to-gold-50 rounded-lg p-4 mb-4">
+                        <h5 className="font-bold text-primary-800 mb-2">Carrying Forward a Legacy of Love</h5>
+                      </div>
+                      <p className="text-gray-600 mb-3">
+                        In 2000, <strong>Shri Anil Goyal</strong> carried forward this legacy of matchmaking with the same passion and integrity. With over 16 years of experience, he emphasized personal attention, emotional understanding, and sincerity.
+                      </p>
+                      <p className="text-gray-600">
+                        Every rishta was nurtured with care, guided by his belief that marriages are not transactions—they are lifelong commitments.
+                      </p>
+                    </div>
+                  </div>
+                  {/* Timeline dot */}
+                  <div className="absolute left-4 md:left-1/2 transform md:-translate-x-1/2 w-6 h-6 md:w-8 md:h-8 bg-primary-600 rounded-full border-2 md:border-4 border-white"></div>
                 </div>
 
                 {/* 2010 */}
