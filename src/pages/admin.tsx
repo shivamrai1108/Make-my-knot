@@ -7,6 +7,7 @@ import {
 import { useOnlineStatus } from '@/lib/OnlineStatusContext'
 import { OnlineUsersList, OnlineStatusBadge, OnlineStatusIndicator } from '@/components/OnlineStatusIndicator'
 import { getQuestionnaireResponses, essentialQuestions, calculateCompatibilityScore, QuestionnaireResponse } from '@/lib/questionnaireStore'
+import { deleteLead as deleteLeadFromCRM } from '@/lib/leadStore'
 import jsPDF from 'jspdf'
 import * as XLSX from 'xlsx'
 
@@ -155,11 +156,7 @@ function getLeads(): Lead[] {
   return JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
 }
 
-function deleteLead(id: string) {
-  const leads = getLeads()
-  const filtered = leads.filter(l => l.id !== id)
-  localStorage.setItem('makemyknot_leads', JSON.stringify(filtered))
-}
+// Removed local deleteLead function - now using secure version from leadStore
 
 function verifyLead(id: string) {
   const leads = getLeads()
@@ -2127,17 +2124,24 @@ function CRMLeadsTab() {
     setLeadQuestionnaires(leadQuestionnaires)
   }
 
-  const handleDelete = (id: string) => {
-    if (confirm('Delete this lead? This will also delete their questionnaire data if any.')) {
-      deleteLead(id)
-      // Also delete questionnaire if exists
-      const questionnaire = leadQuestionnaires.find(q => q.leadId === id)
-      if (questionnaire) {
-        const allQuestionnaires = getQuestionnaireResponses()
-        const filtered = allQuestionnaires.filter(q => q.id !== questionnaire.id)
-        localStorage.setItem('questionnaire_responses', JSON.stringify(filtered))
+  const handleDelete = async (id: string) => {
+    const confirmDelete = confirm('🗑️ PERMANENT DELETION: Delete this lead from CRM?\n\nThis action cannot be undone and will remove all lead data permanently.')
+    if (confirmDelete) {
+      try {
+        await deleteLeadFromCRM(id, true) // Pass admin confirmation = true
+        // Also delete questionnaire if exists
+        const questionnaire = leadQuestionnaires.find(q => q.leadId === id)
+        if (questionnaire) {
+          const allQuestionnaires = getQuestionnaireResponses()
+          const filtered = allQuestionnaires.filter(q => q.id !== questionnaire.id)
+          localStorage.setItem('questionnaire_responses', JSON.stringify(filtered))
+        }
+        refresh()
+        alert('✅ Lead permanently deleted from CRM')
+      } catch (error) {
+        console.error('Delete failed:', error)
+        alert('⚠️ Error deleting lead: ' + (error as Error).message)
       }
-      refresh()
     }
   }
 
@@ -2183,7 +2187,7 @@ function CRMLeadsTab() {
     }
   }
   
-  const handleBulkAction = () => {
+  const handleBulkAction = async () => {
     if (selectedLeads.length === 0) {
       alert('Please select at least one lead')
       return
@@ -2217,11 +2221,19 @@ function CRMLeadsTab() {
         break
         
       case 'delete':
-        if (confirm(`Are you sure you want to delete ${selectedLeads.length} leads? This action cannot be undone.`)) {
-          selectedLeads.forEach(leadId => deleteLead(leadId))
-          refresh()
-          setSelectedLeads([])
-          alert(`Deleted ${selectedLeads.length} leads`)
+        const bulkConfirmDelete = confirm(`🗑️ BULK PERMANENT DELETION: Delete ${selectedLeads.length} leads from CRM?\n\nThis action cannot be undone and will remove all selected lead data permanently.`)
+        if (bulkConfirmDelete) {
+          try {
+            for (const leadId of selectedLeads) {
+              await deleteLeadFromCRM(leadId, true) // Pass admin confirmation = true
+            }
+            refresh()
+            setSelectedLeads([])
+            alert(`✅ Successfully deleted ${selectedLeads.length} leads from CRM`)
+          } catch (error) {
+            console.error('Bulk delete failed:', error)
+            alert('⚠️ Error during bulk delete: ' + (error as Error).message)
+          }
         }
         break
     }

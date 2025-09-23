@@ -5,6 +5,7 @@ import { OnlineStatusProvider } from '@/lib/OnlineStatusContext'
 import { LanguageProvider } from '@/contexts/LanguageContext'
 import Analytics from '@/components/Analytics'
 import SplashScreen from '@/components/SplashScreen'
+import { preventLeadDataLoss } from '@/lib/leadStore'
 import { useState, useEffect } from 'react'
 
 export default function App({ Component, pageProps }: AppProps) {
@@ -12,6 +13,11 @@ export default function App({ Component, pageProps }: AppProps) {
   const [isFirstLoad, setIsFirstLoad] = useState(true)
 
   useEffect(() => {
+    // Initialize lead data protection
+    if (typeof window !== 'undefined') {
+      preventLeadDataLoss()
+    }
+    
     // Check if this is the first visit
     const hasVisited = sessionStorage.getItem('hasVisited')
     if (hasVisited) {

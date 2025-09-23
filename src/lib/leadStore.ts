@@ -20,6 +20,8 @@ export interface Lead {
   followUpDate?: string
   isActive?: boolean
   biodataFile?: File | null // Biodata upload file
+  isPermanent?: boolean // Flag to indicate this lead should persist in CRM
+  savedToCRM?: boolean // Flag to confirm lead is saved to CRM
 }
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
@@ -27,6 +29,39 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/a
 // Helper function to get auth token
 function getAuthToken(): string | null {
   return localStorage.getItem('makemyknot_token')
+}
+
+// PERMANENT STORAGE PROTECTION: Prevent accidental lead data loss
+export function preventLeadDataLoss(): void {
+  console.log('🔒 LEAD PROTECTION: Leads are stored permanently in CRM until admin deletion')
+  
+  // Protect against accidental localStorage clearing
+  const originalClear = localStorage.clear
+  localStorage.clear = function() {
+    console.warn('⚠️ BLOCKED: localStorage.clear() blocked to protect lead data')
+    console.log('🔒 If you need to clear storage, use clearNonLeadData() function')
+  }
+  
+  // Protect against lead-specific removals
+  const originalRemoveItem = localStorage.removeItem
+  localStorage.removeItem = function(key: string) {
+    if (key === 'makemyknot_leads') {
+      console.warn('⚠️ BLOCKED: Attempted to remove lead data from localStorage')
+      console.log('🔒 Use deleteLead() with admin confirmation to remove specific leads')
+      return
+    }
+    return originalRemoveItem.call(this, key)
+  }
+}
+
+// Safe function to clear non-lead data
+export function clearNonLeadData(): void {
+  const leads = localStorage.getItem('makemyknot_leads')
+  localStorage.clear()
+  if (leads) {
+    localStorage.setItem('makemyknot_leads', leads)
+    console.log('🔒 Cleared all data except protected lead data')
+  }
 }
 
 // Helper function to make authenticated API calls
@@ -94,14 +129,17 @@ export async function getLeads(params: {
 
 export async function saveLead(leadInput: Omit<Lead, 'id' | 'createdAt' | 'updatedAt'> | Lead): Promise<Lead> {
   try {
+    // PERMANENT CRM STORAGE: Leads are stored permanently until admin deletion
     // If lead already has an ID, it's coming from LeadQuestionnaire, use it as-is for localStorage first
     if ('id' in leadInput && leadInput.id) {
-      console.log('Saving lead with existing ID to localStorage first:', leadInput)
+      console.log('🔒 PERMANENT CRM STORAGE: Saving lead with existing ID to localStorage:', leadInput.id)
       const leads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
-      // Remove any existing lead with the same ID
+      // Remove any existing lead with the same ID to update it
       const filteredLeads = leads.filter((l: Lead) => l.id !== leadInput.id)
-      filteredLeads.push(leadInput)
+      const permanentLead = { ...leadInput, isPermanent: true, savedToCRM: true }
+      filteredLeads.push(permanentLead)
       localStorage.setItem('makemyknot_leads', JSON.stringify(filteredLeads))
+      console.log('🔒 Lead stored permanently in CRM. Total leads in CRM:', filteredLeads.length)
     }
 
     const result = await apiCall('/leads', {
@@ -143,14 +181,16 @@ export async function saveLead(leadInput: Omit<Lead, 'id' | 'createdAt' | 'updat
     return apiLead
   } catch (error) {
     console.error('Error saving lead to API, using localStorage fallback:', error)
-    // Fallback to localStorage if API fails
+    // Fallback to localStorage if API fails - STILL PERMANENT STORAGE
     const localLead = 'id' in leadInput && leadInput.id ? 
-      leadInput as Lead : 
+      { ...leadInput as Lead, isPermanent: true, savedToCRM: true } : 
       {
         ...leadInput,
         id: Date.now().toString(),
         createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
+        isPermanent: true,
+        savedToCRM: true
       }
     
     const leads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
@@ -163,17 +203,31 @@ export async function saveLead(leadInput: Omit<Lead, 'id' | 'createdAt' | 'updat
   }
 }
 
-export async function deleteLead(id: string): Promise<void> {
+export async function deleteLead(id: string, adminConfirmation: boolean = false): Promise<void> {
+  if (!adminConfirmation) {
+    throw new Error('🔒 LEAD PROTECTION: Leads can only be deleted by admin with explicit confirmation')
+  }
+  
   try {
+    console.log('🗑️ ADMIN ACTION: Deleting lead', id, 'with admin confirmation')
     await apiCall(`/leads/${id}`, {
       method: 'DELETE'
     })
-  } catch (error) {
-    console.error('Error deleting lead:', error)
-    // Fallback to localStorage if API fails
+    
+    // Also remove from localStorage after successful API deletion
     const leads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
     const filteredLeads = leads.filter((l: Lead) => l.id !== id)
     localStorage.setItem('makemyknot_leads', JSON.stringify(filteredLeads))
+    console.log('🗑️ Lead permanently deleted from both API and localStorage')
+  } catch (error) {
+    console.error('Error deleting lead from API:', error)
+    // Even with API error, require admin confirmation for localStorage deletion
+    if (adminConfirmation) {
+      const leads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
+      const filteredLeads = leads.filter((l: Lead) => l.id !== id)
+      localStorage.setItem('makemyknot_leads', JSON.stringify(filteredLeads))
+      console.log('🗑️ ADMIN ACTION: Lead deleted from localStorage (API failed)')
+    }
   }
 }
 

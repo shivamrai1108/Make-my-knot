@@ -446,17 +446,15 @@ function TestimonialsSection() {
 export default function Home() {
   const { t } = useLanguage()
   
-  // Clean up completed lead sessions on page load
+  // Keep assessment completion status without clearing lead data
   useEffect(() => {
     const leadId = sessionStorage.getItem('leadId')
     if (leadId) {
       const assessmentCompleted = sessionStorage.getItem(`assessment_completed_${leadId}`)
       if (assessmentCompleted === 'true') {
-        // Assessment is completed, clear all lead-related session storage
-        console.log('Cleaning up completed lead session on home page load')
-        sessionStorage.removeItem('leadSubmitted')
-        sessionStorage.removeItem('leadId')
-        // Keep the assessment_completed flag for future reference but clean up lead flow
+        // Assessment is completed - lead data should remain in CRM permanently
+        console.log('Assessment completed for lead:', leadId, '- Lead data preserved in CRM')
+        // DO NOT remove lead data - it should persist until admin manually deletes it
       }
     }
   }, [])

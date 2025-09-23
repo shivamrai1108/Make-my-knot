@@ -68,16 +68,9 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
       })
       
       if (assessmentCompleted === 'true') {
-        // Assessment is completed, clear the lead submission state to allow fresh start
-        console.log('Assessment already completed, clearing lead submission state and staying on fresh home page')
-        sessionStorage.removeItem('leadSubmitted')
-        sessionStorage.removeItem('leadId')
-        // Clear any other lead-related session items except the completed flag
-        Object.keys(sessionStorage).forEach(key => {
-          if (key.startsWith('lead_') && !key.includes('assessment_completed_')) {
-            sessionStorage.removeItem(key)
-          }
-        })
+        // Assessment is completed - lead data remains in CRM permanently
+        console.log('Assessment already completed for lead:', storedLeadId, '- Lead data preserved in CRM')
+        // DO NOT clear lead data - it should persist until admin manually deletes it
         return // Don't show the countdown screen - stay on normal home page
       }
       

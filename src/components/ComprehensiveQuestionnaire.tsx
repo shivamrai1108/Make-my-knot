@@ -428,30 +428,15 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
             {/* Okay Button */}
             <button
               onClick={() => {
-                // Clear all lead-related session storage to ensure fresh home page experience
+                // Keep lead data in CRM permanently - do NOT clear lead storage
                 const sessionLeadId = sessionStorage.getItem('leadId')
                 if (sessionLeadId) {
-                  // Keep the assessment completed flag for future reference
-                  const assessmentCompletedFlag = sessionStorage.getItem(`assessment_completed_${sessionLeadId}`)
-                  
-                  // Clear all lead flow related storage
-                  sessionStorage.removeItem('leadSubmitted')
-                  sessionStorage.removeItem('leadId')
-                  
-                  // Re-set the assessment completed flag if it was there
-                  if (assessmentCompletedFlag) {
-                    sessionStorage.setItem(`assessment_completed_${sessionLeadId}`, 'true')
-                  }
+                  // Mark assessment as completed but preserve lead data
+                  sessionStorage.setItem(`assessment_completed_${sessionLeadId}`, 'true')
+                  console.log('Assessment completed for lead:', sessionLeadId, '- Lead data preserved in CRM permanently')
                 }
                 
-                // Also clear any other lead-related storage items
-                Object.keys(sessionStorage).forEach(key => {
-                  if (key.startsWith('lead_') && !key.includes('assessment_completed_')) {
-                    sessionStorage.removeItem(key)
-                  }
-                })
-                
-                console.log('Cleared lead session storage, redirecting to fresh home page')
+                console.log('Redirecting to home page - lead data remains in CRM for admin access')
                 
                 // Redirect to home page
                 window.location.href = '/'
