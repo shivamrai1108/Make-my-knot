@@ -49,6 +49,7 @@ import {
   Star
 } from 'lucide-react'
 import BrandLogo from '@/components/BrandLogo'
+import { getRecentContactSubmissions, getContactSubmissionCount } from '../api/contact'
 
 // Enhanced interfaces
 interface UserProfile {
@@ -132,14 +133,14 @@ const mockOffers: Offer[] = []
 
 const adminRoles: AdminRole[] = [
   { id: 'super', name: 'Super Admin', permissions: ['*'] },
-  { id: 'manager', name: 'Manager', permissions: ['users', 'webinars', 'analytics', 'offers'] },
-  { id: 'support', name: 'Support Agent', permissions: ['users:read', 'messages', 'support'] },
+  { id: 'manager', name: 'Manager', permissions: ['users', 'webinars', 'analytics', 'offers', 'contacts'] },
+  { id: 'support', name: 'Support Agent', permissions: ['users:read', 'messages', 'contacts', 'support'] },
   { id: 'content', name: 'Content Manager', permissions: ['webinars', 'content'] }
 ]
 
 export default function EnhancedAdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'messages' | 'offers' | 'webinars' | 'analytics' | 'roles'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'messages' | 'contacts' | 'offers' | 'webinars' | 'analytics' | 'roles'>('overview')
   const [users, setUsers] = useState<UserProfile[]>(mockUsers)
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null)
   const [showUserDetails, setShowUserDetails] = useState(false)
@@ -149,11 +150,19 @@ export default function EnhancedAdminDashboard() {
   const [newMessage, setNewMessage] = useState('')
   const [selectedUserForMessage, setSelectedUserForMessage] = useState<string | null>(null)
   const [currentAdminRole, setCurrentAdminRole] = useState('super')
+  const [contactSubmissions, setContactSubmissions] = useState<any[]>([])
   const router = useRouter()
 
   useEffect(() => {
     // Mock authentication check
     setIsAuthenticated(true)
+    // Load contact submissions
+    try {
+      const submissions = getRecentContactSubmissions()
+      setContactSubmissions(submissions)
+    } catch (error) {
+      console.error('Error loading contact submissions:', error)
+    }
   }, [])
 
   const hasPermission = (permission: string): boolean => {
@@ -320,6 +329,7 @@ export default function EnhancedAdminDashboard() {
                 { id: 'overview', label: 'Overview', icon: BarChart3, permission: 'overview' },
                 { id: 'users', label: 'User Management', icon: Users, permission: 'users' },
                 { id: 'messages', label: 'Messages', icon: MessageSquare, permission: 'messages' },
+                { id: 'contacts', label: 'Contact Forms', icon: Mail, permission: 'contacts' },
                 { id: 'offers', label: 'Offers', icon: Gift, permission: 'offers' },
                 { id: 'webinars', label: 'Webinars', icon: Video, permission: 'webinars' },
                 { id: 'analytics', label: 'Analytics', icon: TrendingUp, permission: 'analytics' },
@@ -379,13 +389,13 @@ export default function EnhancedAdminDashboard() {
 
                 <div className="bg-white rounded-xl p-6 shadow-sm border">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-medium text-gray-600">Messages Today</h3>
-                    <MessageSquare className="h-5 w-5 text-purple-600" />
+                    <h3 className="text-sm font-medium text-gray-600">Contact Forms</h3>
+                    <Mail className="h-5 w-5 text-purple-600" />
                   </div>
-                  <div className="text-2xl font-bold text-gray-900">89</div>
-                  <div className="text-sm text-red-600 mt-1 flex items-center">
-                    <AlertCircle className="h-3 w-3 mr-1" />
-                    12 urgent
+                  <div className="text-2xl font-bold text-gray-900">{getContactSubmissionCount() || 0}</div>
+                  <div className="text-sm text-green-600 mt-1 flex items-center">
+                    <TrendingUp className="h-3 w-3 mr-1" />
+                    New inquiries
                   </div>
                 </div>
 
@@ -842,8 +852,113 @@ export default function EnhancedAdminDashboard() {
             </div>
           )}
 
+          {/* Contact Forms Tab */}
+          {activeTab === 'contacts' && (
+            <div className="bg-white rounded-xl shadow-sm border">
+              <div className="p-6 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-xl font-semibold text-gray-900">Contact Form Submissions</h2>
+                    <p className="text-gray-600 mt-1">Manage and respond to customer inquiries</p>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <span className="text-sm text-gray-500">
+                      Total: {getContactSubmissionCount() || 0} submissions
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="divide-y divide-gray-200">
+                {contactSubmissions.length === 0 ? (
+                  <div className="p-8 text-center">
+                    <Mail className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No submissions yet</h3>
+                    <p className="text-gray-600">
+                      Contact form submissions will appear here once users start contacting you.
+                    </p>
+                  </div>
+                ) : (
+                  contactSubmissions.map((submission, index) => (
+                    <div key={index} className="p-6 hover:bg-gray-50 transition-colors">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-3 mb-2">
+                            <h3 className="font-semibold text-gray-900">{submission.name}</h3>
+                            <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+                              {submission.subject.replace('-', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                            </span>
+                            <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
+                              {submission.preferredContactMethod}
+                            </span>
+                          </div>
+                          
+                          <div className="flex items-center space-x-4 text-sm text-gray-600 mb-3">
+                            <div className="flex items-center">
+                              <Mail className="h-4 w-4 mr-1" />
+                              {submission.email}
+                            </div>
+                            <div className="flex items-center">
+                              <Phone className="h-4 w-4 mr-1" />
+                              {submission.phone}
+                            </div>
+                            <div className="flex items-center">
+                              <Clock className="h-4 w-4 mr-1" />
+                              {formatDate(submission.submittedAt)}
+                            </div>
+                          </div>
+                          
+                          <p className="text-gray-700 text-sm leading-relaxed">
+                            {submission.message}
+                          </p>
+                        </div>
+                        
+                        <div className="flex items-center space-x-2 ml-4">
+                          <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                            <Eye className="h-4 w-4" />
+                          </button>
+                          <button className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors">
+                            <Send className="h-4 w-4" />
+                          </button>
+                          <button className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <div className="mt-4 flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-xs text-gray-500">Source: {submission.source}</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <button className="px-3 py-1 text-xs bg-blue-100 text-blue-800 rounded-full hover:bg-blue-200 transition-colors">
+                            Reply via {submission.preferredContactMethod}
+                          </button>
+                          <button className="px-3 py-1 text-xs bg-gray-100 text-gray-800 rounded-full hover:bg-gray-200 transition-colors">
+                            Mark as Processed
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+              
+              {contactSubmissions.length > 0 && (
+                <div className="p-6 bg-gray-50 border-t border-gray-200">
+                  <div className="flex items-center justify-between text-sm text-gray-600">
+                    <span>Showing {contactSubmissions.length} most recent submissions</span>
+                    <button className="text-blue-600 hover:text-blue-800 font-medium">
+                      View All Submissions
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          
           {/* Other tabs placeholder */}
-          {activeTab !== 'overview' && activeTab !== 'users' && (
+          {activeTab !== 'overview' && activeTab !== 'users' && activeTab !== 'contacts' && (
             <div className="bg-white rounded-xl p-8 shadow-sm border text-center">
               <h2 className="text-xl font-semibold text-gray-900 mb-4">
                 {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Management
