@@ -9,7 +9,7 @@ export default function PricingPage() {
     <>
       <Head>
         <title>Pricing Coming Soon - Make My Knot</title>
-        <meta name="description" content="Our pricing plans are coming soon. Join the waitlist to get early access to our matchmaking services." />
+        <meta name="description" content="From Handshakes to Pheras - Our pricing plans are coming soon. Join the waitlist to get early access to our trusted matchmaking services." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>

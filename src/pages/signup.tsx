@@ -180,7 +180,7 @@ export default function Signup() {
     <>
       <Head>
         <title>Sign Up - Make My Knot</title>
-        <meta name="description" content="Join Make My Knot to find your perfect life partner through AI-powered matchmaking." />
+        <meta name="description" content="From Handshakes to Pheras - Join Make My Knot to find your perfect life partner through our trusted matchmaking service." />
       </Head>
 
       <Navigation variant="white" />

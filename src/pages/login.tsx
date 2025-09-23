@@ -67,7 +67,7 @@ export default function Login() {
     <>
       <Head>
         <title>Sign In - Make My Knot</title>
-        <meta name="description" content="Sign in to your Make My Knot account to find your perfect life partner." />
+        <meta name="description" content="From Handshakes to Pheras - Sign in to your Make My Knot account to continue your journey to finding your perfect life partner." />
       </Head>
 
       <Navigation variant="white" />

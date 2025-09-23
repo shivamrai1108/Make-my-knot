@@ -24,7 +24,7 @@ export default function Footer() {
               <span className="text-2xl font-bold">{t('footer.company', 'Make My Knot')}</span>
             </div>
             <p className="text-gray-400 mb-6">
-              {t('footer.tagline', 'Where Hearts Meet Intelligence')}
+              {t('footer.tagline', 'From Handshakes to Pheras')}
             </p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-primary-400 transition-colors">

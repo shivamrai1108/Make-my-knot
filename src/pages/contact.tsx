@@ -164,7 +164,7 @@ export default function Contact() {
         <title>Contact Us - Make My Knot | Get in Touch for Your Perfect Match</title>
         <meta 
           name="description" 
-          content="Contact Make My Knot for personalized matchmaking services. Get in touch with our CEO Moulik Goyal and our expert team. We're here to help you find your perfect life partner." 
+          content="From Handshakes to Pheras - Contact Make My Knot for personalized matchmaking services. Get in touch with our CEO Moulik Goyal and our expert team to find your perfect life partner." 
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />

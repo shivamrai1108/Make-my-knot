@@ -464,8 +464,8 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Make My Knot - AI-Powered Wedding Matchmaking</title>
-        <meta name="description" content="Find your perfect life partner with our AI-powered matchmaking platform. Quality matches, compatibility-based pairing, and personalized service." />
+        <title>Make My Knot - From Handshakes to Pheras</title>
+        <meta name="description" content="From Handshakes to Pheras - Find your perfect life partner with our trusted matchmaking service. Quality matches, personalized service, and 50 years of experience." />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
@@ -495,7 +495,7 @@ export default function Home() {
                   {t('hero.title', 'Find Your Perfect Life Partner')}
                 </h1>
                 <p className="text-base sm:text-lg md:text-xl text-white mb-4 sm:mb-6 md:mb-8 italic leading-relaxed drop-shadow-md">
-                  {t('splash.subtitle', 'Where Love Meets Intelligence')}
+                  {t('splash.subtitle', 'From Handshakes to Pheras')}
                 </p>
                 <p className="text-gray-200 mb-4 sm:mb-6 md:mb-8 text-sm sm:text-base md:text-lg drop-shadow-sm leading-relaxed">
                   {t('hero.description', 'Join thousands who found love through our intelligent matching system. Quality matches, verified profiles, and personalized matchmaking services.')}

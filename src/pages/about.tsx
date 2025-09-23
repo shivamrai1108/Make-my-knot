@@ -11,7 +11,7 @@ export default function About() {
     <>
       <Head>
         <title>About Us - Make My Knot | Our Legacy: From 1975 to 2025</title>
-        <meta name="description" content="Discover our 3-generation legacy of bringing families together since 1975. From Chaman Prakash Goyal's foundation to today's AI-powered platform - 50 years of matches made with Mannat, not just metrics." />
+        <meta name="description" content="From Handshakes to Pheras - Discover our 3-generation legacy since 1975. 50 years of trusted matchmaking from Chaman Prakash Goyal's foundation to today's personalized platform." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>

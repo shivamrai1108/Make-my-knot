@@ -348,7 +348,7 @@ export default function Dashboard() {
     <>
       <Head>
         <title>Dashboard - Make My Knot</title>
-        <meta name="description" content="Your personal dashboard for finding your perfect life partner." />
+        <meta name="description" content="From Handshakes to Pheras - Your personal dashboard for finding your perfect life partner through trusted matchmaking." />
       </Head>
 
       <main className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-gold-50">
