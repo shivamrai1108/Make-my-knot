@@ -355,41 +355,47 @@ export default function About() {
 
             {/* Chaman Prakash Goyal - Featured with Full Story */}
             <div className="bg-white rounded-3xl shadow-xl p-8 lg:p-12 mb-12 border border-gray-100">
-              <div className="flex items-center justify-center mb-8">
-                <div className="w-48 h-48 rounded-2xl overflow-hidden shadow-lg">
-                  <Image
-                    src="/images/chaman-prakash-goyal.jpg"
-                    alt="Shri Chaman Prakash Goyal - Visionary Founder"
-                    width={192}
-                    height={192}
-                    className="w-full h-full object-cover"
-                    priority
-                  />
+              <div className="flex flex-col lg:flex-row items-start gap-8">
+                {/* Image on Left */}
+                <div className="flex-shrink-0">
+                  <div className="w-64 h-80 rounded-2xl overflow-hidden shadow-lg">
+                    <Image
+                      src="/images/chaman-prakash-goyal.jpg"
+                      alt="Shri Chaman Prakash Goyal - Visionary Founder"
+                      width={256}
+                      height={320}
+                      className="w-full h-full object-cover"
+                      priority
+                    />
+                  </div>
                 </div>
-              </div>
-              
-              <div className="text-center mb-8">
-                <h3 className="text-3xl font-bold text-gray-900 mb-2">Shri Chaman Prakash Goyal</h3>
-                <p className="text-xl text-gold-600 font-semibold">Visionary Founder • 1975</p>
-              </div>
-              
-              <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed text-center">
-                <p className="mb-6">
-                  In 1975, Chaman Prakash Goyal laid the foundation of Goyal Marriage Bureau, planting the roots of what has become one of the most trusted matchmaking services in India. His belief was simple yet powerful: every rishta deserves honesty, care, and blessings.
-                </p>
                 
-                <p className="mb-6">
-                  At a time when matchmaking was limited to biodatas and formalities, Chaman Prakash Goyal brought heart into the process. He personally met families, understood their values, and ensured that every match was built on trust and compatibility. His dedication turned countless dreams into successful marriages, earning him respect as one of India's most reliable matchmakers.
-                </p>
-                
-                <p className="mb-8">
-                  For him, shaadi was never just about two individuals, but about uniting families. With sincerity, blessings, and a personal touch, he created a legacy of meaningful connections—one that continues to inspire generations.
-                </p>
-                
-                <div className="bg-gradient-to-r from-primary-50 to-gold-50 rounded-2xl p-6 border-l-4 border-gold-400">
-                  <div className="text-center">
-                    <p className="text-lg font-medium text-primary-800 mb-2">His guiding philosophy that lives on today:</p>
-                    <p className="text-2xl font-bold text-primary-900 italic">"Matches Made with Mannat, Not Just Metrics"</p>
+                {/* Content on Right */}
+                <div className="flex-1">
+                  <div className="mb-6">
+                    <h3 className="text-3xl font-bold text-gray-900 mb-2">Shri Chaman Prakash Goyal</h3>
+                    <p className="text-xl text-gold-600 font-semibold">Visionary Founder • 1975</p>
+                  </div>
+                  
+                  <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed">
+                    <p className="mb-6">
+                      In 1975, <strong>Shri Chaman Prakash Goyal</strong> laid the foundation of Goyal Marriage Bureau, planting the roots of what has become one of the most trusted matchmaking services in India. His belief was simple yet powerful: every rishta deserves honesty, care, and blessings.
+                    </p>
+                    
+                    <p className="mb-6">
+                      At a time when matchmaking was limited to biodatas and formalities, Shri Chaman Prakash Goyal brought heart into the process. He personally met families, understood their values, and ensured that every match was built on trust and compatibility. His dedication turned countless dreams into successful marriages, earning him respect as one of India's most reliable matchmakers.
+                    </p>
+                    
+                    <p className="mb-8">
+                      For him, shaadi was never just about two individuals, but about uniting families. With sincerity, blessings, and a personal touch, he created a legacy of meaningful connections—one that continues to inspire generations.
+                    </p>
+                    
+                    <div className="bg-gradient-to-r from-primary-50 to-gold-50 rounded-2xl p-6 border-l-4 border-gold-400">
+                      <div className="text-center">
+                        <p className="text-lg font-medium text-primary-800 mb-2">His guiding philosophy that lives on today:</p>
+                        <p className="text-2xl font-bold text-primary-900 italic">"Matches Made with Mannat, Not Just Metrics"</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -397,20 +403,34 @@ export default function About() {
 
             {/* Anil Goyal - Featured */}
             <div className="bg-white rounded-2xl shadow-lg p-8 mb-12">
-              <div className="flex flex-col lg:flex-row items-center gap-8">
+              <div className="flex flex-col lg:flex-row items-start gap-8">
+                {/* Image on Left */}
                 <div className="flex-shrink-0">
-                  <div className="w-32 h-32 bg-gradient-to-br from-green-100 to-green-200 rounded-2xl flex items-center justify-center mx-auto shadow-lg">
-                    <div className="text-4xl font-bold text-green-600">AG</div>
+                  <div className="w-64 h-80 rounded-2xl overflow-hidden shadow-lg">
+                    <Image
+                      src="/images/anil-goyal.jpg"
+                      alt="Shri Anil Goyal - Managing Director"
+                      width={256}
+                      height={320}
+                      className="w-full h-full object-cover"
+                      priority
+                    />
                   </div>
                 </div>
-                <div className="flex-1 text-center lg:text-left">
-                  <h3 className="text-3xl font-bold text-gray-900 mb-2">Shri Anil Goyal</h3>
-                  <div className="text-xl text-green-600 font-semibold mb-6">Managing Director</div>
+                
+                {/* Content on Right */}
+                <div className="flex-1">
+                  <div className="mb-6">
+                    <h3 className="text-3xl font-bold text-gray-900 mb-2">Shri Anil Goyal</h3>
+                    <div className="text-xl text-green-600 font-semibold">Managing Director</div>
+                  </div>
+                  
                   <p className="text-gray-600 leading-relaxed mb-6 text-lg">
-                    The bridge between tradition and modernity, Shri Anil Goyal dedicated over 16 years to nurturing the family vision
+                    The bridge between tradition and modernity, <strong>Shri Anil Goyal</strong> dedicated over 16 years to nurturing the family vision
                     with deep care and emotional understanding. He ensured every rishta was handled with love and sincerity, 
                     continuing the legacy with personal attention to each family's needs.
                   </p>
+                  
                   <div className="grid md:grid-cols-2 gap-6 text-sm text-gray-600">
                     <div>
                       <strong className="text-gray-900">Experience:</strong><br />
