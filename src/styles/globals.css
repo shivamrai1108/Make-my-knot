@@ -1485,6 +1485,7 @@
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
   will-change: scroll-position;
+  contain: layout style paint;
 }
 
 .scroll-stack-inner {
@@ -1514,6 +1515,8 @@
   position: relative;
   background: white;
   overflow: hidden;
+  contain: layout style paint;
+  isolation: isolate;
 }
 
 .scroll-stack-end {

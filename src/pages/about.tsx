@@ -368,7 +368,7 @@ export default function About() {
                           width={256}
                           height={320}
                           className="w-full h-full object-cover"
-                          priority
+                          loading="lazy"
                         />
                       </div>
                     </div>
@@ -400,7 +400,7 @@ export default function About() {
                           width={256}
                           height={320}
                           className="w-full h-full object-cover"
-                          priority
+                          loading="lazy"
                         />
                       </div>
                     </div>
@@ -440,7 +440,7 @@ export default function About() {
                           width={320}
                           height={384}
                           className="w-full h-full object-cover"
-                          priority
+                          loading="lazy"
                         />
                       </div>
                     </div>

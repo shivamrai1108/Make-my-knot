@@ -6,7 +6,6 @@ import { LanguageProvider } from '@/contexts/LanguageContext'
 import Analytics from '@/components/Analytics'
 import SplashScreen from '@/components/SplashScreen'
 import { useState, useEffect } from 'react'
-import '@/styles/globals.css'
 
 export default function App({ Component, pageProps }: AppProps) {
   const [showSplash, setShowSplash] = useState(true)

@@ -126,19 +126,19 @@ const ScrollStack = ({
       }
 
       const newTransform = {
-        translateY: Math.round(translateY * 100) / 100,
-        scale: Math.round(scale * 1000) / 1000,
-        rotation: Math.round(rotation * 100) / 100,
-        blur: Math.round(blur * 100) / 100
+        translateY: Math.round(translateY),
+        scale: Math.round(scale * 100) / 100,
+        rotation: Math.round(rotation),
+        blur: Math.round(blur)
       };
 
       const lastTransform = lastTransformsRef.current.get(i);
       const hasChanged =
         !lastTransform ||
-        Math.abs(lastTransform.translateY - newTransform.translateY) > 0.1 ||
-        Math.abs(lastTransform.scale - newTransform.scale) > 0.001 ||
-        Math.abs(lastTransform.rotation - newTransform.rotation) > 0.1 ||
-        Math.abs(lastTransform.blur - newTransform.blur) > 0.1;
+        Math.abs(lastTransform.translateY - newTransform.translateY) > 0.5 ||
+        Math.abs(lastTransform.scale - newTransform.scale) > 0.01 ||
+        Math.abs(lastTransform.rotation - newTransform.rotation) > 0.5 ||
+        Math.abs(lastTransform.blur - newTransform.blur) > 0.5;
 
       if (hasChanged) {
         const transform = `translate3d(0, ${newTransform.translateY}px, 0) scale(${newTransform.scale}) rotate(${newTransform.rotation}deg)`;
@@ -179,30 +179,34 @@ const ScrollStack = ({
   ]);
 
   const handleScroll = useCallback(() => {
-    updateCardTransforms();
+    if (animationFrameRef.current) return; // Already queued
+    animationFrameRef.current = requestAnimationFrame(() => {
+      updateCardTransforms();
+      animationFrameRef.current = null;
+    });
   }, [updateCardTransforms]);
 
   const setupLenis = useCallback(() => {
     if (useWindowScroll) {
       const lenis = new Lenis({
-        duration: 1.2,
-        easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        duration: 0.8,
+        easing: t => 1 - Math.pow(1 - t, 3),
         smoothWheel: true,
-        touchMultiplier: 2,
+        touchMultiplier: 1.8,
         infinite: false,
-        wheelMultiplier: 1,
-        lerp: 0.1,
+        wheelMultiplier: 0.8,
+        lerp: 0.08,
         syncTouch: true,
-        syncTouchLerp: 0.075
+        syncTouchLerp: 0.1
       });
 
       lenis.on('scroll', handleScroll);
 
       const raf = time => {
         lenis.raf(time);
-        animationFrameRef.current = requestAnimationFrame(raf);
+        requestAnimationFrame(raf);
       };
-      animationFrameRef.current = requestAnimationFrame(raf);
+      requestAnimationFrame(raf);
 
       lenisRef.current = lenis;
       return lenis;
@@ -213,28 +217,28 @@ const ScrollStack = ({
       const lenis = new Lenis({
         wrapper: scroller,
         content: scroller.querySelector('.scroll-stack-inner'),
-        duration: 1.2,
-        easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        duration: 0.6,
+        easing: t => 1 - Math.pow(1 - t, 3),
         smoothWheel: true,
-        touchMultiplier: 2,
+        touchMultiplier: 1.5,
         infinite: false,
         gestureOrientationHandler: true,
         normalizeWheel: true,
-        wheelMultiplier: 1,
-        touchInertiaMultiplier: 35,
-        lerp: 0.1,
+        wheelMultiplier: 0.7,
+        touchInertiaMultiplier: 25,
+        lerp: 0.06,
         syncTouch: true,
-        syncTouchLerp: 0.075,
-        touchInertia: 0.6
+        syncTouchLerp: 0.08,
+        touchInertia: 0.4
       });
 
       lenis.on('scroll', handleScroll);
 
       const raf = time => {
         lenis.raf(time);
-        animationFrameRef.current = requestAnimationFrame(raf);
+        requestAnimationFrame(raf);
       };
-      animationFrameRef.current = requestAnimationFrame(raf);
+      requestAnimationFrame(raf);
 
       lenisRef.current = lenis;
       return lenis;
