@@ -10,7 +10,6 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@react-three/fiber": "^9.3.0",
     "@stripe/stripe-js": "^7.9.0",
     "clsx": "^2.0.0",
     "framer-motion": "^12.23.12",
@@ -22,7 +21,6 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "stripe": "^18.5.0",
-    "three": "^0.180.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
