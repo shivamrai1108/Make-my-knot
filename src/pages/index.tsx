@@ -223,116 +223,69 @@ function SuccessStoriesCarousel() {
   }
   
   return (
-    <div className="relative w-full">
-      {/* Cards Grid Layout - Desktop Only */}
-      <div 
-        className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-6"
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
-      >
-        {stories.map((story, index) => (
-          <div 
-            key={index}
-            className="relative h-[500px] rounded-2xl overflow-hidden shadow-xl group cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-2xl"
-          >
-            {/* Background Image with Wavy Crop */}
-            <div className="absolute inset-0">
-              <div className="relative w-full h-full overflow-hidden">
-                <img
-                  src={story.image}
-                  alt={`${story.names} wedding photo`}
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                  draggable={false}
-                  style={{
-                    clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 60px), 95% calc(100% - 40px), 90% calc(100% - 60px), 80% calc(100% - 30px), 70% calc(100% - 50px), 60% calc(100% - 35px), 50% calc(100% - 55px), 40% calc(100% - 25px), 30% calc(100% - 45px), 20% calc(100% - 35px), 10% calc(100% - 50px), 5% calc(100% - 40px), 0 calc(100% - 60px))'
-                  }}
-                />
-              </div>
-              
-              {/* Gradient Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20"></div>
-              
-              {/* Hover Overlay */}
-              <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </div>
-            
-            {/* Content Overlay */}
-            <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
-              {/* Couple Names */}
-              <h3 className="text-2xl font-bold mb-2 text-center">
-                {story.names}
-              </h3>
-              
-              {/* Location */}
-              <p className="text-sm text-gray-200 mb-4 text-center font-medium">
-                {story.location}
-              </p>
-              
-              {/* Star Rating */}
-              <div className="flex justify-center mb-4">
-                {[...Array(story.rating)].map((_, i) => (
-                  <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
-                ))}
-              </div>
-              
-              {/* Testimonial */}
-              <div className="bg-black/30 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-                <p className="text-sm leading-relaxed text-gray-100 text-center italic line-clamp-4">
-                  {story.testimonial}
-                </p>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-      
-      {/* Mobile Carousel View */}
-      <div className="md:hidden">
+    <div className="relative w-full overflow-hidden">
+      {/* Auto-scrolling Horizontal Marquee - All Screen Sizes */}
+      <div className="relative">
         <div 
-          className="relative h-[500px] overflow-hidden rounded-2xl"
-          onTouchStart={() => setIsPaused(true)}
-          onTouchEnd={() => setIsPaused(false)}
+          className="flex gap-6 animate-marquee"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+          style={{
+            animation: isPaused ? 'none' : undefined,
+            animationDuration: '30s',
+            animationIterationCount: 'infinite',
+            animationTimingFunction: 'linear'
+          }}
         >
+          {/* First set of stories */}
           {stories.map((story, index) => (
-            <div
-              key={index}
-              className={`absolute inset-0 transition-all duration-500 ${
-                index === currentIndex 
-                  ? 'opacity-100 transform translate-x-0' 
-                  : index < currentIndex 
-                  ? 'opacity-0 transform -translate-x-full'
-                  : 'opacity-0 transform translate-x-full'
-              }`}
+            <div 
+              key={`first-${index}`}
+              className="relative h-[400px] w-[320px] flex-shrink-0 rounded-2xl overflow-hidden shadow-xl group cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-2xl"
             >
-              {/* Background Image with Wavy Crop - Mobile */}
+              {/* Background Image with Wavy Crop */}
               <div className="absolute inset-0">
                 <div className="relative w-full h-full overflow-hidden">
                   <img
                     src={story.image}
                     alt={`${story.names} wedding photo`}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                     draggable={false}
                     style={{
-                      clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 60px), 95% calc(100% - 40px), 90% calc(100% - 60px), 80% calc(100% - 30px), 70% calc(100% - 50px), 60% calc(100% - 35px), 50% calc(100% - 55px), 40% calc(100% - 25px), 30% calc(100% - 45px), 20% calc(100% - 35px), 10% calc(100% - 50px), 5% calc(100% - 40px), 0 calc(100% - 60px))'
+                      clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 50px), 95% calc(100% - 35px), 90% calc(100% - 50px), 80% calc(100% - 25px), 70% calc(100% - 45px), 60% calc(100% - 30px), 50% calc(100% - 50px), 40% calc(100% - 20px), 30% calc(100% - 40px), 20% calc(100% - 30px), 10% calc(100% - 45px), 5% calc(100% - 35px), 0 calc(100% - 50px))'
                     }}
                   />
                 </div>
+                
+                {/* Gradient Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20"></div>
+                
+                {/* Hover Overlay */}
+                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>
               
-              {/* Content */}
-              <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
-                <h3 className="text-2xl font-bold mb-2 text-center">{story.names}</h3>
-                <p className="text-sm text-gray-200 mb-4 text-center font-medium">{story.location}</p>
+              {/* Content Overlay */}
+              <div className="absolute inset-0 p-4 flex flex-col justify-end text-white">
+                {/* Couple Names */}
+                <h3 className="text-lg font-bold mb-2 text-center">
+                  {story.names}
+                </h3>
                 
-                <div className="flex justify-center mb-4">
+                {/* Location */}
+                <p className="text-xs text-gray-200 mb-3 text-center font-medium">
+                  {story.location}
+                </p>
+                
+                {/* Star Rating */}
+                <div className="flex justify-center mb-3">
                   {[...Array(story.rating)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                    <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
                   ))}
                 </div>
                 
-                <div className="bg-black/30 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-                  <p className="text-sm leading-relaxed text-gray-100 text-center italic">
+                {/* Testimonial */}
+                <div className="bg-black/40 backdrop-blur-sm rounded-lg p-3 border border-white/20">
+                  <p className="text-xs leading-relaxed text-gray-100 text-center italic line-clamp-3">
                     {story.testimonial}
                   </p>
                 </div>
@@ -340,23 +293,61 @@ function SuccessStoriesCarousel() {
             </div>
           ))}
           
-          {/* Mobile Navigation - Removed for cleaner touch interface */}
-          
-          {/* Mobile Dots */}
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-30">
-            {stories.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => goToSlide(index)}
-                className={`transition-all duration-300 ${
-                  index === currentIndex 
-                    ? 'w-8 h-2 bg-white rounded-full' 
-                    : 'w-2 h-2 bg-white/50 hover:bg-white/70 rounded-full'
-                }`}
-                aria-label={`Go to story ${index + 1}`}
-              />
-            ))}
-          </div>
+          {/* Duplicate set for seamless loop */}
+          {stories.map((story, index) => (
+            <div 
+              key={`second-${index}`}
+              className="relative h-[400px] w-[320px] flex-shrink-0 rounded-2xl overflow-hidden shadow-xl group cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-2xl"
+            >
+              {/* Background Image with Wavy Crop */}
+              <div className="absolute inset-0">
+                <div className="relative w-full h-full overflow-hidden">
+                  <img
+                    src={story.image}
+                    alt={`${story.names} wedding photo`}
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                    draggable={false}
+                    style={{
+                      clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 50px), 95% calc(100% - 35px), 90% calc(100% - 50px), 80% calc(100% - 25px), 70% calc(100% - 45px), 60% calc(100% - 30px), 50% calc(100% - 50px), 40% calc(100% - 20px), 30% calc(100% - 40px), 20% calc(100% - 30px), 10% calc(100% - 45px), 5% calc(100% - 35px), 0 calc(100% - 50px))'
+                    }}
+                  />
+                </div>
+                
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20"></div>
+                
+                {/* Hover Overlay */}
+                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+              
+              {/* Content Overlay */}
+              <div className="absolute inset-0 p-4 flex flex-col justify-end text-white">
+                {/* Couple Names */}
+                <h3 className="text-lg font-bold mb-2 text-center">
+                  {story.names}
+                </h3>
+                
+                {/* Location */}
+                <p className="text-xs text-gray-200 mb-3 text-center font-medium">
+                  {story.location}
+                </p>
+                
+                {/* Star Rating */}
+                <div className="flex justify-center mb-3">
+                  {[...Array(story.rating)].map((_, i) => (
+                    <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
+                  ))}
+                </div>
+                
+                {/* Testimonial */}
+                <div className="bg-black/40 backdrop-blur-sm rounded-lg p-3 border border-white/20">
+                  <p className="text-xs leading-relaxed text-gray-100 text-center italic line-clamp-3">
+                    {story.testimonial}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

@@ -778,6 +778,20 @@
     animation: float 4s ease-in-out infinite;
   }
   
+  /* Marquee animation for testimonial carousel */
+  @keyframes marquee {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+  
+  .animate-marquee {
+    animation: marquee 30s linear infinite;
+  }
+  
   /* Premium spacing utilities */
   .space-y-premium > * + * {
     margin-top: 2rem;

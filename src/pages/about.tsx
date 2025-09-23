@@ -57,8 +57,8 @@ export default function About() {
             </h1>
             <p className="text-xl text-gray-200 leading-relaxed mb-8">
               Since 1975, the Goyal family has been India's most trusted name in matchmaking. What started with 
-              Chaman Prakash Goyal (Visionary Founder) as a heartfelt mission to create meaningful rishtas has evolved through 
-              three generations into today's AI-powered platform under Managing Director Anil Goyal and CEO Moulik Goyal, 
+              Shri Chaman Prakash Goyal (Visionary Founder) as a heartfelt mission to create meaningful rishtas has evolved through 
+              three generations into today's AI-powered platform under Managing Director Shri Anil Goyal and CEO Moulik Goyal, 
               but our commitment to "Matches Made with Mannat, Not Just Metrics" remains unchanged.
             </p>
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
@@ -108,10 +108,10 @@ export default function About() {
                       <h5 className="font-bold text-primary-800 mb-2">Matches Made with Mannat, Not Just Metrics</h5>
                     </div>
                     <p className="text-gray-600 mb-3">
-                      In 1975, <strong>Chaman Prakash Goyal</strong> laid the foundation of Goyal Marriage Bureau, planting the roots of what has become one of the most trusted matchmaking services in India. His belief was simple yet powerful: every rishta deserves honesty, care, and blessings.
+                      In 1975, <strong>Shri Chaman Prakash Goyal</strong> laid the foundation of Goyal Marriage Bureau, planting the roots of what has become one of the most trusted matchmaking services in India. His belief was simple yet powerful: every rishta deserves honesty, care, and blessings.
                     </p>
                     <p className="text-gray-600 mb-3">
-                      At a time when matchmaking was limited to biodatas and formalities, Chaman Prakash Goyal brought heart into the process. He personally met families, understood their values, and ensured that every match was built on trust and compatibility. His dedication turned countless dreams into successful marriages, earning him respect as one of India's most reliable matchmakers.
+                      At a time when matchmaking was limited to biodatas and formalities, Shri Chaman Prakash Goyal brought heart into the process. He personally met families, understood their values, and ensured that every match was built on trust and compatibility. His dedication turned countless dreams into successful marriages, earning him respect as one of India's most reliable matchmakers.
                     </p>
                     <p className="text-gray-600 mb-3">
                       For him, shaadi was never just about two individuals, but about uniting families. With sincerity, blessings, and a personal touch, he created a legacy of meaningful connections—one that continues to inspire generations.
@@ -144,10 +144,10 @@ export default function About() {
                         <h5 className="font-bold text-primary-800 mb-2">Matches Made with Mannat, Not Just Metrics</h5>
                       </div>
                       <p className="text-gray-600 mb-3">
-                        In 1975, <strong>Chaman Prakash Goyal</strong> laid the foundation of Goyal Marriage Bureau, planting the roots of what has become one of the most trusted matchmaking services in India. His belief was simple yet powerful: every rishta deserves honesty, care, and blessings.
+                        In 1975, <strong>Shri Chaman Prakash Goyal</strong> laid the foundation of Goyal Marriage Bureau, planting the roots of what has become one of the most trusted matchmaking services in India. His belief was simple yet powerful: every rishta deserves honesty, care, and blessings.
                       </p>
                       <p className="text-gray-600 mb-3">
-                        At a time when matchmaking was limited to biodatas and formalities, Chaman Prakash Goyal brought heart into the process. He personally met families, understood their values, and ensured that every match was built on trust and compatibility. His dedication turned countless dreams into successful marriages, earning him respect as one of India's most reliable matchmakers.
+                        At a time when matchmaking was limited to biodatas and formalities, Shri Chaman Prakash Goyal brought heart into the process. He personally met families, understood their values, and ensured that every match was built on trust and compatibility. His dedication turned countless dreams into successful marriages, earning him respect as one of India's most reliable matchmakers.
                       </p>
                       <p className="text-gray-600 mb-3">
                         For him, shaadi was never just about two individuals, but about uniting families. With sincerity, blessings, and a personal touch, he created a legacy of meaningful connections—one that continues to inspire generations.
@@ -233,7 +233,7 @@ export default function About() {
                       <h5 className="font-bold text-primary-800 mb-2">Where Technology Met Heart</h5>
                     </div>
                     <p className="text-gray-600 mb-3">
-                      As technology reshaped India, so did matchmaking. While many reduced rishtas to online biodata lists, <strong>Anil Goyal</strong> blended technology with human touch.
+                      As technology reshaped India, so did matchmaking. While many reduced rishtas to online biodata lists, <strong>Shri Anil Goyal</strong> blended technology with human touch.
                     </p>
                     <p className="text-gray-600">
                       He believed in stories, not just profiles—helping families find matches that were not only compatible on paper but deeply meaningful in real life.
@@ -356,12 +356,12 @@ export default function About() {
             {/* Chaman Prakash Goyal - Featured with Full Story */}
             <div className="bg-white rounded-3xl shadow-xl p-8 lg:p-12 mb-12 border border-gray-100">
               <div className="flex items-center justify-center mb-8">
-                <div className="w-32 h-32 rounded-2xl overflow-hidden shadow-lg">
+                <div className="w-48 h-48 rounded-2xl overflow-hidden shadow-lg">
                   <Image
                     src="/images/chaman-prakash-goyal.jpg"
-                    alt="Chaman Prakash Goyal - Visionary Founder"
-                    width={128}
-                    height={128}
+                    alt="Shri Chaman Prakash Goyal - Visionary Founder"
+                    width={192}
+                    height={192}
                     className="w-full h-full object-cover"
                     priority
                   />
@@ -369,7 +369,7 @@ export default function About() {
               </div>
               
               <div className="text-center mb-8">
-                <h3 className="text-3xl font-bold text-gray-900 mb-2">Chaman Prakash Goyal</h3>
+                <h3 className="text-3xl font-bold text-gray-900 mb-2">Shri Chaman Prakash Goyal</h3>
                 <p className="text-xl text-gold-600 font-semibold">Visionary Founder • 1975</p>
               </div>
               
@@ -404,10 +404,10 @@ export default function About() {
                   </div>
                 </div>
                 <div className="flex-1 text-center lg:text-left">
-                  <h3 className="text-3xl font-bold text-gray-900 mb-2">Anil Goyal</h3>
+                  <h3 className="text-3xl font-bold text-gray-900 mb-2">Shri Anil Goyal</h3>
                   <div className="text-xl text-green-600 font-semibold mb-6">Managing Director</div>
                   <p className="text-gray-600 leading-relaxed mb-6 text-lg">
-                    The bridge between tradition and modernity, Anil Goyal dedicated over 16 years to nurturing the family vision 
+                    The bridge between tradition and modernity, Shri Anil Goyal dedicated over 16 years to nurturing the family vision
                     with deep care and emotional understanding. He ensured every rishta was handled with love and sincerity, 
                     continuing the legacy with personal attention to each family's needs.
                   </p>
@@ -455,17 +455,14 @@ export default function About() {
                   </p>
                   <div className="grid md:grid-cols-2 gap-6 text-sm text-gray-600">
                     <div>
-                      <strong className="text-gray-900">Education:</strong><br />
-                      MBA, IIM Ahmedabad<br />
-                      B.Tech, IIT Delhi
-                    </div>
-                    <div>
                       <strong className="text-gray-900">Experience:</strong><br />
                       10+ years in Technology<br />
                       5+ years leading Make My Knot
                     </div>
-                    <div className="md:col-span-2">
-                      <strong className="text-gray-900">Expertise:</strong> AI Matchmaking, Business Strategy, Technology Innovation, Digital Transformation
+                    <div>
+                      <strong className="text-gray-900">Expertise:</strong><br />
+                      AI Matchmaking, Business Strategy<br />
+                      Technology Innovation, Digital Transformation
                     </div>
                   </div>
                 </div>
@@ -477,8 +474,8 @@ export default function About() {
                 <h4 className="text-2xl font-bold mb-4">Three Generations. One Wisdom. Infinite Connections.</h4>
                 <p className="text-primary-100 leading-relaxed">
                   For over 50 years, the Goyal family has turned dreams into lifelong rishtas. 
-                  From Chaman Prakash Goyal's trust, to Anil Goyal's personal care, to Moulik Goyal's AI-powered innovation — every generation carried the same belief: 
-                  "Shaadi sirf do logon ka milan nahi, do parivaron ka bandhan hota hai." 
+                  From Shri Chaman Prakash Goyal's trust, to Shri Anil Goyal's personal care, to Moulik Goyal's AI-powered innovation — every generation carried the same belief: 
+                  "Shaadi sirf do logon ka milan nahi, do parivaron ka bandhan hota hai."
                   At Make My Knot, we combine traditional matchmaking values with advanced AI technology to create meaningful, lasting connections that go beyond profiles and biodatas.
                 </p>
               </div>
