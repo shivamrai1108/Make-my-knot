@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { Heart, Clock, Users, Award, ArrowRight, CheckCircle } from 'lucide-react'
 import Footer from '@/components/Footer'
 import BrandLogo from '@/components/BrandLogo'
+import ScrollStack, { ScrollStackItem } from '@/components/ScrollStack'
 
 export default function About() {
   return (
@@ -348,155 +349,129 @@ export default function About() {
         {/* Meet Our Experts Section */}
         <section className="py-20 bg-gray-50">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">Meet Our Experts</h2>
-              <p className="text-xl text-gray-600">Three generations of matchmaking expertise driving innovation while preserving tradition</p>
+            <div className="text-center mb-8">
+              <h2 className="text-4xl font-bold text-gray-900 mb-2">Meet Our Experts</h2>
+              <p className="text-lg text-gray-600">Three generations of matchmaking expertise driving innovation while preserving tradition</p>
             </div>
 
-            {/* Chaman Prakash Goyal - Featured with Full Story */}
-            <div className="bg-white rounded-3xl shadow-xl p-8 lg:p-12 mb-12 border border-gray-100">
-              <div className="flex flex-col lg:flex-row items-start gap-8">
-                {/* Image on Left */}
-                <div className="flex-shrink-0">
-                  <div className="w-64 h-80 rounded-2xl overflow-hidden shadow-lg">
-                    <Image
-                      src="/images/chaman-prakash-goyal.jpg"
-                      alt="Shri Chaman Prakash Goyal - Visionary Founder"
-                      width={256}
-                      height={320}
-                      className="w-full h-full object-cover"
-                      priority
-                    />
-                  </div>
-                </div>
-                
-                {/* Content on Right */}
-                <div className="flex-1">
-                  <div className="mb-6">
-                    <h3 className="text-3xl font-bold text-gray-900 mb-2">Shri Chaman Prakash Goyal</h3>
-                    <p className="text-xl text-gold-600 font-semibold">Visionary Founder • 1975</p>
-                  </div>
-                  
-                  <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed">
-                    <p className="mb-6">
-                      In 1975, <strong>Shri Chaman Prakash Goyal</strong> laid the foundation of Goyal Marriage Bureau, planting the roots of what has become one of the most trusted matchmaking services in India. His belief was simple yet powerful: every rishta deserves honesty, care, and blessings.
-                    </p>
-                    
-                    <p className="mb-6">
-                      At a time when matchmaking was limited to biodatas and formalities, Shri Chaman Prakash Goyal brought heart into the process. He personally met families, understood their values, and ensured that every match was built on trust and compatibility. His dedication turned countless dreams into successful marriages, earning him respect as one of India's most reliable matchmakers.
-                    </p>
-                    
-                    <p className="mb-8">
-                      For him, shaadi was never just about two individuals, but about uniting families. With sincerity, blessings, and a personal touch, he created a legacy of meaningful connections—one that continues to inspire generations.
-                    </p>
-                    
-                    <div className="bg-gradient-to-r from-primary-50 to-gold-50 rounded-2xl p-6 border-l-4 border-gold-400">
-                      <div className="text-center">
+            {/* Scroll Stack */}
+            <div className="rounded-3xl overflow-hidden border border-gray-100 shadow-xl">
+              <ScrollStack className="bg-white">
+                {/* Chaman Card */}
+                <ScrollStackItem>
+                  <div className="flex flex-col lg:flex-row items-start gap-8 p-6 lg:p-10">
+                    <div className="flex-shrink-0">
+                      <div className="w-64 h-80 rounded-2xl overflow-hidden shadow-lg">
+                        <Image
+                          src="/images/chaman-prakash-goyal.jpg"
+                          alt="Shri Chaman Prakash Goyal - Visionary Founder"
+                          width={256}
+                          height={320}
+                          className="w-full h-full object-cover"
+                          priority
+                        />
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-3xl font-bold text-gray-900 mb-2">Shri Chaman Prakash Goyal</h3>
+                      <p className="text-xl text-gold-600 font-semibold mb-4">Visionary Founder • 1975</p>
+                      <p className="text-gray-700 leading-relaxed mb-4">
+                        In 1975, <strong>Shri Chaman Prakash Goyal</strong> laid the foundation of Goyal Marriage Bureau, planting the roots of one of India’s most trusted matchmaking services. His belief was simple yet powerful: every rishta deserves honesty, care, and blessings.
+                      </p>
+                      <p className="text-gray-700 leading-relaxed mb-6">
+                        He brought heart into the process—personally meeting families and ensuring every match was built on trust and compatibility.
+                      </p>
+                      <div className="bg-gradient-to-r from-primary-50 to-gold-50 rounded-2xl p-6 border-l-4 border-gold-400">
                         <p className="text-lg font-medium text-primary-800 mb-2">His guiding philosophy that lives on today:</p>
                         <p className="text-2xl font-bold text-primary-900 italic">"Matches Made with Mannat, Not Just Metrics"</p>
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
+                </ScrollStackItem>
 
-            {/* Anil Goyal - Featured */}
-            <div className="bg-white rounded-2xl shadow-lg p-8 mb-12">
-              <div className="flex flex-col lg:flex-row items-start gap-8">
-                {/* Image on Left */}
-                <div className="flex-shrink-0">
-                  <div className="w-64 h-80 rounded-2xl overflow-hidden shadow-lg">
-                    <Image
-                      src="/images/anil-goyal.jpg"
-                      alt="Shri Anil Goyal - Managing Director"
-                      width={256}
-                      height={320}
-                      className="w-full h-full object-cover"
-                      priority
-                    />
-                  </div>
-                </div>
-                
-                {/* Content on Right */}
-                <div className="flex-1">
-                  <div className="mb-6">
-                    <h3 className="text-3xl font-bold text-gray-900 mb-2">Shri Anil Goyal</h3>
-                    <div className="text-xl text-green-600 font-semibold">Managing Director</div>
-                  </div>
-                  
-                  <p className="text-gray-600 leading-relaxed mb-6 text-lg">
-                    The bridge between tradition and modernity, <strong>Shri Anil Goyal</strong> dedicated over 16 years to nurturing the family vision
-                    with deep care and emotional understanding. He ensured every rishta was handled with love and sincerity, 
-                    continuing the legacy with personal attention to each family's needs.
-                  </p>
-                  
-                  <div className="grid md:grid-cols-2 gap-6 text-sm text-gray-600">
-                    <div>
-                      <strong className="text-gray-900">Experience:</strong><br />
-                      16+ years dedicated service<br />
-                      2nd generation leader
+                {/* Anil Card */}
+                <ScrollStackItem>
+                  <div className="flex flex-col lg:flex-row items-start gap-8 p-6 lg:p-10">
+                    <div className="flex-shrink-0">
+                      <div className="w-64 h-80 rounded-2xl overflow-hidden shadow-lg">
+                        <Image
+                          src="/images/anil-goyal.jpg"
+                          alt="Shri Anil Goyal - Managing Director"
+                          width={256}
+                          height={320}
+                          className="w-full h-full object-cover"
+                          priority
+                        />
+                      </div>
                     </div>
-                    <div>
-                      <strong className="text-gray-900">Expertise:</strong><br />
-                      Relationship counseling<br />
-                      Family dynamics, Traditional values
-                    </div>
-                    <div className="md:col-span-2">
-                      <strong className="text-gray-900">Approach:</strong> Personal attention, Emotional understanding, Family-first mindset
+                    <div className="flex-1">
+                      <h3 className="text-3xl font-bold text-gray-900 mb-2">Shri Anil Goyal</h3>
+                      <p className="text-xl text-green-600 font-semibold mb-4">Managing Director</p>
+                      <p className="text-gray-700 leading-relaxed mb-6">
+                        The bridge between tradition and modernity, <strong>Shri Anil Goyal</strong> dedicated over 16 years to nurturing the family vision with deep care and emotional understanding.
+                      </p>
+                      <div className="grid md:grid-cols-2 gap-6 text-sm text-gray-600">
+                        <div>
+                          <strong className="text-gray-900">Experience:</strong><br />
+                          16+ years dedicated service<br />
+                          2nd generation leader
+                        </div>
+                        <div>
+                          <strong className="text-gray-900">Expertise:</strong><br />
+                          Relationship counseling<br />
+                          Family dynamics, Traditional values
+                        </div>
+                        <div className="md:col-span-2">
+                          <strong className="text-gray-900">Approach:</strong> Personal attention, Emotional understanding, Family-first mindset
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
+                </ScrollStackItem>
 
-            {/* Maulik Goyal - Featured */}
-            <div className="bg-white rounded-2xl shadow-lg p-8 mb-12">
-              <div className="flex flex-col lg:flex-row items-center gap-8">
-                <div className="flex-shrink-0">
-                  <div className="w-80 h-96 rounded-2xl overflow-hidden shadow-lg">
-                    <Image
-                      src="/images/maulik-goyal.jpg"
-                      alt="Maulik Goyal - Chief Executive Officer"
-                      width={320}
-                      height={384}
-                      className="w-full h-full object-cover"
-                      priority
-                    />
-                  </div>
-                </div>
-                <div className="flex-1 text-center lg:text-left">
-                  <h3 className="text-3xl font-bold text-gray-900 mb-2">Moulik Goyal</h3>
-                  <div className="text-xl text-primary-600 font-semibold mb-6">Chief Executive Officer</div>
-                  <p className="text-gray-600 leading-relaxed mb-6 text-lg">
-                    As the third-generation leader of the Goyal family legacy, Moulik brings together traditional matchmaking 
-                    wisdom with cutting-edge technology. Having grown up watching his father and grandfather devote their lives to matchmaking, 
-                    he is now transforming our 50-year-old family business into India's most sophisticated AI-powered matchmaking platform.
-                  </p>
-                  <div className="grid md:grid-cols-2 gap-6 text-sm text-gray-600">
-                    <div>
-                      <strong className="text-gray-900">Experience:</strong><br />
-                      10+ years in Technology<br />
-                      5+ years leading Make My Knot
+                {/* Moulik Card */}
+                <ScrollStackItem>
+                  <div className="flex flex-col lg:flex-row items-start gap-8 p-6 lg:p-10">
+                    <div className="flex-shrink-0">
+                      <div className="w-80 h-96 rounded-2xl overflow-hidden shadow-lg">
+                        <Image
+                          src="/images/maulik-goyal.jpg"
+                          alt="Moulik Goyal - Chief Executive Officer"
+                          width={320}
+                          height={384}
+                          className="w-full h-full object-cover"
+                          priority
+                        />
+                      </div>
                     </div>
-                    <div>
-                      <strong className="text-gray-900">Expertise:</strong><br />
-                      AI Matchmaking, Business Strategy<br />
-                      Technology Innovation, Digital Transformation
+                    <div className="flex-1">
+                      <h3 className="text-3xl font-bold text-gray-900 mb-2">Moulik Goyal</h3>
+                      <p className="text-xl text-primary-600 font-semibold mb-4">Chief Executive Officer</p>
+                      <p className="text-gray-700 leading-relaxed mb-6">
+                        As the third-generation leader, Moulik blends traditional wisdom with AI and modern product thinking to build India’s most advanced matchmaking platform.
+                      </p>
+                      <div className="grid md:grid-cols-2 gap-6 text-sm text-gray-600">
+                        <div>
+                          <strong className="text-gray-900">Experience:</strong><br />
+                          10+ years in Technology<br />
+                          5+ years leading Make My Knot
+                        </div>
+                        <div>
+                          <strong className="text-gray-900">Expertise:</strong><br />
+                          AI Matchmaking, Business Strategy, Digital Transformation
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
+                </ScrollStackItem>
+              </ScrollStack>
             </div>
 
             <div className="text-center mt-12">
               <div className="bg-gradient-to-r from-primary-600 to-gold-500 text-white rounded-2xl p-6 max-w-4xl mx-auto">
                 <h4 className="text-2xl font-bold mb-4">Three Generations. One Wisdom. Infinite Connections.</h4>
                 <p className="text-primary-100 leading-relaxed">
-                  For over 50 years, the Goyal family has turned dreams into lifelong rishtas. 
-                  From Shri Chaman Prakash Goyal's trust, to Shri Anil Goyal's personal care, to Moulik Goyal's AI-powered innovation — every generation carried the same belief: 
-                  "Shaadi sirf do logon ka milan nahi, do parivaron ka bandhan hota hai."
-                  At Make My Knot, we combine traditional matchmaking values with advanced AI technology to create meaningful, lasting connections that go beyond profiles and biodatas.
+                  For over 50 years, the Goyal family has turned dreams into lifelong rishtas. From Shri Chaman Prakash Goyal's trust, to Shri Anil Goyal's personal care, to Moulik Goyal's AI-powered innovation — every generation carried the same belief: "Shaadi sirf do logon ka milan nahi, do parivaron ka bandhan hota hai."
                 </p>
               </div>
             </div>
