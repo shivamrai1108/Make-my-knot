@@ -97,9 +97,8 @@ export default function AssessmentPage() {
     
     if (effectiveLeadId) {
       sessionStorage.setItem(`assessment_completed_${effectiveLeadId}`, 'true')
-      // Clear lead submission state to prevent redirect loop when returning to home page
-      sessionStorage.removeItem('leadSubmitted')
-      console.log('Marked assessment as completed and cleared lead submission state')
+      // Keep leadSubmitted flag but mark assessment as completed to prevent countdown
+      console.log('Marked assessment as completed - lead data preserved in CRM')
     }
     
     console.log('Lead detection:', {
