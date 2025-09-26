@@ -65,6 +65,7 @@ module.exports = {
         }
       },
       fontFamily: {
+        'qasira': ['Qasira', 'Crimson Pro', 'Libre Baskerville', 'Cormorant Garamond', 'Playfair Display', 'EB Garamond', 'Lora', 'serif'],
         'serif': ['Playfair Display', 'serif'],
         'sans': ['Inter', 'sans-serif'],
       },
