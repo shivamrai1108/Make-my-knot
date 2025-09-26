@@ -3,11 +3,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 // Supported languages
 export const LANGUAGES = {
   en: { code: 'en', name: 'English', flag: '🇺🇸' },
-  hi: { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
-  gu: { code: 'gu', name: 'ગુજરાતી', flag: '🇮🇳' },
-  mr: { code: 'mr', name: 'मराठी', flag: '🇮🇳' },
-  ta: { code: 'ta', name: 'தமிழ்', flag: '🇮🇳' },
-  te: { code: 'te', name: 'తెలుగు', flag: '🇮🇳' }
+  hi: { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' }
 } as const
 
 export type LanguageCode = keyof typeof LANGUAGES
@@ -24,11 +20,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 // Translation storage
 let translations: Record<LanguageCode, any> = {
   en: {},
-  hi: {},
-  gu: {},
-  mr: {},
-  ta: {},
-  te: {}
+  hi: {}
 }
 
 interface LanguageProviderProps {
