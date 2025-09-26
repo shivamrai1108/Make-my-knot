@@ -277,10 +277,10 @@ export default function About() {
                       <h5 className="font-bold text-primary-800 mb-2">Where Tradition Meets Innovation</h5>
                     </div>
                     <p className="text-gray-600 mb-3">
-                      The legacy entered its third generation with <strong>Moulik Goyal</strong>, who had grown up watching his father and grandfather devote their lives to matchmaking. With 5+ years of experience at Make My Knot, he is now transforming the 50-year-old family business into India’s most advanced AI-powered matchmaking platform.
+                      The legacy continues with <strong>Moulik Goyal</strong>, who grew up watching his father and grandfather dedicate their lives to creating happy marriages. With over 5 years of experience in matchmaking at the Goyal Marriage Bureau and 3 years in sales, Moulik brings together the wisdom of tradition with the mindset of a modern entrepreneur.
                     </p>
                     <p className="text-gray-600">
-                      By blending traditional wisdom with cutting-edge technology, Moulik is ensuring that the Goyal family’s heritage continues to evolve for the modern world, supporting both Indian and NRI families in finding meaningful connections.
+                      Carrying forward a 50-year-old family legacy, he is now leading Make My Knot — a platform that blends honesty, family values, and trust with a fresh, modern approach to help individuals and families find their perfect match.
                     </p>
                   </div>
                   <div className="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-primary-600 rounded-full border-4 border-white"></div>
@@ -448,17 +448,22 @@ export default function About() {
                       <h3 className="text-3xl font-bold text-gray-900 mb-2">Moulik Goyal</h3>
                       <p className="text-xl text-primary-600 font-semibold mb-4">Chief Executive Officer</p>
                       <p className="text-gray-700 leading-relaxed mb-6">
-                        As the third-generation leader, Moulik blends traditional wisdom with AI and modern product thinking to build India’s most advanced matchmaking platform.
+                        The legacy continues with Moulik Goyal, who grew up watching his father and grandfather dedicate their lives to creating happy marriages. With over 5 years of experience in matchmaking at the Goyal Marriage Bureau and 3 years in sales, Moulik brings together the wisdom of tradition with the mindset of a modern entrepreneur.
+                      </p>
+                      <p className="text-gray-700 leading-relaxed mb-6">
+                        Carrying forward a 50-year-old family legacy, he is now leading Make My Knot — a platform that blends honesty, family values, and trust with a fresh, modern approach to help individuals and families find their perfect match.
                       </p>
                       <div className="grid md:grid-cols-2 gap-6 text-sm text-gray-600">
                         <div>
                           <strong className="text-gray-900">Experience:</strong><br />
-                          10+ years in Technology<br />
-                          5+ years leading Make My Knot
+                          5+ years in Matchmaking (Goyal Marriage Bureau & Make My Knot)<br />
+                          3 years in Sales & Relationship Management
                         </div>
                         <div>
                           <strong className="text-gray-900">Expertise:</strong><br />
-                          AI Matchmaking, Business Strategy, Digital Transformation
+                          Matchmaking & Relationship Building<br />
+                          Business Strategy, Consumer Trust<br />
+                          Sales & Growth
                         </div>
                       </div>
                     </div>
