@@ -416,24 +416,24 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
           <div className="text-xs sm:text-sm text-white/70 mt-3">Step {step+1} of {steps.length+1}</div>
         </div>
       ) : (
-        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 md:p-8 border border-white/20 mb-8 max-w-2xl mx-auto">
-          <p className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-6 sm:mb-8 drop-shadow-lg">Almost there! How can we reach you?</p>
+        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 md:p-6 border border-white/20 mb-6 sm:mb-8 max-w-2xl mx-auto overflow-hidden">
+          <p className="text-base sm:text-lg md:text-xl font-bold text-white mb-4 sm:mb-6 drop-shadow-lg">Almost there! How can we reach you?</p>
           
-          {/* Name and Email */}
-          <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-white/90 mb-2">Full Name *</label>
+          {/* Name and Email - Stack on mobile for better spacing */}
+          <div className="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-1 md:grid-cols-2 sm:gap-3 md:gap-4 mb-3 sm:mb-4">
+            <div className="min-w-0"> {/* Prevent flex item overflow */}
+              <label className="block text-xs sm:text-sm font-medium text-white/90 mb-1 sm:mb-2">Full Name *</label>
               <input
-                className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/20 border border-white/30 rounded-lg focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white placeholder-white/70 text-sm sm:text-base"
+                className="w-full px-2 sm:px-3 py-2 bg-white/20 border border-white/30 rounded-lg focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white placeholder-white/70 text-sm min-w-0"
                 placeholder="Enter your full name"
                 value={contact.name}
                 onChange={(e)=>setContact({...contact, name: e.target.value})}
               />
             </div>
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-white/90 mb-2">Email Address *</label>
+            <div className="min-w-0">
+              <label className="block text-xs sm:text-sm font-medium text-white/90 mb-1 sm:mb-2">Email Address *</label>
               <input
-                className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/20 border border-white/30 rounded-lg focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white placeholder-white/70 text-sm sm:text-base"
+                className="w-full px-2 sm:px-3 py-2 bg-white/20 border border-white/30 rounded-lg focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white placeholder-white/70 text-sm min-w-0"
                 placeholder="Enter your email"
                 type="email"
                 value={contact.email}
@@ -442,16 +442,16 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
             </div>
           </div>
 
-          {/* Password and Phone Number */}
-          <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
+          {/* Password and Phone Number - Stack on mobile */}
+          <div className="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-1 md:grid-cols-2 sm:gap-3 md:gap-4 mb-3 sm:mb-4">
             {/* Password Field */}
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-white/90 mb-2">
+            <div className="min-w-0">
+              <label className="block text-xs sm:text-sm font-medium text-white/90 mb-1 sm:mb-2">
                 <Lock className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
                 Create Password *
               </label>
               <input
-                className={`w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/20 border border-white/30 rounded-lg focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white placeholder-white/70 text-sm sm:text-base ${
+                className={`w-full px-2 sm:px-3 py-2 bg-white/20 border border-white/30 rounded-lg focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white placeholder-white/70 text-sm min-w-0 ${
                   contact.password && !validatePassword(contact.password) ? 'border-red-300 bg-red-50/20' : ''
                 }`}
                 placeholder="Create a secure password"
@@ -460,16 +460,16 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
                 onChange={(e) => setContact({...contact, password: e.target.value})}
               />
               {contact.password && (
-                <div className="mt-2">
+                <div className="mt-1 sm:mt-2">
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-white/70">Password strength:</span>
                     <span className={`text-xs font-medium ${getPasswordStrengthColor(getPasswordStrength(contact.password))}`}>
                       {getPasswordStrengthText(getPasswordStrength(contact.password))}
                     </span>
                   </div>
-                  <div className="w-full bg-white/20 rounded-full h-2 mt-1">
+                  <div className="w-full bg-white/20 rounded-full h-1.5 sm:h-2 mt-1">
                     <div 
-                      className={`h-2 rounded-full transition-all duration-300 ${
+                      className={`h-1.5 sm:h-2 rounded-full transition-all duration-300 ${
                         getPasswordStrength(contact.password) <= 1 ? 'bg-red-400' :
                         getPasswordStrength(contact.password) === 2 ? 'bg-orange-400' :
                         getPasswordStrength(contact.password) === 3 ? 'bg-yellow-400' :
@@ -488,25 +488,25 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
             </div>
             
             {/* Phone Number */}
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-white/90 mb-2">Phone Number *</label>
-              <div className="flex">
+            <div className="min-w-0">
+              <label className="block text-xs sm:text-sm font-medium text-white/90 mb-1 sm:mb-2">Phone Number *</label>
+              <div className="flex min-w-0">
                 <select
-                  className="px-2 sm:px-3 py-2 sm:py-3 bg-white/20 border border-white/30 rounded-l-lg focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white text-xs sm:text-sm"
+                  className="px-1 sm:px-2 py-2 bg-white/20 border border-white/30 rounded-l-lg focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white text-xs flex-shrink-0 max-w-[90px] sm:max-w-none"
                   value={contact.countryCode}
                   onChange={(e) => setContact({...contact, countryCode: e.target.value})}
                 >
                   {countryCodes.map((country) => (
                     <option key={country.code} value={country.code} className="text-gray-900">
-                      {country.flag} {country.code} {country.country}
+                      {country.flag} {country.code}
                     </option>
                   ))}
                 </select>
                 <input
-                  className={`flex-1 px-3 sm:px-4 py-2 sm:py-3 bg-white/20 border border-l-0 border-white/30 rounded-r-lg focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white placeholder-white/70 text-sm sm:text-base ${
+                  className={`flex-1 px-2 sm:px-3 py-2 bg-white/20 border border-l-0 border-white/30 rounded-r-lg focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white placeholder-white/70 text-sm min-w-0 ${
                     contact.phone && !validatePhone(contact.phone) ? 'border-red-300 bg-red-50/20' : ''
                   }`}
-                  placeholder="10-digit phone number"
+                  placeholder="10-digit number"
                   type="tel"
                   value={contact.phone}
                   onChange={(e) => {
@@ -523,13 +523,13 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
           </div>
 
           {/* Date of Birth */}
-          <div className="mb-4 sm:mb-6">
-            <label className="block text-xs sm:text-sm font-medium text-white/90 mb-2">
+          <div className="mb-3 sm:mb-4">
+            <label className="block text-xs sm:text-sm font-medium text-white/90 mb-1 sm:mb-2">
               <Calendar className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
               Date of Birth *
             </label>
             <input
-              className={`w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/20 border border-white/30 rounded-lg focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white placeholder-white/70 text-sm sm:text-base ${
+              className={`w-full px-2 sm:px-3 py-2 bg-white/20 border border-white/30 rounded-lg focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white placeholder-white/70 text-sm min-w-0 ${
                 contact.dateOfBirth && !validateAge(contact.dateOfBirth) ? 'border-red-300 bg-red-50/20' : ''
               }`}
               type="date"
@@ -543,17 +543,17 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
           </div>
 
           {/* Optional Biodata Upload */}
-          <div className="mb-4 sm:mb-6">
-            <label className="block text-xs sm:text-sm font-medium text-white/90 mb-2">
+          <div className="mb-3 sm:mb-4">
+            <label className="block text-xs sm:text-sm font-medium text-white/90 mb-1 sm:mb-2">
               <Upload className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
               Upload Biodata (Optional)
             </label>
-            <p className="text-xs text-white/70 mb-3">
+            <p className="text-xs text-white/70 mb-2 sm:mb-3">
               Upload your biodata in PDF or JPEG format (max 5MB) to help us serve you better
             </p>
             
             {!biodataFile ? (
-              <div className="relative">
+              <div className="relative min-w-0">
                 <input
                   type="file"
                   accept=".pdf,.jpeg,.jpg"
@@ -561,40 +561,40 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                   id="biodata-upload"
                 />
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary-400 hover:bg-primary-50 transition-colors">
-                  <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                  <p className="text-xs sm:text-sm text-gray-600 mb-1">Click to upload biodata</p>
-                  <p className="text-xs text-gray-500">PDF or JPEG files only</p>
+                <div className="border-2 border-dashed border-white/30 rounded-lg p-3 sm:p-4 text-center hover:border-white/50 hover:bg-white/10 transition-colors">
+                  <Upload className="h-6 w-6 sm:h-8 sm:w-8 text-white/70 mx-auto mb-1 sm:mb-2" />
+                  <p className="text-xs sm:text-sm text-white/80 mb-1">Click to upload biodata</p>
+                  <p className="text-xs text-white/60">PDF or JPEG files only</p>
                 </div>
               </div>
             ) : (
-              <div className="border border-primary-200 bg-primary-50 rounded-lg p-4 flex items-center justify-between">
-                <div className="flex items-center">
-                  <CheckCircle className="h-5 w-5 text-primary-600 mr-2" />
-                  <div>
-                    <p className="text-xs sm:text-sm font-medium text-gray-900">{biodataFile.name}</p>
-                    <p className="text-xs text-gray-500">{(biodataFile.size / 1024 / 1024).toFixed(1)} MB</p>
+              <div className="border border-white/30 bg-white/10 rounded-lg p-3 flex items-center justify-between min-w-0">
+                <div className="flex items-center min-w-0 flex-1">
+                  <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 mr-2 flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs sm:text-sm font-medium text-white truncate">{biodataFile.name}</p>
+                    <p className="text-xs text-white/70">{(biodataFile.size / 1024 / 1024).toFixed(1)} MB</p>
                   </div>
                 </div>
                 <button
                   type="button"
                   onClick={removeBiodataFile}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                  className="text-white/60 hover:text-white/90 transition-colors flex-shrink-0 ml-2"
                 >
-                  <X className="h-5 w-5" />
+                  <X className="h-4 w-4 sm:h-5 sm:w-5" />
                 </button>
               </div>
             )}
             
             {uploadError && (
-              <p className="text-red-500 text-xs mt-2">{uploadError}</p>
+              <p className="text-red-400 text-xs mt-1 sm:mt-2">{uploadError}</p>
             )}
           </div>
 
           <button 
             disabled={!canSubmitContact || isProcessing} 
             onClick={handleSubmitLead} 
-            className={`w-full py-3 sm:py-4 rounded-lg font-semibold transition-all duration-200 text-sm sm:text-base ${
+            className={`w-full py-2.5 sm:py-3 rounded-lg font-semibold transition-all duration-200 text-sm sm:text-base min-w-0 ${
               canSubmitContact && !isProcessing
                 ? 'bg-gradient-to-r from-primary-600 to-gold-500 text-white hover:from-primary-700 hover:to-gold-600 transform hover:scale-105 shadow-lg'
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
@@ -602,21 +602,21 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
           >
             {isProcessing ? (
               <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                Processing...
+                <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-white mr-2"></div>
+                <span className="text-sm sm:text-base">Processing...</span>
               </div>
             ) : (
               <div className="flex items-center justify-center">
-                Get My Perfect Matches
-                <ArrowRight className="h-5 w-5 ml-2" />
+                <span className="text-sm sm:text-base">Get My Perfect Matches</span>
+                <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 ml-2" />
               </div>
             )}
           </button>
           
-          <div className="text-xs text-white/70 mt-4 text-center">
+          <div className="text-xs text-white/70 mt-3 sm:mt-4 text-center px-2">
             We&apos;ll contact you with curated matches. No spam, promise! 🤝
           </div>
-          <div className="text-xs sm:text-sm text-white/70 mt-2 text-center">
+          <div className="text-xs sm:text-sm text-white/70 mt-1 sm:mt-2 text-center">
             Step {steps.length+1} of {steps.length+1}
           </div>
         </div>

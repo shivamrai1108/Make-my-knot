@@ -75,7 +75,7 @@ export default function SplashScreen({ onComplete, duration = 4000 }: SplashScre
             delay: 0.6,
             ease: "easeOut"
           }}
-          className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 drop-shadow-2xl"
+          className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-white mb-6 drop-shadow-2xl"
         >
           Make My <span className="text-gold-300">Knot</span>
         </motion.h1>

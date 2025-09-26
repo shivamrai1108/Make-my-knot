@@ -1377,9 +1377,9 @@
   }
 }
 
-/* Silk Background Animation */
+/* Silk Background Animation - Plum Wine Color */
 .silk-background {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #722f37 0%, #5f2d3e 25%, #4a2750 50%, #3d1a5f 75%, #2d0f4e 100%);
   overflow: hidden;
 }
 

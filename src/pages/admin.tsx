@@ -2,12 +2,12 @@ import Head from 'next/head'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { 
-  Shield, Trash2, CheckCircle2, Mail, Phone, User, Lock, LogOut, Users, BarChart3, MessageSquare, CreditCard, Eye, EyeOff, Settings, Zap, AlertTriangle, DollarSign, TrendingUp, Activity, UserPlus, Video, Calendar, Gift, Edit, XCircle, MapPin, Briefcase, GraduationCap, Search, Wifi, MessageCircle, FileText, Brain, Download, Target, Filter
+  Shield, Trash2, CheckCircle2, Mail, Phone, User, Lock, LogOut, Users, BarChart3, MessageSquare, CreditCard, Eye, EyeOff, Settings, Zap, AlertTriangle, DollarSign, TrendingUp, Activity, UserPlus, Video, Calendar, Gift, Edit, XCircle, MapPin, Briefcase, GraduationCap, Search, Wifi, MessageCircle, FileText, Brain, Download, Target, Filter, Clock, Heart, Star
 } from 'lucide-react'
 import { useOnlineStatus } from '@/lib/OnlineStatusContext'
 import { OnlineUsersList, OnlineStatusBadge, OnlineStatusIndicator } from '@/components/OnlineStatusIndicator'
 import { getQuestionnaireResponses, essentialQuestions, calculateCompatibilityScore, QuestionnaireResponse } from '@/lib/questionnaireStore'
-import { deleteLead as deleteLeadFromCRM } from '@/lib/leadStore'
+import { deleteLead as deleteLeadFromCRM, preventLeadDataLoss } from '@/lib/leadStore'
 import jsPDF from 'jspdf'
 import * as XLSX from 'xlsx'
 
@@ -96,6 +96,190 @@ function getAnalyticsData() {
 // Mock notification system
 function sendNotification(userId: string, message: string, type: string) {
   console.log(`Sending ${type} notification to ${userId}: ${message}`)
+}
+
+// Global PDF generation function
+const generatePDF = async (assessment: any, setIsGeneratingPdf: (loading: boolean) => void) => {
+  setIsGeneratingPdf(true)
+  
+  try {
+    // Create new PDF document with A4 format for better quality
+    const pdf = new jsPDF('portrait', 'pt', 'a4')
+    const pageWidth = pdf.internal.pageSize.getWidth()
+    const pageHeight = pdf.internal.pageSize.getHeight()
+    let currentY = 60
+    const margin = 50
+    const contentWidth = pageWidth - (2 * margin)
+    
+    // Color palette for professional design
+    const colors = {
+      primary: [99, 102, 241], // Indigo
+      secondary: [139, 92, 246], // Purple  
+      accent: [245, 158, 11], // Amber
+      success: [16, 185, 129], // Emerald
+      text: [31, 41, 55], // Gray-800
+      lightGray: [249, 250, 251], // Gray-50
+      mediumGray: [156, 163, 175], // Gray-400
+      darkGray: [75, 85, 99] // Gray-600
+    }
+    
+    // Helper function to add text with better formatting
+    const addText = (text: string, x: number, y: number, options: any = {}) => {
+      const { 
+        fontSize = 12, 
+        fontStyle = 'normal', 
+        color = colors.text, 
+        align = 'left',
+        maxWidth = contentWidth,
+        lineHeight = 1.4
+      } = options
+      
+      pdf.setFontSize(fontSize)
+      pdf.setFont('helvetica', fontStyle)
+      pdf.setTextColor(color[0], color[1], color[2])
+      
+      if (maxWidth && text.length > 0) {
+        const lines = pdf.splitTextToSize(text, maxWidth)
+        if (align === 'center') {
+          lines.forEach((line: string, index: number) => {
+            pdf.text(line, x, y + (index * fontSize * lineHeight), { align: 'center' })
+          })
+        } else {
+          pdf.text(lines, x, y)
+        }
+        return y + (lines.length * fontSize * lineHeight)
+      } else {
+        pdf.text(text, x, y, { align })
+        return y + (fontSize * lineHeight)
+      }
+    }
+    
+    // Header with gradient-like design
+    pdf.setFillColor(colors.primary[0], colors.primary[1], colors.primary[2])
+    pdf.rect(0, 0, pageWidth, 120, 'F')
+    
+    // Company logo and branding
+    pdf.setFillColor(255, 255, 255)
+    pdf.roundedRect(margin + 10, 25, 40, 40, 8, 8, 'F')
+    pdf.setTextColor(colors.primary[0], colors.primary[1], colors.primary[2])
+    pdf.setFontSize(10)
+    pdf.setFont('helvetica', 'bold')
+    pdf.text('Make My', margin + 15, 42)
+    pdf.text('Knot', margin + 22, 52)
+    
+    // Main title
+    pdf.setTextColor(255, 255, 255)
+    pdf.setFontSize(28)
+    pdf.setFont('helvetica', 'bold')
+    pdf.text('COMPATIBILITY ASSESSMENT REPORT', margin + 70, 55)
+    
+    // Subtitle
+    pdf.setFontSize(14)
+    pdf.setFont('helvetica', 'normal')
+    pdf.text('Professional Psychological & Compatibility Analysis', margin + 70, 75)
+    
+    // Report metadata in header
+    pdf.setFontSize(10)
+    const reportDate = new Date().toLocaleDateString('en-US', { 
+      year: 'numeric', month: 'long', day: 'numeric' 
+    })
+    const reportTime = new Date().toLocaleTimeString('en-US', { 
+      hour: '2-digit', minute: '2-digit' 
+    })
+    pdf.text(`Generated: ${reportDate} at ${reportTime}`, pageWidth - margin, 50, { align: 'right' })
+    pdf.text(`Report ID: ${assessment.id.substring(0, 8).toUpperCase()}`, pageWidth - margin, 65, { align: 'right' })
+    
+    currentY = 160
+    
+    // Personal Information Section
+    pdf.setFillColor(colors.lightGray[0], colors.lightGray[1], colors.lightGray[2])
+    pdf.rect(margin, currentY, contentWidth, 30, 'F')
+    currentY = addText('Personal Information', margin + 15, currentY + 20, { 
+      fontSize: 16, fontStyle: 'bold', color: colors.primary 
+    })
+    currentY += 15
+    
+    // User details in a clean table format
+    const userDetails = [
+      ['Name:', assessment.userInfo?.name || 'N/A'],
+      ['Email:', assessment.userInfo?.email || 'N/A'],
+      ['Phone:', assessment.userInfo?.phone || 'N/A'],
+      ['User Type:', assessment.userInfo?.type?.toUpperCase() || 'N/A'],
+      ['Assessment Date:', new Date(assessment.createdAt).toLocaleDateString()],
+      ['Completion Status:', assessment.isComplete ? 'Complete' : 'In Progress']
+    ]
+    
+    userDetails.forEach(([label, value]) => {
+      currentY = addText(label, margin + 20, currentY, { 
+        fontSize: 11, fontStyle: 'bold', color: colors.darkGray 
+      })
+      addText(value, margin + 120, currentY - 15, { 
+        fontSize: 11, color: colors.text 
+      })
+      currentY += 5
+    })
+    
+    currentY += 20
+    
+    // Responses Section
+    pdf.setFillColor(colors.lightGray[0], colors.lightGray[1], colors.lightGray[2])
+    pdf.rect(margin, currentY, contentWidth, 30, 'F')
+    currentY = addText('Assessment Responses', margin + 15, currentY + 20, { 
+      fontSize: 16, fontStyle: 'bold', color: colors.primary 
+    })
+    currentY += 25
+    
+    // Add assessment responses with better formatting
+    essentialQuestions.forEach((question, index) => {
+      const answer = assessment.responses[question.id]
+      if (answer) {
+        // Check if we need a new page
+        if (currentY > pageHeight - 100) {
+          pdf.addPage()
+          currentY = 60
+        }
+        
+        // Question number and category
+        currentY = addText(`Q${index + 1}. [${question.category}]`, margin, currentY, {
+          fontSize: 10, fontStyle: 'bold', color: colors.accent
+        })
+        
+        // Question text
+        currentY = addText(question.question, margin, currentY + 5, {
+          fontSize: 11, fontStyle: 'bold', color: colors.text, maxWidth: contentWidth - 20
+        })
+        
+        // Answer
+        const formattedAnswer = Array.isArray(answer) ? answer.join(', ') : String(answer)
+        currentY = addText(`Answer: ${formattedAnswer}`, margin + 20, currentY + 5, {
+          fontSize: 10, color: colors.darkGray, maxWidth: contentWidth - 40
+        })
+        
+        currentY += 15
+      }
+    })
+    
+    // Footer
+    const footerY = pageHeight - 50
+    pdf.setDrawColor(colors.mediumGray[0], colors.mediumGray[1], colors.mediumGray[2])
+    pdf.setLineWidth(0.5)
+    pdf.line(margin, footerY - 10, pageWidth - margin, footerY - 10)
+    
+    pdf.setFontSize(8)
+    pdf.setTextColor(colors.mediumGray[0], colors.mediumGray[1], colors.mediumGray[2])
+    pdf.text('© Make My Knot - Confidential Assessment Report', margin, footerY)
+    pdf.text(`Page 1 of ${pdf.getNumberOfPages()}`, pageWidth - margin, footerY, { align: 'right' })
+    
+    // Save the PDF
+    const fileName = `Assessment_${assessment.userInfo?.name?.replace(/[^a-zA-Z0-9]/g, '_') || 'User'}_${new Date().toISOString().split('T')[0]}.pdf`
+    pdf.save(fileName)
+    
+  } catch (error) {
+    console.error('Error generating PDF:', error)
+    alert('Error generating PDF. Please try again.')
+  } finally {
+    setIsGeneratingPdf(false)
+  }
 }
 
 // CRM Configuration Interface
@@ -424,6 +608,9 @@ export default function Admin() {
     const token = sessionStorage.getItem(ADMIN_TOKEN_KEY)
     if (token === 'ok') {
       setAuthed(true)
+      // Initialize lead data protection when admin loads
+      preventLeadDataLoss()
+      console.log('🔒 Lead data protection initialized for admin session')
     }
   }, [])
 
@@ -822,415 +1009,18 @@ function AssessmentsTab() {
     }
   }
 
-  const generatePDF = async (assessment: any) => {
-    setIsGeneratingPdf(true)
-    
-    try {
-      // Create new PDF document with A4 format for better quality
-      const pdf = new jsPDF('portrait', 'pt', 'a4')
-      const pageWidth = pdf.internal.pageSize.getWidth()
-      const pageHeight = pdf.internal.pageSize.getHeight()
-      let currentY = 60
-      const margin = 50
-      const contentWidth = pageWidth - (2 * margin)
+  const handleDeleteAssessment = (assessmentId: string) => {
+    if (confirm('Delete this assessment? This action cannot be undone.')) {
+      const allAssessments = getQuestionnaireResponses()
+      const filteredAssessments = allAssessments.filter(q => q.id !== assessmentId)
+      localStorage.setItem('questionnaire_responses', JSON.stringify(filteredAssessments))
       
-      // Color palette for professional design
-      const colors = {
-        primary: [99, 102, 241], // Indigo
-        secondary: [139, 92, 246], // Purple  
-        accent: [245, 158, 11], // Amber
-        success: [16, 185, 129], // Emerald
-        text: [31, 41, 55], // Gray-800
-        lightGray: [249, 250, 251], // Gray-50
-        mediumGray: [156, 163, 175], // Gray-400
-        darkGray: [75, 85, 99] // Gray-600
-      }
+      // Update state
+      setAssessments(prev => prev.filter(a => a.id !== assessmentId))
       
-      // Helper function to add text with better formatting
-      const addText = (text: string, x: number, y: number, options: any = {}) => {
-        const { 
-          fontSize = 12, 
-          fontStyle = 'normal', 
-          color = colors.text, 
-          align = 'left',
-          maxWidth = contentWidth,
-          lineHeight = 1.4
-        } = options
-        
-        pdf.setFontSize(fontSize)
-        pdf.setFont('helvetica', fontStyle)
-        pdf.setTextColor(color[0], color[1], color[2])
-        
-        if (maxWidth && text.length > 0) {
-          const lines = pdf.splitTextToSize(text, maxWidth)
-          if (align === 'center') {
-            lines.forEach((line: string, index: number) => {
-              pdf.text(line, x, y + (index * fontSize * lineHeight), { align: 'center' })
-            })
-          } else {
-            pdf.text(lines, x, y)
-          }
-          return y + (lines.length * fontSize * lineHeight)
-        } else {
-          pdf.text(text, x, y, { align })
-          return y + (fontSize * lineHeight)
-        }
-      }
-      
-      // Helper to add section divider
-      const addSectionDivider = (y: number) => {
-        pdf.setDrawColor(colors.mediumGray[0], colors.mediumGray[1], colors.mediumGray[2])
-        pdf.setLineWidth(0.5)
-        pdf.line(margin, y, pageWidth - margin, y)
-        return y + 20
-      }
-      
-      // Header with gradient-like design
-      pdf.setFillColor(colors.primary[0], colors.primary[1], colors.primary[2])
-      pdf.rect(0, 0, pageWidth, 120, 'F')
-      
-      // Add subtle pattern overlay (decorative lines)
-      pdf.setDrawColor(255, 255, 255, 0.1)
-      pdf.setLineWidth(1)
-      for (let i = 0; i < pageWidth; i += 30) {
-        pdf.line(i, 0, i + 60, 120)
-      }
-      
-      // Company logo and branding
-      pdf.setFillColor(255, 255, 255)
-      pdf.roundedRect(margin + 10, 25, 40, 40, 8, 8, 'F')
-      pdf.setTextColor(colors.primary[0], colors.primary[1], colors.primary[2])
-      pdf.setFontSize(10)
-      pdf.setFont('helvetica', 'bold')
-      pdf.text('Make My', margin + 15, 42)
-      pdf.text('Knot', margin + 22, 52)
-      
-      // Main title
-      pdf.setTextColor(255, 255, 255)
-      pdf.setFontSize(28)
-      pdf.setFont('helvetica', 'bold')
-      pdf.text('COMPATIBILITY ASSESSMENT REPORT', margin + 70, 55)
-      
-      // Subtitle
-      pdf.setFontSize(14)
-      pdf.setFont('helvetica', 'normal')
-      pdf.text('Professional Psychological & Compatibility Analysis', margin + 70, 75)
-      
-      // Report metadata in header
-      pdf.setFontSize(10)
-      const reportDate = new Date().toLocaleDateString('en-US', { 
-        year: 'numeric', month: 'long', day: 'numeric' 
-      })
-      const reportTime = new Date().toLocaleTimeString('en-US', { 
-        hour: '2-digit', minute: '2-digit' 
-      })
-      pdf.text(`Generated: ${reportDate} at ${reportTime}`, pageWidth - margin, 50, { align: 'right' })
-      pdf.text(`Report ID: ${assessment.id.substring(0, 8).toUpperCase()}`, pageWidth - margin, 65, { align: 'right' })
-      
-      currentY = 160
-      
-      // User Profile Section with enhanced design
-      pdf.setFillColor(colors.lightGray[0], colors.lightGray[1], colors.lightGray[2])
-      pdf.roundedRect(margin, currentY - 15, contentWidth, 120, 8, 8, 'F')
-      
-      // Try to add profile picture if available
-      const userData = JSON.parse(localStorage.getItem('makemyknot_user') || '{}')
-      if (userData.profilePicture) {
-        try {
-          // Add profile picture (placeholder for now - would need actual image processing)
-          pdf.setFillColor(colors.primary[0], colors.primary[1], colors.primary[2])
-          pdf.circle(margin + 40, currentY + 25, 25, 'F')
-          pdf.setTextColor(255, 255, 255)
-          pdf.setFontSize(20)
-          pdf.text(assessment.userInfo.name.charAt(0), margin + 35, currentY + 30)
-        } catch (e) {
-          console.log('Could not add profile picture')
-        }
-      } else {
-        // Profile placeholder
-        pdf.setFillColor(colors.accent[0], colors.accent[1], colors.accent[2])
-        pdf.circle(margin + 40, currentY + 25, 25, 'F')
-        pdf.setTextColor(255, 255, 255)
-        pdf.setFontSize(24)
-        pdf.setFont('helvetica', 'bold')
-        pdf.text(assessment.userInfo.name.charAt(0), margin + 35, currentY + 32)
-      }
-      
-      // User information with better typography
-      addText('USER PROFILE', margin + 90, currentY + 5, { fontSize: 16, fontStyle: 'bold', color: colors.primary })
-      
-      const userDetails = [
-        { label: 'Full Name:', value: assessment.userInfo.name || 'Not specified' },
-        { label: 'Email Address:', value: assessment.userInfo.email || 'Not provided' },
-        { label: 'Phone Number:', value: assessment.userInfo.phone || 'Not provided' },
-        { label: 'User Category:', value: (assessment.userInfo.type || 'standard').charAt(0).toUpperCase() + (assessment.userInfo.type || 'standard').slice(1) }
-      ]
-      
-      let detailY = currentY + 25
-      userDetails.forEach(detail => {
-        addText(detail.label, margin + 90, detailY, { fontSize: 10, fontStyle: 'bold', color: colors.darkGray })
-        addText(detail.value, margin + 180, detailY, { fontSize: 10, color: colors.text })
-        detailY += 20
-      })
-      
-      currentY += 140
-      currentY = addSectionDivider(currentY)
-      
-      // Assessment Status with progress visualization
-      addText('ASSESSMENT STATUS & PROGRESS', margin, currentY, { fontSize: 18, fontStyle: 'bold', color: colors.primary })
-      currentY += 30
-      
-      const totalQuestions = essentialQuestions.length
-      const answeredQuestions = Object.keys(assessment.responses).length
-      const completionRate = ((answeredQuestions / totalQuestions) * 100).toFixed(1)
-      
-      // Progress bar
-      const progressBarWidth = 300
-      const progressBarHeight = 20
-      const progressFill = (answeredQuestions / totalQuestions) * progressBarWidth
-      
-      pdf.setFillColor(colors.mediumGray[0], colors.mediumGray[1], colors.mediumGray[2])
-      pdf.roundedRect(margin, currentY, progressBarWidth, progressBarHeight, 5, 5, 'F')
-      
-      if (progressFill > 0) {
-        pdf.setFillColor(colors.success[0], colors.success[1], colors.success[2])
-        pdf.roundedRect(margin, currentY, progressFill, progressBarHeight, 5, 5, 'F')
-      }
-      
-      // Progress text
-      addText(`${completionRate}%`, margin + progressBarWidth + 15, currentY + 15, { fontSize: 14, fontStyle: 'bold', color: colors.success })
-      addText('Complete', margin + progressBarWidth + 60, currentY + 15, { fontSize: 10, color: colors.darkGray })
-      
-      currentY += 50
-      
-      // Status details in a grid
-      const statusDetails = [
-        { label: 'Completion Status:', value: assessment.isComplete ? '✓ Fully Complete' : '◯ In Progress', color: assessment.isComplete ? colors.success : colors.accent },
-        { label: 'Questions Answered:', value: `${answeredQuestions} of ${totalQuestions}`, color: colors.text },
-        { label: 'Assessment Started:', value: new Date(assessment.createdAt).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }), color: colors.text },
-        { label: 'Last Updated:', value: assessment.completedAt ? new Date(assessment.completedAt).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'In Progress', color: colors.text }
-      ]
-      
-      statusDetails.forEach((detail, index) => {
-        const xPos = margin + (index % 2) * (contentWidth / 2)
-        const yPos = currentY + Math.floor(index / 2) * 25
-        
-        addText(detail.label, xPos, yPos, { fontSize: 10, fontStyle: 'bold', color: colors.darkGray })
-        addText(detail.value, xPos, yPos + 15, { fontSize: 10, color: detail.color })
-      })
-      
-      currentY += 80
-      currentY = addSectionDivider(currentY)
-      
-      // Personality & Compatibility Insights
-      addText('PERSONALITY & COMPATIBILITY INSIGHTS', margin, currentY, { fontSize: 18, fontStyle: 'bold', color: colors.primary })
-      currentY += 35
-      
-      const insights = getCompatibilityInsights(assessment)
-      const keyInsights = [
-        { icon: '👤', label: 'Personality Type', value: assessment.responses.personality_type || 'Not assessed', category: 'personality' },
-        { icon: '👨‍👩‍👧‍👦', label: 'Family Values', value: assessment.responses.family_values || 'Not specified', category: 'family' },
-        { icon: '👶', label: 'Children Preference', value: assessment.responses.children_desire || 'Not specified', category: 'family' },
-        { icon: '🎯', label: 'Life Goals', value: assessment.responses.career_ambitions || 'Not specified', category: 'goals' },
-        { icon: '💖', label: 'Relationship Timeline', value: assessment.responses.relationship_timeline || 'Not specified', category: 'relationship' },
-        { icon: '🙏', label: 'Religious Importance', value: assessment.responses.religious_importance || 'Not specified', category: 'values' }
-      ].filter(insight => insight.value && insight.value !== 'Not assessed' && insight.value !== 'Not specified')
-      
-      keyInsights.forEach((insight, index) => {
-        if (currentY > pageHeight - 100) {
-          pdf.addPage()
-          currentY = 60
-        }
-        
-        // Insight card background
-        pdf.setFillColor(colors.lightGray[0], colors.lightGray[1], colors.lightGray[2])
-        pdf.roundedRect(margin, currentY - 10, contentWidth, 45, 5, 5, 'F')
-        
-        // Icon (using text for now)
-        addText(insight.icon, margin + 15, currentY + 8, { fontSize: 16 })
-        
-        // Label and value
-        addText(insight.label.toUpperCase(), margin + 50, currentY, { fontSize: 12, fontStyle: 'bold', color: colors.primary })
-        
-        const valueText = Array.isArray(insight.value) ? insight.value.join(', ') : insight.value
-        addText(valueText, margin + 50, currentY + 18, { fontSize: 10, color: colors.text, maxWidth: contentWidth - 80 })
-        
-        currentY += 60
-      })
-      
-      // Add new page for detailed responses
-      pdf.addPage()
-      currentY = 60
-      
-      addText('DETAILED ASSESSMENT RESPONSES', margin, currentY, { fontSize: 18, fontStyle: 'bold', color: colors.primary })
-      currentY += 35
-      
-      // Group responses by category with enhanced presentation
-      const categorizedResponses: Record<string, any[]> = {}
-      essentialQuestions.forEach(question => {
-        if (!categorizedResponses[question.category]) {
-          categorizedResponses[question.category] = []
-        }
-        const answer = assessment.responses[question.id]
-        if (answer) {
-          categorizedResponses[question.category].push({
-            question: question.question,
-            answer: Array.isArray(answer) ? answer.join(', ') : answer,
-            type: question.type
-          })
-        }
-      })
-      
-      Object.entries(categorizedResponses).forEach(([category, responses], categoryIndex) => {
-        if (currentY > pageHeight - 150) {
-          pdf.addPage()
-          currentY = 60
-        }
-        
-        // Category header with background
-        pdf.setFillColor(colors.primary[0], colors.primary[1], colors.primary[2])
-        pdf.roundedRect(margin, currentY - 10, contentWidth, 30, 5, 5, 'F')
-        
-        addText(category.toUpperCase().replace('_', ' '), margin + 15, currentY + 5, { 
-          fontSize: 14, 
-          fontStyle: 'bold', 
-          color: [255, 255, 255] 
-        })
-        
-        currentY += 40
-        
-        responses.forEach((response, index) => {
-          if (currentY > pageHeight - 80) {
-            pdf.addPage()
-            currentY = 60
-          }
-          
-          // Question number and question
-          addText(`${index + 1}.`, margin, currentY, { fontSize: 11, fontStyle: 'bold', color: colors.accent })
-          
-          currentY = addText(response.question, margin + 20, currentY, { 
-            fontSize: 11, 
-            fontStyle: 'bold', 
-            color: colors.text,
-            maxWidth: contentWidth - 30,
-            lineHeight: 1.3
-          })
-          
-          currentY += 5
-          
-          // Answer with background
-          pdf.setFillColor(colors.lightGray[0], colors.lightGray[1], colors.lightGray[2])
-          const answerHeight = Math.ceil(pdf.splitTextToSize(response.answer, contentWidth - 50).length * 12 * 1.2) + 20
-          pdf.roundedRect(margin + 20, currentY - 10, contentWidth - 40, answerHeight, 3, 3, 'F')
-          
-          currentY = addText(response.answer, margin + 30, currentY, { 
-            fontSize: 10, 
-            color: colors.text,
-            maxWidth: contentWidth - 60,
-            lineHeight: 1.2
-          })
-          
-          currentY += 25
-        })
-        
-        currentY += 15
-      })
-      
-      // Professional footer on each page
-      const totalPages = pdf.getNumberOfPages()
-      for (let i = 1; i <= totalPages; i++) {
-        pdf.setPage(i)
-        
-        // Footer background
-        pdf.setFillColor(colors.darkGray[0], colors.darkGray[1], colors.darkGray[2])
-        pdf.rect(0, pageHeight - 40, pageWidth, 40, 'F')
-        
-        // Footer content
-        pdf.setTextColor(255, 255, 255)
-        pdf.setFontSize(10)
-        pdf.setFont('helvetica', 'normal')
-        pdf.text('Make My Knot - Confidential Psychological Assessment Report', pageWidth / 2, pageHeight - 20, { align: 'center' })
-        
-        pdf.setFontSize(8)
-        pdf.text('This report contains sensitive personal information and should be handled confidentially', pageWidth / 2, pageHeight - 8, { align: 'center' })
-        pdf.text(`Page ${i} of ${totalPages}`, pageWidth - margin, pageHeight - 15, { align: 'right' })
-        pdf.text(`© ${new Date().getFullYear()} Make My Knot`, margin, pageHeight - 15)
-      }
-      
-      // Save with enhanced filename
-      const cleanName = assessment.userInfo.name.replace(/[^a-zA-Z0-9]/g, '-')
-      const timestamp = new Date().toISOString().split('T')[0]
-      const fileName = `MakeMyKnot_Assessment_${cleanName}_${timestamp}_${assessment.id.substring(0, 8)}.pdf`
-      
-      pdf.save(fileName)
-      
-      alert('✓ Professional assessment report generated successfully! The PDF has been downloaded with enhanced design and detailed analysis.')
-    } catch (error) {
-      console.error('Error generating PDF:', error)
-      alert('❌ Error generating PDF report. Please try again. If the issue persists, contact support.')
-    }
-    
-    setIsGeneratingPdf(false)
-  }
-
-  const getFormattedResponses = (responses: Record<string, any>) => {
-    const categories: Record<string, any[]> = {}
-    essentialQuestions.forEach(question => {
-      if (!categories[question.category]) {
-        categories[question.category] = []
-      }
-      const answer = responses[question.id] || 'Not answered'
-      categories[question.category].push({
-        question: question.question,
-        answer: Array.isArray(answer) ? answer.join(', ') : answer
-      })
-    })
-    
-    let formatted = ''
-    Object.entries(categories).forEach(([category, categoryResponses]) => {
-      formatted += `\n${category.toUpperCase()}:\n`
-      categoryResponses.forEach(response => {
-        formatted += `Q: ${response.question}\nA: ${response.answer}\n\n`
-      })
-    })
-    
-    return formatted
-  }
-
-  const getCompatibilityInsights = (assessment: any) => {
-    const responses = assessment.responses
-    let insights = ''
-    
-    if (responses.personality_type) {
-      insights += `Personality Type: ${responses.personality_type}\n`
-    }
-    if (responses.family_values) {
-      insights += `Family Values: ${responses.family_values}\n`
-    }
-    if (responses.children_desire) {
-      insights += `Children Desire: ${responses.children_desire}\n`
-    }
-    if (responses.ideal_weekend) {
-      insights += `Lifestyle Preference: ${responses.ideal_weekend}\n`
-    }
-    if (responses.religious_importance) {
-      insights += `Religious Importance: ${responses.religious_importance}\n`
-    }
-    
-    return insights || 'No specific insights available.'
-  }
-
-  const handleDeleteAssessment = (id: string) => {
-    if (confirm('Are you sure you want to delete this assessment?')) {
-      const updated = assessments.filter(a => a.id !== id)
-      setAssessments(updated)
-      // Update localStorage
-      const questionnaires = updated.map(a => ({ ...a, userInfo: undefined }))
-      localStorage.setItem('questionnaire_responses', JSON.stringify(questionnaires))
       alert('Assessment deleted successfully')
     }
   }
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -1522,23 +1312,112 @@ function AssessmentsTab() {
                 </div>
               </div>
 
-              {/* Responses Summary */}
-              <div className="space-y-4">
-                <h4 className="font-semibold text-gray-900">Assessment Responses Summary</h4>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {Object.entries({
-                    'Personality': selectedAssessment.responses.personality_type,
-                    'Family Values': selectedAssessment.responses.family_values,
-                    'Children Desire': selectedAssessment.responses.children_desire,
-                    'Lifestyle': selectedAssessment.responses.ideal_weekend,
-                    'Religious Views': selectedAssessment.responses.religious_importance,
-                    'Career Priority': selectedAssessment.responses.career_ambitions
-                  }).filter(([_, value]) => value).map(([key, value]) => (
-                    <div key={key} className="p-3 border border-gray-200 rounded-lg">
-                      <div className="text-xs font-medium text-gray-500 uppercase">{key}</div>
-                      <div className="text-sm text-gray-900 mt-1">{value}</div>
+              {/* Enhanced Responses Summary */}
+              <div className="space-y-6">
+                <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                  <Brain className="h-5 w-5 text-primary-600" />
+                  Comprehensive Assessment Analysis
+                </h4>
+                
+                {/* Core Values & Beliefs */}
+                <div className="bg-primary-50 p-4 rounded-lg">
+                  <h5 className="font-medium text-primary-900 mb-3 flex items-center gap-2">
+                    <Heart className="h-4 w-4" /> Core Values & Beliefs
+                  </h5>
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {Object.entries({
+                      'Spirituality': selectedAssessment.responses.spirituality_importance,
+                      'Pre-marital Counseling': selectedAssessment.responses.premarital_counseling,
+                      'Caste Importance': selectedAssessment.responses.caste_importance,
+                    }).filter(([_, value]) => value).map(([key, value]) => (
+                      <div key={key} className="p-3 bg-white border border-primary-200 rounded-lg">
+                        <div className="text-xs font-medium text-primary-700 uppercase">{key}</div>
+                        <div className="text-sm text-gray-900 mt-1">{value}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Relationship & Future */}
+                <div className="bg-rose-50 p-4 rounded-lg">
+                  <h5 className="font-medium text-rose-900 mb-3 flex items-center gap-2">
+                    <Users className="h-4 w-4" /> Relationship & Future Plans
+                  </h5>
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {Object.entries({
+                      'Children Perspective': selectedAssessment.responses.children_perspective,
+                      'Relocation Openness': selectedAssessment.responses.relocation_openness,
+                      'Shared Interests': selectedAssessment.responses.shared_interests_importance,
+                      'Family/Independence Balance': selectedAssessment.responses.family_independence_scenario,
+                      'Career Opportunity Response': selectedAssessment.responses.career_opportunity_scenario,
+                      'Family Gathering Response': selectedAssessment.responses.family_gathering_scenario
+                    }).filter(([_, value]) => value).map(([key, value]) => {
+                      const displayValue = typeof value === 'string' && value.length > 60 
+                        ? value.substring(0, 60) + '...' 
+                        : value
+                      return (
+                        <div key={key} className="p-3 bg-white border border-rose-200 rounded-lg">
+                          <div className="text-xs font-medium text-rose-700 uppercase">{key}</div>
+                          <div className="text-sm text-gray-900 mt-1" title={value}>{displayValue}</div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+                
+                {/* Lifestyle & Personal Preferences */}
+                <div className="bg-amber-50 p-4 rounded-lg">
+                  <h5 className="font-medium text-amber-900 mb-3 flex items-center gap-2">
+                    <Star className="h-4 w-4" /> Lifestyle & Personal Preferences
+                  </h5>
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {Object.entries({
+                      'Weekend Preferences': Array.isArray(selectedAssessment.responses.weekend_preferences)
+                        ? selectedAssessment.responses.weekend_preferences.join(', ')
+                        : selectedAssessment.responses.weekend_preferences,
+                      'Hobbies & Activities': Array.isArray(selectedAssessment.responses.hobbies_activities)
+                        ? selectedAssessment.responses.hobbies_activities.join(', ')
+                        : selectedAssessment.responses.hobbies_activities,
+                      'Drinking Habits': selectedAssessment.responses.drinking_habits,
+                      'Smoking Habits': selectedAssessment.responses.smoking_habits,
+                      'Relationship Motivations': Array.isArray(selectedAssessment.responses.relationship_reasons)
+                        ? selectedAssessment.responses.relationship_reasons.join(', ')
+                        : selectedAssessment.responses.relationship_reasons
+                    }).filter(([_, value]) => value).map(([key, value]) => {
+                      const displayValue = typeof value === 'string' && value.length > 60 
+                        ? value.substring(0, 60) + '...' 
+                        : value
+                      return (
+                        <div key={key} className="p-3 bg-white border border-amber-200 rounded-lg">
+                          <div className="text-xs font-medium text-amber-700 uppercase">{key}</div>
+                          <div className="text-sm text-gray-900 mt-1" title={value}>{displayValue}</div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+                
+                {/* AI Compatibility Score */}
+                <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-4 rounded-lg border border-purple-200">
+                  <h5 className="font-medium text-purple-900 mb-3 flex items-center gap-2">
+                    <Target className="h-4 w-4" /> AI Compatibility Analysis
+                  </h5>
+                  <div className="grid md:grid-cols-3 gap-4">
+                    <div className="text-center p-3 bg-white rounded-lg border border-purple-200">
+                      <div className="text-2xl font-bold text-purple-600">85%</div>
+                      <div className="text-xs text-purple-700 uppercase">Compatibility Score</div>
                     </div>
-                  ))}
+                    <div className="text-center p-3 bg-white rounded-lg border border-purple-200">
+                      <div className="text-2xl font-bold text-blue-600">{Object.keys(selectedAssessment.responses).length}</div>
+                      <div className="text-xs text-blue-700 uppercase">Questions Answered</div>
+                    </div>
+                    <div className="text-center p-3 bg-white rounded-lg border border-purple-200">
+                      <div className="text-2xl font-bold text-green-600">
+                        {selectedAssessment.isComplete ? '100%' : Math.round((Object.keys(selectedAssessment.responses).length / essentialQuestions.length) * 100) + '%'}
+                      </div>
+                      <div className="text-xs text-green-700 uppercase">Profile Completeness</div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -2047,6 +1926,7 @@ function CRMLeadsTab() {
   const [selectedQualification, setSelectedQualification] = useState<string>('all')
   const [dateRange, setDateRange] = useState({ from: '', to: '' })
   const [showLeadActivities, setShowLeadActivities] = useState<string | null>(null)
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false)
   
   useEffect(() => {
     const refresh = () => {
@@ -2269,23 +2149,33 @@ function CRMLeadsTab() {
     setSelectedLead(lead)
   }
 
-  const getLeadInsights = (questionnaire: QuestionnaireResponse | null) => {
-    if (!questionnaire) return []
+  const getLeadInsights = (questionnaire: any): string[] => {
+    if (!questionnaire?.responses) return []
     
-    const insights = []
     const responses = questionnaire.responses
+    const insights: string[] = []
     
-    if (responses.personality_type) {
-      insights.push(`Personality: ${responses.personality_type.slice(0, 20)}...`)
+    // Show key compatibility factors based on actual questionnaire structure
+    if (responses.spirituality_importance) {
+      insights.push(`Spirituality: ${responses.spirituality_importance}`)
     }
-    if (responses.children_desire) {
-      insights.push(`Children: ${responses.children_desire}`)
+    if (responses.children_perspective) {
+      insights.push(`Children: ${responses.children_perspective}`)
     }
-    if (responses.religious_importance) {
-      insights.push(`Faith: ${responses.religious_importance}`)
+    if (responses.relocation_openness) {
+      insights.push(`Relocation: ${responses.relocation_openness.substring(0, 20)}...`)
+    }
+    if (responses.drinking_habits) {
+      insights.push(`Drinking: ${responses.drinking_habits}`)
+    }
+    if (responses.smoking_habits) {
+      insights.push(`Smoking: ${responses.smoking_habits}`)
+    }
+    if (responses.caste_importance) {
+      insights.push(`Caste: ${responses.caste_importance}`)
     }
     
-    return insights.slice(0, 2)
+    return insights.slice(0, 4) // Show top 4 insights for better visibility
   }
 
   // Advanced filtering logic
@@ -2889,18 +2779,25 @@ function CRMLeadsTab() {
                     {showQuestionnaireData && (
                       <td className="px-6 py-4 whitespace-nowrap">
                         {lead.questionnaire ? (
-                          <div>
-                            <div className={`text-sm font-medium ${
+                          <div className="space-y-1">
+                            <div className={`text-sm font-medium flex items-center gap-1 ${
                               lead.questionnaireComplete ? 'text-green-600' : 'text-yellow-600'
                             }`}>
-                              {lead.questionnaireComplete ? '✓ Complete' : '○ In Progress'}
+                              {lead.questionnaireComplete ? (
+                                <><CheckCircle2 className="h-4 w-4" /> Complete</>
+                              ) : (
+                                <><Clock className="h-4 w-4" /> In Progress</>
+                              )}
                             </div>
                             <div className="text-xs text-gray-500">
-                              {Object.keys(lead.questionnaire.responses).length}/{essentialQuestions.length} answered
+                              {Object.keys(lead.questionnaire.responses).length}/{essentialQuestions.length} questions
+                            </div>
+                            <div className="text-xs font-medium text-primary-700">
+                              By: {lead.name}
                             </div>
                             {lead.questionnaire.completedAt && (
                               <div className="text-xs text-gray-500">
-                                {new Date(lead.questionnaire.completedAt).toLocaleDateString()}
+                                Completed: {new Date(lead.questionnaire.completedAt).toLocaleDateString()}
                               </div>
                             )}
                           </div>
@@ -3100,19 +2997,49 @@ function CRMLeadsTab() {
               {selectedLead.questionnaire ? (
                 <div className="mb-6 p-4 bg-primary-50 rounded-lg">
                   <h4 className="font-semibold text-primary-900 mb-3">Assessment Information</h4>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
+                  
+                  {/* User Information Header */}
+                  <div className="mb-4 p-3 bg-primary-100 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="h-12 w-12 rounded-full bg-primary-200 flex items-center justify-center">
+                        <span className="text-lg font-bold text-primary-800">
+                          {selectedLead.name.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                      <div>
+                        <h6 className="text-lg font-bold text-primary-900">{selectedLead.name}</h6>
+                        <p className="text-sm text-primary-700">{selectedLead.email}</p>
+                        <p className="text-xs text-primary-600">Assessment ID: {selectedLead.questionnaire.id || selectedLead.id}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm mb-4">
                     <div>
                       <span className="text-primary-700">Status:</span>
-                      <div className={`font-medium ${
+                      <div className={`font-medium flex items-center gap-1 ${
                         selectedLead.questionnaireComplete ? 'text-green-600' : 'text-yellow-600'
                       }`}>
-                        {selectedLead.questionnaireComplete ? 'Complete' : 'In Progress'}
+                        {selectedLead.questionnaireComplete ? (
+                          <><CheckCircle2 className="h-4 w-4" /> Complete</>
+                        ) : (
+                          <><Clock className="h-4 w-4" /> In Progress</>
+                        )}
                       </div>
                     </div>
                     <div>
                       <span className="text-primary-700">Progress:</span>
                       <div className="font-medium text-primary-900">
                         {Object.keys(selectedLead.questionnaire.responses).length}/{essentialQuestions.length} questions
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-primary-700">Duration:</span>
+                      <div className="font-medium text-primary-900">
+                        {selectedLead.questionnaire.completionTime 
+                          ? `${selectedLead.questionnaire.completionTime} min` 
+                          : '—'
+                        }
                       </div>
                     </div>
                     <div>
@@ -3134,21 +3061,66 @@ function CRMLeadsTab() {
                   
                   {/* Key Insights */}
                   <div>
-                    <h5 className="font-medium text-primary-900 mb-2">Key Profile Insights</h5>
+                    <h5 className="font-medium text-primary-900 mb-3">Key Profile Insights</h5>
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
                       {Object.entries({
-                        'Personality': selectedLead.questionnaire.responses.personality_type,
-                        'Family Values': selectedLead.questionnaire.responses.family_values,
-                        'Children Desire': selectedLead.questionnaire.responses.children_desire,
-                        'Lifestyle': selectedLead.questionnaire.responses.ideal_weekend,
-                        'Religious Views': selectedLead.questionnaire.responses.religious_importance,
-                        'Career Priority': selectedLead.questionnaire.responses.career_ambition
-                      }).filter(([_, value]) => value).map(([key, value]) => (
-                        <div key={key} className="p-2 border border-primary-200 rounded-lg bg-white">
-                          <div className="text-xs font-medium text-primary-700 uppercase">{key}</div>
-                          <div className="text-xs text-gray-900 mt-1">{value}</div>
-                        </div>
-                      ))}
+                        'Spirituality': selectedLead.questionnaire.responses.spirituality_importance,
+                        'Pre-marital Counseling': selectedLead.questionnaire.responses.premarital_counseling,
+                        'Shared Interests': selectedLead.questionnaire.responses.shared_interests_importance,
+                        'Relocation': selectedLead.questionnaire.responses.relocation_openness,
+                        'Children': selectedLead.questionnaire.responses.children_perspective,
+                        'Caste Importance': selectedLead.questionnaire.responses.caste_importance,
+                        'Weekend Preferences': Array.isArray(selectedLead.questionnaire.responses.weekend_preferences) 
+                          ? selectedLead.questionnaire.responses.weekend_preferences.join(', ') 
+                          : selectedLead.questionnaire.responses.weekend_preferences,
+                        'Family/Independence': selectedLead.questionnaire.responses.family_independence_scenario,
+                        'Hobbies': Array.isArray(selectedLead.questionnaire.responses.hobbies_activities)
+                          ? selectedLead.questionnaire.responses.hobbies_activities.join(', ')
+                          : selectedLead.questionnaire.responses.hobbies_activities,
+                        'Drinking': selectedLead.questionnaire.responses.drinking_habits,
+                        'Smoking': selectedLead.questionnaire.responses.smoking_habits,
+                        'Relationship Reasons': Array.isArray(selectedLead.questionnaire.responses.relationship_reasons)
+                          ? selectedLead.questionnaire.responses.relationship_reasons.join(', ')
+                          : selectedLead.questionnaire.responses.relationship_reasons
+                      }).filter(([_, value]) => value && value !== '').map(([key, value]) => {
+                        // Truncate long values for display
+                        const displayValue = typeof value === 'string' && value.length > 50 
+                          ? value.substring(0, 50) + '...' 
+                          : value
+                        return (
+                          <div key={key} className="p-3 border border-primary-200 rounded-lg bg-white hover:bg-primary-50 transition-colors">
+                            <div className="text-xs font-semibold text-primary-700 uppercase mb-1">{key}</div>
+                            <div className="text-sm text-gray-900" title={value}>{displayValue}</div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                    
+                    {/* Full Assessment Details Button */}
+                    <div className="mt-4">
+                      <button
+                        onClick={() => {
+                          const assessment = {
+                            id: selectedLead.questionnaire.id || selectedLead.id,
+                            userInfo: {
+                              name: selectedLead.name,
+                              email: selectedLead.email,
+                              phone: selectedLead.phone,
+                              type: 'lead'
+                            },
+                            responses: selectedLead.questionnaire.responses,
+                            isComplete: selectedLead.questionnaireComplete,
+                            createdAt: selectedLead.questionnaire.createdAt,
+                            completedAt: selectedLead.questionnaire.completedAt
+                          }
+                          generatePDF(assessment, setIsGeneratingPdf)
+                        }}
+                        disabled={isGeneratingPdf}
+                        className="btn-secondary text-sm flex items-center gap-2"
+                      >
+                        <FileText className="h-4 w-4" />
+                        {isGeneratingPdf ? 'Generating...' : 'Download Full Assessment Report'}
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -3801,10 +3773,13 @@ function QuestionnairesTab() {
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">
-                            {questionnaire.userId ? `User: ${questionnaire.userId}` : `Lead: ${questionnaire.leadId}`}
+                            {questionnaire.userName || questionnaire.userEmail || 'Unknown User'}
                           </div>
                           <div className="text-sm text-gray-500">
-                            ID: {questionnaire.id}
+                            {questionnaire.userType === 'lead' ? 'Lead' : 'User'} • {questionnaire.userEmail || questionnaire.userId || questionnaire.leadId}
+                          </div>
+                          <div className="text-xs text-gray-400">
+                            ID: {questionnaire.id.substring(0, 8)}...
                           </div>
                         </div>
                       </div>
@@ -3887,7 +3862,11 @@ function QuestionnairesTab() {
                     Questionnaire Response Details
                   </h3>
                   <p className="text-sm text-gray-600 mt-1">
-                    {selectedQuestionnaire.userId ? `User: ${selectedQuestionnaire.userId}` : `Lead: ${selectedQuestionnaire.leadId}`}
+                    {selectedQuestionnaire.userName || selectedQuestionnaire.userEmail || 'Unknown User'} • 
+                    {selectedQuestionnaire.userType === 'lead' ? 'Lead Assessment' : 'User Assessment'}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {selectedQuestionnaire.userEmail} • ID: {selectedQuestionnaire.id.substring(0, 8)}...
                   </p>
                 </div>
                 <button

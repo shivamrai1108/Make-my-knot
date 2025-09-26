@@ -97,7 +97,7 @@ export default function Navigation({ variant = 'transparent', className = '' }: 
           {/* Logo */}
           <Link href="/" className="flex items-center">
             <BrandLogo size="md" className="mr-2" />
-            <span className={`text-xl font-bold ${textColor}`}>Make My Knot</span>
+            <span className={`text-xl font-serif font-bold ${textColor}`}>Make My Knot</span>
           </Link>
 
           {/* Desktop Navigation */}
