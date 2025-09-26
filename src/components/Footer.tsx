@@ -1,4 +1,4 @@
-import { Heart, Mail, Phone, MapPin, Instagram, Twitter, Facebook, Smartphone, Monitor } from 'lucide-react'
+import { Heart, Mail, Phone, MapPin, Instagram, Twitter, Facebook, Smartphone, Monitor, MessageCircle } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useLanguage } from '@/contexts/LanguageContext'
@@ -56,7 +56,7 @@ export default function Footer() {
             <ul className="space-y-2">
               <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Help Center</a></li>
               <li><Link href="/contact" className="text-gray-400 hover:text-white transition-colors">Contact Us</Link></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
+              <li><Link href="/privacy-policy" className="text-gray-400 hover:text-white transition-colors">Privacy Policy</Link></li>
               <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Terms of Service</a></li>
               <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Community Guidelines</a></li>
             </ul>
@@ -72,14 +72,31 @@ export default function Footer() {
               </div>
               <div className="flex items-center">
                 <Phone className="h-5 w-5 text-primary-400 mr-3" />
-                <span className="text-gray-400">+91 98765 43210</span>
+                <div className="flex flex-col">
+                  <a href="tel:+919220511631" className="text-gray-400 hover:text-white transition-colors">+91 92205 11631</a>
+                  <a href="tel:+919315643044" className="text-gray-400 hover:text-white transition-colors">+91 93156 43044</a>
+                </div>
               </div>
               <div className="flex items-start">
                 <MapPin className="h-5 w-5 text-primary-400 mr-3 mt-0.5" />
                 <span className="text-gray-400">
-                  Noida, India<br />
-                  Serving users globally
+                  NPX URBTECH<br />
+                  99-100, 7th Floor, Sector 153<br />
+                  Noida - 201304, India
                 </span>
+              </div>
+              
+              {/* WhatsApp Button */}
+              <div className="mt-4">
+                <a 
+                  href="https://wa.me/919315643044?text=Hi%2C%20I%27m%20interested%20in%20Make%20My%20Knot%20services" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors group"
+                >
+                  <MessageCircle className="h-5 w-5 mr-2" />
+                  <span className="font-medium">WhatsApp Us</span>
+                </a>
               </div>
             </div>
             
@@ -131,7 +148,7 @@ export default function Footer() {
               © 2024 Make My Knot. All rights reserved.
             </p>
             <div className="flex items-center space-x-6">
-              <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">Privacy</a>
+              <Link href="/privacy-policy" className="text-gray-400 hover:text-white text-sm transition-colors">Privacy</Link>
               <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">Terms</a>
               <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">Cookies</a>
             </div>
