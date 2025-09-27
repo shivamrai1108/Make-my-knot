@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { Heart, Clock, Users, Award, ArrowRight, CheckCircle } from 'lucide-react'
 import Footer from '@/components/Footer'
 import BrandLogo from '@/components/BrandLogo'
+import WhatsAppButton from '@/components/WhatsAppButton'
 
 export default function About() {
   return (
@@ -226,85 +227,156 @@ export default function About() {
 
                 {/* 2010 */}
                 <div className="relative flex items-center">
-                  <div className="flex-1 text-right pr-8">
-                    <h3 className="text-2xl font-bold text-gray-900">2010</h3>
-                    <h4 className="text-lg font-semibold text-primary-600 mb-2">The Digital Shift</h4>
-                    <div className="bg-gradient-to-r from-primary-50 to-gold-50 rounded-lg p-4 mb-4">
-                      <h5 className="font-bold text-primary-800 mb-2">Where Technology Met Heart</h5>
+                  {/* Mobile Layout */}
+                  <div className="md:hidden pl-12 w-full">
+                    <h3 className="text-xl font-bold text-gray-900">2010</h3>
+                    <h4 className="text-base font-semibold text-primary-600 mb-2">The Digital Shift</h4>
+                    <div className="bg-gradient-to-r from-primary-50 to-gold-50 rounded-lg p-3 mb-3">
+                      <h5 className="font-bold text-primary-800 mb-1 text-sm">Where Technology Met Heart</h5>
                     </div>
-                    <p className="text-gray-600 mb-3">
+                    <p className="text-gray-600 mb-3 text-sm">
                       As technology reshaped India, so did matchmaking. While many reduced rishtas to online biodata lists, <strong>Shri Anil Goyal</strong> blended technology with human touch.
                     </p>
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 text-sm">
                       He believed in stories, not just profiles—helping families find matches that were not only compatible on paper but deeply meaningful in real life.
                     </p>
                   </div>
-                  <div className="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-primary-600 rounded-full border-4 border-white"></div>
-                  <div className="flex-1 pl-8"></div>
+                  {/* Desktop Layout */}
+                  <div className="hidden md:flex md:items-center md:w-full">
+                    <div className="flex-1 text-right pr-8">
+                      <h3 className="text-2xl font-bold text-gray-900">2010</h3>
+                      <h4 className="text-lg font-semibold text-primary-600 mb-2">The Digital Shift</h4>
+                      <div className="bg-gradient-to-r from-primary-50 to-gold-50 rounded-lg p-4 mb-4">
+                        <h5 className="font-bold text-primary-800 mb-2">Where Technology Met Heart</h5>
+                      </div>
+                      <p className="text-gray-600 mb-3">
+                        As technology reshaped India, so did matchmaking. While many reduced rishtas to online biodata lists, <strong>Shri Anil Goyal</strong> blended technology with human touch.
+                      </p>
+                      <p className="text-gray-600">
+                        He believed in stories, not just profiles—helping families find matches that were not only compatible on paper but deeply meaningful in real life.
+                      </p>
+                    </div>
+                    <div className="flex-1 pl-8"></div>
+                  </div>
+                  {/* Timeline dot */}
+                  <div className="absolute left-4 md:left-1/2 transform md:-translate-x-1/2 w-6 h-6 md:w-8 md:h-8 bg-primary-600 rounded-full border-2 md:border-4 border-white"></div>
                 </div>
 
                 {/* 2015 */}
                 <div className="relative flex items-center">
-                  <div className="flex-1 pr-8"></div>
-                  <div className="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-primary-600 rounded-full border-4 border-white"></div>
-                  <div className="flex-1 pl-8">
-                    <h3 className="text-2xl font-bold text-gray-900">2015</h3>
-                    <h4 className="text-lg font-semibold text-primary-600 mb-2">Handwritten Diaries to Platforms</h4>
-                    <div className="bg-gradient-to-r from-primary-50 to-gold-50 rounded-lg p-4 mb-4">
-                      <h5 className="font-bold text-primary-800 mb-2">Every Rishta Tells a Story</h5>
+                  {/* Mobile Layout */}
+                  <div className="md:hidden pl-12 w-full">
+                    <h3 className="text-xl font-bold text-gray-900">2015</h3>
+                    <h4 className="text-base font-semibold text-primary-600 mb-2">Handwritten Diaries to Platforms</h4>
+                    <div className="bg-gradient-to-r from-primary-50 to-gold-50 rounded-lg p-3 mb-3">
+                      <h5 className="font-bold text-primary-800 mb-1 text-sm">Every Rishta Tells a Story</h5>
                     </div>
-                    <p className="text-gray-600 mb-3">
+                    <p className="text-gray-600 mb-3 text-sm">
                       From handwritten diaries filled with biodatas to meaningful conversations, over 1,000 couples were united under the guidance of the Goyal family. Their philosophy remained unchanged:
                     </p>
                     <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 mb-3">
-                      <p className="text-primary-800 font-semibold text-center">
-                        “Shaadi ek event nahi — ek zindagi bhar ka saath hota hai.”
+                      <p className="text-primary-800 font-semibold text-center text-sm">
+                        "Shaadi ek event nahi — ek zindagi bhar ka saath hota hai."
                       </p>
                     </div>
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 text-sm">
                       Every rishta was not just a profile—it was a story of love, trust, and companionship.
                     </p>
                   </div>
+                  {/* Desktop Layout */}
+                  <div className="hidden md:flex md:items-center md:w-full">
+                    <div className="flex-1 pr-8"></div>
+                    <div className="flex-1 pl-8">
+                      <h3 className="text-2xl font-bold text-gray-900">2015</h3>
+                      <h4 className="text-lg font-semibold text-primary-600 mb-2">Handwritten Diaries to Platforms</h4>
+                      <div className="bg-gradient-to-r from-primary-50 to-gold-50 rounded-lg p-4 mb-4">
+                        <h5 className="font-bold text-primary-800 mb-2">Every Rishta Tells a Story</h5>
+                      </div>
+                      <p className="text-gray-600 mb-3">
+                        From handwritten diaries filled with biodatas to meaningful conversations, over 1,000 couples were united under the guidance of the Goyal family. Their philosophy remained unchanged:
+                      </p>
+                      <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 mb-3">
+                        <p className="text-primary-800 font-semibold text-center">
+                          "Shaadi ek event nahi — ek zindagi bhar ka saath hota hai."
+                        </p>
+                      </div>
+                      <p className="text-gray-600">
+                        Every rishta was not just a profile—it was a story of love, trust, and companionship.
+                      </p>
+                    </div>
+                  </div>
+                  {/* Timeline dot */}
+                  <div className="absolute left-4 md:left-1/2 transform md:-translate-x-1/2 w-6 h-6 md:w-8 md:h-8 bg-primary-600 rounded-full border-2 md:border-4 border-white"></div>
                 </div>
 
                 {/* 2020 */}
                 <div className="relative flex items-center">
-                  <div className="flex-1 text-right pr-8">
-                    <h3 className="text-2xl font-bold text-gray-900">2020</h3>
-                    <h4 className="text-lg font-semibold text-primary-600 mb-2">Third Generation Leadership</h4>
-                    <div className="bg-gradient-to-r from-primary-50 to-gold-50 rounded-lg p-4 mb-4">
-                      <h5 className="font-bold text-primary-800 mb-2">Where Tradition Meets Innovation</h5>
+                  {/* Mobile Layout */}
+                  <div className="md:hidden pl-12 w-full">
+                    <h3 className="text-xl font-bold text-gray-900">2020</h3>
+                    <h4 className="text-base font-semibold text-primary-600 mb-2">Third Generation Leadership</h4>
+                    <div className="bg-gradient-to-r from-primary-50 to-gold-50 rounded-lg p-3 mb-3">
+                      <h5 className="font-bold text-primary-800 mb-1 text-sm">Where Tradition Meets Innovation</h5>
                     </div>
-                    <p className="text-gray-600 mb-3">
+                    <p className="text-gray-600 mb-3 text-sm">
                       The legacy continues with <strong>Moulik Goyal</strong>, who grew up watching his father and grandfather dedicate their lives to creating happy marriages. With over 5 years of experience in matchmaking at the Goyal Marriage Bureau and 3 years in sales, he uniquely blends tradition with a modern entrepreneurial mindset.
                     </p>
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 text-sm">
                       Leading Make My Knot with a 50-year family legacy, Moulik focuses on honesty, family values, trust, and a modern approach to matchmaking. His expertise in matchmaking & relationship building, business strategy, consumer trust, and sales & growth helps families find meaningful connections in today's world.
                     </p>
                   </div>
-                  <div className="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-primary-600 rounded-full border-4 border-white"></div>
-                  <div className="flex-1 pl-8"></div>
+                  {/* Desktop Layout */}
+                  <div className="hidden md:flex md:items-center md:w-full">
+                    <div className="flex-1 text-right pr-8">
+                      <h3 className="text-2xl font-bold text-gray-900">2020</h3>
+                      <h4 className="text-lg font-semibold text-primary-600 mb-2">Third Generation Leadership</h4>
+                      <div className="bg-gradient-to-r from-primary-50 to-gold-50 rounded-lg p-4 mb-4">
+                        <h5 className="font-bold text-primary-800 mb-2">Where Tradition Meets Innovation</h5>
+                      </div>
+                      <p className="text-gray-600 mb-3">
+                        The legacy continues with <strong>Moulik Goyal</strong>, who grew up watching his father and grandfather dedicate their lives to creating happy marriages. With over 5 years of experience in matchmaking at the Goyal Marriage Bureau and 3 years in sales, he uniquely blends tradition with a modern entrepreneurial mindset.
+                      </p>
+                      <p className="text-gray-600">
+                        Leading Make My Knot with a 50-year family legacy, Moulik focuses on honesty, family values, trust, and a modern approach to matchmaking. His expertise in matchmaking & relationship building, business strategy, consumer trust, and sales & growth helps families find meaningful connections in today's world.
+                      </p>
+                    </div>
+                    <div className="flex-1 pl-8"></div>
+                  </div>
+                  {/* Timeline dot */}
+                  <div className="absolute left-4 md:left-1/2 transform md:-translate-x-1/2 w-6 h-6 md:w-8 md:h-8 bg-primary-600 rounded-full border-2 md:border-4 border-white"></div>
                 </div>
 
                 {/* Interlude */}
                 <div className="relative flex items-center">
-                  <div className="flex-1 text-right pr-8">
-                    <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-                      <h4 className="text-lg font-semibold text-gray-900 mb-2">From Handshake to Pheras</h4>
-                      <p className="text-gray-600">
-                        From meaningful rishtas to lifelong companionship, we&rsquo;ve supported families at every step. Today, we continue that tradition with modern tools and heartfelt service.
+                  {/* Mobile Layout */}
+                  <div className="md:hidden pl-12 w-full">
+                    <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm">
+                      <h4 className="text-base font-semibold text-gray-900 mb-2">From Handshake to Pheras</h4>
+                      <p className="text-gray-600 text-sm">
+                        From meaningful rishtas to lifelong companionship, we've supported families at every step. Today, we continue that tradition with modern tools and heartfelt service.
                       </p>
                     </div>
                   </div>
-                  <div className="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-gold-400 rounded-full border-4 border-white"></div>
-                  <div className="flex-1 pl-8"></div>
+                  {/* Desktop Layout */}
+                  <div className="hidden md:flex md:items-center md:w-full">
+                    <div className="flex-1 text-right pr-8">
+                      <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+                        <h4 className="text-lg font-semibold text-gray-900 mb-2">From Handshake to Pheras</h4>
+                        <p className="text-gray-600">
+                          From meaningful rishtas to lifelong companionship, we&rsquo;ve supported families at every step. Today, we continue that tradition with modern tools and heartfelt service.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex-1 pl-8"></div>
+                  </div>
+                  {/* Timeline dot */}
+                  <div className="absolute left-4 md:left-1/2 transform md:-translate-x-1/2 w-6 h-6 md:w-8 md:h-8 bg-gold-400 rounded-full border-2 md:border-4 border-white"></div>
                 </div>
 
                 {/* 2025 */}
                 <div className="relative flex items-center">
-                  <div className="flex-1 pr-8"></div>
-                  <div className="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 bg-gold-600 rounded-full border-4 border-white"></div>
-                  <div className="flex-1 pl-8">
+                  {/* Mobile Layout */}
+                  <div className="md:hidden pl-12 w-full">
                     <div className="mb-4">
                       <div className="relative w-48 h-32 rounded-lg overflow-hidden shadow-lg">
                         <Image
@@ -315,30 +387,71 @@ export default function About() {
                         />
                       </div>
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-900">2025</h3>
-                    <h4 className="text-lg font-semibold text-primary-600 mb-2">Tech-Powered Matchmaking & Beyond</h4>
-                    <div className="bg-gradient-to-r from-primary-50 to-gold-50 rounded-lg p-4 mb-4">
-                      <h5 className="font-bold text-primary-800 mb-2">Heritage Meets Innovation</h5>
+                    <h3 className="text-xl font-bold text-gray-900">2025</h3>
+                    <h4 className="text-base font-semibold text-primary-600 mb-2">Tech-Powered Matchmaking & Beyond</h4>
+                    <div className="bg-gradient-to-r from-primary-50 to-gold-50 rounded-lg p-3 mb-3">
+                      <h5 className="font-bold text-primary-800 mb-1 text-sm">Heritage Meets Innovation</h5>
                     </div>
-                    <p className="text-gray-600 mb-4">
+                    <p className="text-gray-600 mb-3 text-sm">
                       Today, after five decades of trust, the Goyal family legacy is stronger than ever. Through AI matchmaking, expert guidance, and personalized services, Make My Knot continues to help families create lasting, meaningful, and values-driven relationships.
                     </p>
-                    <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
-                      <h6 className="font-bold text-blue-800 mb-2">✨ Coming Soon: End-to-end wedding services</h6>
-                      <div className="grid md:grid-cols-2 gap-2 text-sm text-blue-700">
-                        <div className="flex items-center"><CheckCircle className="h-4 w-4 text-blue-600 mr-2" /> Wedding Planners</div>
-                        <div className="flex items-center"><CheckCircle className="h-4 w-4 text-blue-600 mr-2" /> Caterers</div>
-                        <div className="flex items-center"><CheckCircle className="h-4 w-4 text-blue-600 mr-2" /> Decorators</div>
-                        <div className="flex items-center"><CheckCircle className="h-4 w-4 text-blue-600 mr-2" /> Photographers</div>
-                        <div className="flex items-center"><CheckCircle className="h-4 w-4 text-blue-600 mr-2" /> Anchors & Singers</div>
-                        <div className="flex items-center"><CheckCircle className="h-4 w-4 text-blue-600 mr-2" /> Honeymoon Packages</div>
+                    <div className="bg-blue-50 border-l-4 border-blue-400 p-3 mb-3">
+                      <h6 className="font-bold text-blue-800 mb-2 text-sm">✨ Coming Soon: End-to-end wedding services</h6>
+                      <div className="grid grid-cols-2 gap-1 text-xs text-blue-700">
+                        <div className="flex items-center"><CheckCircle className="h-3 w-3 text-blue-600 mr-1" /> Wedding Planners</div>
+                        <div className="flex items-center"><CheckCircle className="h-3 w-3 text-blue-600 mr-1" /> Caterers</div>
+                        <div className="flex items-center"><CheckCircle className="h-3 w-3 text-blue-600 mr-1" /> Decorators</div>
+                        <div className="flex items-center"><CheckCircle className="h-3 w-3 text-blue-600 mr-1" /> Photographers</div>
+                        <div className="flex items-center"><CheckCircle className="h-3 w-3 text-blue-600 mr-1" /> Anchors & Singers</div>
+                        <div className="flex items-center"><CheckCircle className="h-3 w-3 text-blue-600 mr-1" /> Honeymoon Packages</div>
                       </div>
-                      <p className="text-sm text-blue-700 mt-2 italic">Making Make My Knot your one-stop partner from rishta to shaadi.</p>
+                      <p className="text-xs text-blue-700 mt-2 italic">Making Make My Knot your one-stop partner from rishta to shaadi.</p>
                     </div>
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 text-sm">
                       From handshake to pheras, our journey has always been about one promise: turning dreams into lifelong bonds.
                     </p>
                   </div>
+                  {/* Desktop Layout */}
+                  <div className="hidden md:flex md:items-center md:w-full">
+                    <div className="flex-1 pr-8"></div>
+                    <div className="flex-1 pl-8">
+                      <div className="mb-4">
+                        <div className="relative w-48 h-32 rounded-lg overflow-hidden shadow-lg">
+                          <Image
+                            src="https://images.unsplash.com/photo-1519741497674-611481863552?w=400&h=300&fit=crop&auto=format"
+                            alt="Modern AI-powered technology with traditional Indian wedding elements"
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                      </div>
+                      <h3 className="text-2xl font-bold text-gray-900">2025</h3>
+                      <h4 className="text-lg font-semibold text-primary-600 mb-2">Tech-Powered Matchmaking & Beyond</h4>
+                      <div className="bg-gradient-to-r from-primary-50 to-gold-50 rounded-lg p-4 mb-4">
+                        <h5 className="font-bold text-primary-800 mb-2">Heritage Meets Innovation</h5>
+                      </div>
+                      <p className="text-gray-600 mb-4">
+                        Today, after five decades of trust, the Goyal family legacy is stronger than ever. Through AI matchmaking, expert guidance, and personalized services, Make My Knot continues to help families create lasting, meaningful, and values-driven relationships.
+                      </p>
+                      <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
+                        <h6 className="font-bold text-blue-800 mb-2">✨ Coming Soon: End-to-end wedding services</h6>
+                        <div className="grid md:grid-cols-2 gap-2 text-sm text-blue-700">
+                          <div className="flex items-center"><CheckCircle className="h-4 w-4 text-blue-600 mr-2" /> Wedding Planners</div>
+                          <div className="flex items-center"><CheckCircle className="h-4 w-4 text-blue-600 mr-2" /> Caterers</div>
+                          <div className="flex items-center"><CheckCircle className="h-4 w-4 text-blue-600 mr-2" /> Decorators</div>
+                          <div className="flex items-center"><CheckCircle className="h-4 w-4 text-blue-600 mr-2" /> Photographers</div>
+                          <div className="flex items-center"><CheckCircle className="h-4 w-4 text-blue-600 mr-2" /> Anchors & Singers</div>
+                          <div className="flex items-center"><CheckCircle className="h-4 w-4 text-blue-600 mr-2" /> Honeymoon Packages</div>
+                        </div>
+                        <p className="text-sm text-blue-700 mt-2 italic">Making Make My Knot your one-stop partner from rishta to shaadi.</p>
+                      </div>
+                      <p className="text-gray-600">
+                        From handshake to pheras, our journey has always been about one promise: turning dreams into lifelong bonds.
+                      </p>
+                    </div>
+                  </div>
+                  {/* Timeline dot */}
+                  <div className="absolute left-4 md:left-1/2 transform md:-translate-x-1/2 w-6 h-6 md:w-8 md:h-8 bg-gold-600 rounded-full border-2 md:border-4 border-white"></div>
                 </div>
               </div>
             </div>
@@ -357,9 +470,9 @@ export default function About() {
             <div className="space-y-12">
               {/* Chaman Card */}
               <div className="bg-white rounded-3xl border border-gray-100 shadow-xl overflow-hidden">
-                <div className="flex flex-col lg:flex-row items-start gap-8 p-6 lg:p-10">
-                  <div className="flex-shrink-0">
-                    <div className="w-64 h-80 rounded-2xl overflow-hidden shadow-lg">
+                <div className="flex flex-col lg:flex-row items-start gap-6 lg:gap-8 p-4 sm:p-6 lg:p-10">
+                  <div className="flex-shrink-0 w-full lg:w-auto flex justify-center lg:justify-start">
+                    <div className="w-56 h-72 sm:w-64 sm:h-80 rounded-2xl overflow-hidden shadow-lg">
                       <Image
                         src="/images/chaman-prakash-goyal.jpg"
                         alt="Shri Chaman Prakash Goyal - Visionary Founder"
@@ -370,9 +483,9 @@ export default function About() {
                       />
                     </div>
                   </div>
-                  <div className="flex-1">
-                    <h3 className="text-3xl font-bold text-gray-900 mb-2">Shri Chaman Prakash Goyal</h3>
-                    <p className="text-xl text-gold-600 font-semibold mb-4">Visionary Founder • 1975</p>
+                  <div className="flex-1 text-center lg:text-left">
+                    <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Shri Chaman Prakash Goyal</h3>
+                    <p className="text-lg sm:text-xl text-gold-600 font-semibold mb-4">Visionary Founder • 1975</p>
                     <p className="text-gray-700 leading-relaxed mb-4">
                       In 1975, <strong>Shri Chaman Prakash Goyal</strong> laid the foundation of Goyal Marriage Bureau, planting the roots of one of India's most trusted matchmaking services. His belief was simple yet powerful: every rishta deserves honesty, care, and blessings.
                     </p>
@@ -541,6 +654,7 @@ export default function About() {
         </section>
       </main>
 
+      <WhatsAppButton />
       <Footer />
     </>
   )

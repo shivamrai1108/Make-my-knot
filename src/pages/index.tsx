@@ -7,6 +7,7 @@ import Footer from '@/components/Footer'
 import LeadQuestionnaire from '@/components/LeadQuestionnaire'
 import Navigation from '@/components/Navigation'
 import NominationMarquee from '@/components/NominationMarquee'
+import WhatsAppButton from '@/components/WhatsAppButton'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { NAVIGATION_CONSTANTS } from '@/lib/constants/navigation'
 import { useState, useEffect, useRef } from 'react'
@@ -19,8 +20,9 @@ function ImageSlider() {
   const [currentX, setCurrentX] = useState(0)
   const slidesRef = useRef<HTMLDivElement>(null)
   
-  // Image data - using your existing images
+  // Image data - using your existing images plus the new wedding ceremony photo
   const images = [
+    '/images/hero-wedding-ceremony.jpg', // Beautiful wedding ceremony photo
     '/images/1.svg',
     '/images/2.svg', 
     '/images/3.svg'
@@ -994,6 +996,7 @@ export default function Home() {
         </section>
       </main>
 
+      <WhatsAppButton />
       <Footer />
     </>
   )
