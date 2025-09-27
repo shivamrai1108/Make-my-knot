@@ -2,7 +2,7 @@ import Head from 'next/head'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { 
-  Shield, Trash2, CheckCircle2, Mail, Phone, User, Lock, LogOut, Users, BarChart3, MessageSquare, CreditCard, Eye, EyeOff, Settings, Zap, AlertTriangle, DollarSign, TrendingUp, Activity, UserPlus, Video, Calendar, Gift, Edit, XCircle, MapPin, Briefcase, GraduationCap, Search, Wifi, MessageCircle, FileText, Brain, Download, Target, Filter, Clock, Heart, Star
+  Shield, Trash2, CheckCircle2, Mail, Phone, User, Lock, LogOut, Users, BarChart3, MessageSquare, CreditCard, Eye, EyeOff, Settings, Zap, AlertTriangle, DollarSign, TrendingUp, Activity, UserPlus, Video, Calendar, Gift, Edit, XCircle, MapPin, Briefcase, GraduationCap, Search, Wifi, MessageCircle, FileText, Brain, Download, Target, Filter, Clock, Heart, Star, X
 } from 'lucide-react'
 import { useOnlineStatus } from '@/lib/OnlineStatusContext'
 import { OnlineUsersList, OnlineStatusBadge, OnlineStatusIndicator } from '@/components/OnlineStatusIndicator'
