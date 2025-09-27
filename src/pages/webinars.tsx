@@ -259,17 +259,26 @@ export default function Webinars() {
     setIsSubmitting(true)
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      // In real implementation, this would be an API call
-      console.log('Registration data:', {
-        webinarId: registrationModal,
-        ...registrationForm
+      // Call API endpoint to save registration
+      const response = await fetch('/api/webinar-registration', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          webinarId: registrationModal,
+          ...registrationForm
+        })
       })
       
+      const data = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Registration failed')
+      }
+      
       // Show success message
-      alert(`Registration successful! You'll receive a confirmation email at ${registrationForm.email}`)
+      alert(`Registration successful! You'll receive a confirmation email at ${registrationForm.email}. Registration ID: ${data.data.id}`)
       
       // Reset form and close modal
       setRegistrationForm({
@@ -281,8 +290,10 @@ export default function Webinars() {
         marketingConsent: false
       })
       closeModal()
-    } catch (error) {
-      alert('Registration failed. Please try again.')
+      
+    } catch (error: any) {
+      console.error('Registration error:', error)
+      alert(error.message || 'Registration failed. Please try again.')
     } finally {
       setIsSubmitting(false)
     }

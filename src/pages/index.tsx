@@ -155,88 +155,122 @@ function SuccessStoriesCarousel() {
   const { t } = useLanguage()
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
+  const [translateX, setTranslateX] = useState(0)
+  const intervalRef = useRef<NodeJS.Timeout | null>(null)
   
-  // Success stories with couple testimonials
+  // Success stories with couple testimonials - Updated with new photos and content
   const stories = [
     {
-      image: '/images/pic1.jpg',
-      names: t('successStories.stories.0.names', 'Rahul & Aishwarya'),
-      location: t('successStories.stories.0.location', 'Mumbai, Maharashtra'),
-      testimonial: t('successStories.stories.0.testimonial', 'When we first connected on Make My Knot, it felt like our hearts recognized each other. Every conversation, every laugh, every shared dream brought us closer. Today, we know our knot isn\'t just a bond—it\'s forever.'),
+      image: '/images/AmanMuskan.jpg',
+      names: t('successStories.stories.0.names', 'Aman & Muskan'),
+      location: t('successStories.stories.0.location', 'Noida, Uttar Pradesh'),
+      testimonial: t('successStories.stories.0.testimonial', 'I always believed that finding the right life partner was about destiny — and Make My Knot proved me right. Meeting Muskan felt like meeting someone I had known forever.'),
       rating: 5
     },
     {
-      image: '/images/pic2.jpg',
-      names: t('successStories.stories.1.names', 'Nitin & Preeti'),
-      location: t('successStories.stories.1.location', 'Delhi, India'),
-      testimonial: t('successStories.stories.1.testimonial', 'We were just looking for someone who really understood us. Make My Knot helped us meet each other, and our connection grew naturally into something meaningful.'),
+      image: '/images/aishwariyarahul.jpg',
+      names: t('successStories.stories.1.names', 'Rahul & Aishwarya'),
+      location: t('successStories.stories.1.location', 'Noida, Uttar Pradesh'),
+      testimonial: t('successStories.stories.1.testimonial', 'For me, marriage was never just about finding a partner — it was about finding someone who would fit beautifully into my family too.'),
       rating: 5
     },
     {
-      image: '/images/pic3.jpg',
-      names: t('successStories.stories.2.names', 'Ravi & Anjali'),
-      location: t('successStories.stories.2.location', 'Pune, Maharashtra'),
-      testimonial: t('successStories.stories.2.testimonial', 'The personalized matchmaking approach at Make My Knot made all the difference. We found not just love, but a true life partnership built on shared values and mutual respect.'),
+      image: '/images/Rahulkhyati.jpg',
+      names: t('successStories.stories.2.names', 'Rahul & Khyati'),
+      location: t('successStories.stories.2.location', 'Noida, Uttar Pradesh'),
+      testimonial: t('successStories.stories.2.testimonial', 'I wasn\'t expecting much when I first got introduced to Khyati through Make My Knot. But what surprised me was how naturally our conversations flowed.'),
       rating: 5
     },
     {
-      image: '/images/aman-muskan.svg',
-      names: t('successStories.stories.3.names', 'Aman & Muskan'),
-      location: t('successStories.stories.3.location', 'Bengaluru, Karnataka'),
-      testimonial: t('successStories.stories.3.testimonial', 'We connected on Make My Knot and soon realized how much we had in common. What started with simple conversations slowly turned into something beautiful. Today, we feel lucky to have found each other.'),
-      rating: 5
-    },
-    {
-      image: '/images/naveen-mampi.svg',
-      names: t('successStories.stories.4.names', 'Naveen & Mampi'),
-      location: t('successStories.stories.4.location', 'Delhi, India'),
-      testimonial: t('successStories.stories.4.testimonial', 'The AI-powered matching was incredible. We both felt an instant connection that has only grown stronger. Make My Knot helped us find our perfect match in ways we never imagined.'),
+      image: '/images/Shwatangbarkha.jpg',
+      names: t('successStories.stories.3.names', 'Shwatang & Barkha'),
+      location: t('successStories.stories.3.location', 'Delhi, India'),
+      testimonial: t('successStories.stories.3.testimonial', 'When I met Barkha through Make My Knot, I felt something I had never felt before — a sense of comfort, like I had found a missing piece of my life.'),
       rating: 5
     }
   ]
   
-  // Auto-advance slides - pause on hover
+  // Smooth marquee animation
   useEffect(() => {
-    if (isPaused) return // Don't start timer if paused
-    
-    const timer = setInterval(() => {
-      setCurrentIndex((prevIndex) => 
-        prevIndex === stories.length - 1 ? 0 : prevIndex + 1
-      )
-    }, 6000)
-    
-    return () => clearInterval(timer)
-  }, [currentIndex, stories.length, isPaused])
+    if (isPaused) {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+        intervalRef.current = null
+      }
+      return
+    }
+
+    intervalRef.current = setInterval(() => {
+      setTranslateX((prev) => {
+        const cardWidth = 320 + 24 // card width + gap
+        const maxTranslate = -(cardWidth * stories.length)
+        const newTranslate = prev - 1
+        
+        // Reset to start when we've scrolled through all cards
+        if (newTranslate <= maxTranslate) {
+          return 0
+        }
+        return newTranslate
+      })
+    }, 50) // Smooth 50ms interval
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+      }
+    }
+  }, [isPaused, stories.length])
   
   const goToSlide = (index: number) => {
+    const cardWidth = 320 + 24 // card width + gap
+    setTranslateX(-(index * cardWidth))
     setCurrentIndex(index)
   }
   
   const nextSlide = () => {
-    setCurrentIndex((prevIndex) => 
-      prevIndex === stories.length - 1 ? 0 : prevIndex + 1
-    )
+    const nextIndex = currentIndex === stories.length - 1 ? 0 : currentIndex + 1
+    goToSlide(nextIndex)
   }
   
   const prevSlide = () => {
-    setCurrentIndex((prevIndex) => 
-      prevIndex === 0 ? stories.length - 1 : prevIndex - 1
-    )
+    const prevIndex = currentIndex === 0 ? stories.length - 1 : currentIndex - 1
+    goToSlide(prevIndex)
+  }
+
+  const handleMouseEnter = () => {
+    setIsPaused(true)
+  }
+
+  const handleMouseLeave = () => {
+    setIsPaused(false)
   }
   
   return (
     <div className="relative w-full overflow-hidden">
+      {/* Navigation Arrows */}
+      <button
+        onClick={prevSlide}
+        className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-gray-800 w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110"
+        aria-label="Previous testimonial"
+      >
+        <ArrowRight className="h-5 w-5 transform rotate-180" />
+      </button>
+      <button
+        onClick={nextSlide}
+        className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-gray-800 w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110"
+        aria-label="Next testimonial"
+      >
+        <ArrowRight className="h-5 w-5" />
+      </button>
+
       {/* Auto-scrolling Horizontal Marquee - All Screen Sizes */}
       <div className="relative">
         <div 
-          className="flex gap-6 animate-marquee"
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
+          className="flex gap-6 transition-transform duration-300 ease-linear"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
           style={{
-            animation: isPaused ? 'none' : undefined,
-            animationDuration: '30s',
-            animationIterationCount: 'infinite',
-            animationTimingFunction: 'linear'
+            transform: `translateX(${translateX}px)`
           }}
         >
           {/* First set of stories */}
@@ -351,6 +385,22 @@ function SuccessStoriesCarousel() {
             </div>
           ))}
         </div>
+      </div>
+      
+      {/* Dots Indicator */}
+      <div className="flex justify-center mt-6 space-x-2">
+        {stories.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => goToSlide(index)}
+            className={`w-3 h-3 rounded-full transition-all duration-200 ${
+              index === currentIndex 
+                ? 'bg-primary-600 w-8' 
+                : 'bg-gray-300 hover:bg-gray-400'
+            }`}
+            aria-label={`Go to testimonial ${index + 1}`}
+          />
+        ))}
       </div>
     </div>
   )

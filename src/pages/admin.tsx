@@ -4094,6 +4094,9 @@ function WebinarsTab() {
   const [showEditModal, setShowEditModal] = useState(false)
   const [selectedWebinar, setSelectedWebinar] = useState<Webinar | null>(null)
   const [filterStatus, setFilterStatus] = useState('all')
+  const [showRegistrations, setShowRegistrations] = useState(false)
+  const [registrations, setRegistrations] = useState<any[]>([])
+  const [loadingRegistrations, setLoadingRegistrations] = useState(false)
   const [newWebinar, setNewWebinar] = useState<Partial<Webinar>>({
     title: '',
     description: '',
@@ -4110,6 +4113,27 @@ function WebinarsTab() {
   })
 
   const filteredWebinars = webinars.filter(w => filterStatus === 'all' || w.status === filterStatus)
+
+  // Load webinar registrations
+  const loadRegistrations = async () => {
+    setLoadingRegistrations(true)
+    try {
+      const response = await fetch('/api/webinar-registration')
+      const data = await response.json()
+      
+      if (data.success) {
+        setRegistrations(data.data)
+        setShowRegistrations(true)
+      } else {
+        alert('Failed to load registrations: ' + data.message)
+      }
+    } catch (error) {
+      console.error('Error loading registrations:', error)
+      alert('Failed to load registrations. Please try again.')
+    } finally {
+      setLoadingRegistrations(false)
+    }
+  }
 
   const handleCreateWebinar = () => {
     const webinar: Webinar = {
@@ -4174,13 +4198,23 @@ function WebinarsTab() {
             <h2 className="text-lg font-semibold text-gray-900">Webinar Management</h2>
             <p className="text-sm text-gray-600">Create, edit, and manage webinar events with pricing and scheduling</p>
           </div>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-          >
-            <Video className="h-4 w-4" />
-            Create Webinar
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={loadRegistrations}
+              disabled={loadingRegistrations}
+              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2 disabled:opacity-50"
+            >
+              <Users className="h-4 w-4" />
+              {loadingRegistrations ? 'Loading...' : 'View Registrations'}
+            </button>
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+            >
+              <Video className="h-4 w-4" />
+              Create Webinar
+            </button>
+          </div>
         </div>
 
         {/* Filters */}
@@ -4517,6 +4551,139 @@ function WebinarsTab() {
               >
                 Update Webinar
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Webinar Registrations Modal */}
+      {showRegistrations && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden">
+            <div className="p-6 border-b flex justify-between items-center">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Webinar Registrations</h3>
+                <p className="text-sm text-gray-600 mt-1">Total: {registrations.length} registrations</p>
+              </div>
+              <button
+                onClick={() => setShowRegistrations(false)}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <X className="h-5 w-5 text-gray-500" />
+              </button>
+            </div>
+            
+            <div className="overflow-auto" style={{ maxHeight: 'calc(90vh - 120px)' }}>
+              {registrations.length === 0 ? (
+                <div className="p-8 text-center">
+                  <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No registrations yet</h3>
+                  <p className="text-gray-600">Registrations will appear here when users sign up for webinars.</p>
+                </div>
+              ) : (
+                <div className="p-6">
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Webinar
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Name
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Email
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Phone
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Status
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Registered
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Marketing
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {registrations.map((registration) => (
+                          <tr key={registration.id} className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm font-medium text-gray-900">
+                                {registration.webinarTitle}
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                ID: {registration.webinarId}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm text-gray-900">{registration.name}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm text-gray-900">{registration.email}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm text-gray-900">{registration.phone}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                                {registration.relationshipStatus}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              {new Date(registration.registrationDate).toLocaleDateString()}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                registration.marketingConsent ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                              }`}>
+                                {registration.marketingConsent ? 'Yes' : 'No'}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  
+                  {/* Export Button */}
+                  <div className="mt-6 flex justify-end">
+                    <button
+                      onClick={() => {
+                        // Export registrations to CSV
+                        const headers = ['Registration ID', 'Webinar Title', 'Name', 'Email', 'Phone', 'Relationship Status', 'Interests', 'Marketing Consent', 'Registration Date']
+                        const csvData = registrations.map(r => [
+                          r.id,
+                          r.webinarTitle,
+                          r.name,
+                          r.email,
+                          r.phone,
+                          r.relationshipStatus,
+                          r.interests || '',
+                          r.marketingConsent ? 'Yes' : 'No',
+                          new Date(r.registrationDate).toLocaleDateString()
+                        ])
+                        const csvContent = [headers, ...csvData].map(row => row.map(field => `"${field}"`).join(',')).join('\n')
+                        const blob = new Blob([csvContent], { type: 'text/csv' })
+                        const url = URL.createObjectURL(blob)
+                        const a = document.createElement('a')
+                        a.href = url
+                        a.download = `webinar_registrations_${new Date().toISOString().split('T')[0]}.csv`
+                        a.click()
+                        URL.revokeObjectURL(url)
+                      }}
+                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                    >
+                      <Download className="h-4 w-4" />
+                      Export CSV
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
