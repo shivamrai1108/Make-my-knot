@@ -6,10 +6,9 @@ const questionnaireResponseSchema = new mongoose.Schema({
     ref: 'User',
     index: true
   },
-  // For public lead submissions
+  // For public lead submissions - can be string or ObjectId
   leadId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Lead',
+    type: mongoose.Schema.Types.Mixed, // Allow both string and ObjectId
     index: true
   },
   userEmail: {
@@ -33,7 +32,7 @@ const questionnaireResponseSchema = new mongoose.Schema({
   },
   source: {
     type: String,
-    enum: ['website', 'mobile_app', 'referral', 'social_media'],
+    enum: ['website', 'mobile_app', 'referral', 'social_media', 'lead_assessment', 'user_assessment'],
     default: 'website'
   },
   responses: {

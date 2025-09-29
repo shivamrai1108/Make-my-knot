@@ -1929,45 +1929,121 @@ function CRMLeadsTab() {
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false)
   
   useEffect(() => {
-    const refresh = () => {
-      const allLeads = getLeads()
-      const allQuestionnaires = getQuestionnaireResponses()
-      
-      // Get questionnaires specifically from leads
-      const leadQuestionnaires = allQuestionnaires.filter(q => q.leadId)
-      
-      // Enhance leads with questionnaire data and scoring
-      const enhancedLeads = allLeads.map(lead => {
-        const questionnaire = leadQuestionnaires.find(q => q.leadId === lead.id)
+    const refreshFromAPI = async () => {
+      try {
+        console.log('🔄 Loading leads and assessments from live backend API...')
         
-        // Ensure required fields exist with defaults
-        const enhancedLead = {
-          ...lead,
-          source: lead.source || 'website',
-          tags: lead.tags || [],
-          createdAt: lead.createdAt || new Date().toISOString(),
-          updatedAt: lead.updatedAt || new Date().toISOString(),
-          questionnaire: questionnaire || null,
-          hasQuestionnaire: !!questionnaire,
-          questionnaireComplete: questionnaire?.isComplete || false
+        // Fetch leads from backend API (admin endpoint)
+        let allLeads = [];
+        try {
+          const leadsResponse = await fetch('http://localhost:4000/api/leads/admin', {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+          })
+          if (leadsResponse.ok) {
+            const leadsData = await leadsResponse.json()
+            allLeads = leadsData.data?.leads || []
+            console.log('✅ Loaded', allLeads.length, 'leads from backend')
+          } else {
+            console.log('⚠️ Backend leads API returned:', leadsResponse.status)
+          }
+        } catch (error) {
+          console.log('⚠️ Backend leads API failed:', error.message)
         }
         
-        // Calculate lead score
-        const score = calculateLeadScore(enhancedLead, questionnaire)
-        const qualificationLevel = getQualificationLevel(score)
-        
-        return {
-          ...enhancedLead,
-          score,
-          qualificationLevel
+        // Fallback to localStorage if API fails
+        if (allLeads.length === 0) {
+          allLeads = getLeads()
+          console.log('📦 Loaded', allLeads.length, 'leads from localStorage')
         }
-      })
-      
-      setLeads(enhancedLeads)
-      setLeadQuestionnaires(leadQuestionnaires)
+        
+        // Fetch questionnaires from backend API (public endpoint)
+        let allQuestionnaires = []
+        try {
+          const questionnairesResponse = await fetch('http://localhost:4000/api/questionnaires/admin', {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+          })
+          if (questionnairesResponse.ok) {
+            const questionnaireData = await questionnairesResponse.json()
+            allQuestionnaires = questionnaireData.data?.responses || []
+            console.log('✅ Loaded', allQuestionnaires.length, 'assessments from backend')
+          }
+        } catch (error) {
+          console.log('⚠️ Backend questionnaires API failed, falling back to localStorage')
+        }
+        
+        // Fallback to localStorage if API fails
+        if (allQuestionnaires.length === 0) {
+          allQuestionnaires = getQuestionnaireResponses()
+          console.log('📦 Loaded', allQuestionnaires.length, 'assessments from localStorage')
+        }
+        
+        // Get questionnaires specifically from leads
+        const leadQuestionnaires = allQuestionnaires.filter(q => q.leadId)
+        console.log('🎯 Found', leadQuestionnaires.length, 'lead assessments')
+        
+        // Enhance leads with questionnaire data and scoring
+        const enhancedLeads = allLeads.map(lead => {
+          const questionnaire = leadQuestionnaires.find(q => q.leadId === lead.id || q.leadId === lead._id)
+          
+          // Ensure required fields exist with defaults
+          const enhancedLead = {
+            ...lead,
+            id: lead._id || lead.id, // Handle both MongoDB _id and regular id
+            source: lead.source || 'website',
+            tags: lead.tags || [],
+            createdAt: lead.createdAt || new Date().toISOString(),
+            updatedAt: lead.updatedAt || new Date().toISOString(),
+            questionnaire: questionnaire || null,
+            hasQuestionnaire: !!questionnaire,
+            questionnaireComplete: questionnaire?.isComplete || false
+          }
+          
+          // Calculate lead score
+          const score = calculateLeadScore(enhancedLead, questionnaire)
+          const qualificationLevel = getQualificationLevel(score)
+          
+          return {
+            ...enhancedLead,
+            score,
+            qualificationLevel
+          }
+        })
+        
+        console.log('🎉 Final enhanced leads count:', enhancedLeads.length)
+        setLeads(enhancedLeads)
+        setLeadQuestionnaires(leadQuestionnaires)
+      } catch (error) {
+        console.error('❌ Error refreshing data from API:', error)
+        // Fallback to localStorage completely
+        const allLeads = getLeads()
+        const allQuestionnaires = getQuestionnaireResponses()
+        const leadQuestionnaires = allQuestionnaires.filter(q => q.leadId)
+        
+        const enhancedLeads = allLeads.map(lead => {
+          const questionnaire = leadQuestionnaires.find(q => q.leadId === lead.id)
+          const enhancedLead = {
+            ...lead,
+            source: lead.source || 'website',
+            tags: lead.tags || [],
+            createdAt: lead.createdAt || new Date().toISOString(),
+            updatedAt: lead.updatedAt || new Date().toISOString(),
+            questionnaire: questionnaire || null,
+            hasQuestionnaire: !!questionnaire,
+            questionnaireComplete: questionnaire?.isComplete || false
+          }
+          const score = calculateLeadScore(enhancedLead, questionnaire)
+          const qualificationLevel = getQualificationLevel(score)
+          return { ...enhancedLead, score, qualificationLevel }
+        })
+        
+        setLeads(enhancedLeads)
+        setLeadQuestionnaires(leadQuestionnaires)
+      }
     }
     
-    refresh()
+    refreshFromAPI()
   }, [])
 
   const refresh = () => {

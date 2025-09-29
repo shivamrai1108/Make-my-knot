@@ -120,6 +120,22 @@ router.get('/public/:email', catchAsync(async (req, res) => {
   });
 }));
 
+// GET /api/questionnaires/admin - Get all questionnaires for admin (PUBLIC for now)
+router.get('/admin', catchAsync(async (req, res) => {
+  const responses = await QuestionnaireResponse.find({})
+    .sort({ createdAt: -1 })
+    .limit(100) // Limit to recent 100 responses
+    .select('-metadata -__v');
+  
+  res.json({
+    status: 'success',
+    results: responses.length,
+    data: {
+      responses
+    }
+  });
+}));
+
 // Protected routes require authentication
 router.use(protect);
 

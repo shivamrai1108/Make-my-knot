@@ -53,6 +53,22 @@ router.post('/', catchAsync(async (req, res) => {
   });
 }));
 
+// GET /api/leads/admin - Get all leads for admin (PUBLIC for now)
+router.get('/admin', catchAsync(async (req, res) => {
+  const leads = await Lead.find({ isActive: true })
+    .sort({ createdAt: -1 })
+    .limit(100) // Limit to recent 100 leads
+    .select('-__v');
+  
+  res.json({
+    status: 'success',
+    results: leads.length,
+    data: {
+      leads
+    }
+  });
+}));
+
 // Protected routes (authentication required)
 router.use(protect);
 
