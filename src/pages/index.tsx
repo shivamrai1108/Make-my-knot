@@ -110,7 +110,9 @@ function ImageSlider() {
             <img 
               src={image} 
               alt={`Slide ${index + 1}`}
-              className="w-full h-full object-cover"
+              className={`w-full h-full object-cover ${
+                index === 0 ? 'object-[center_20%]' : '' // Position first image lower to avoid head cutting
+              }`}
               draggable={false}
             />
           </div>

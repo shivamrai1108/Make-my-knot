@@ -33,8 +33,16 @@ router.post('/public', catchAsync(async (req, res) => {
     });
   }
   
-  // Check if questionnaire already exists for this email
-  let questionnaireResponse = await QuestionnaireResponse.findOne({ userEmail });
+  // Generate unique ID for this response
+  const responseId = `response_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  
+  // Check if questionnaire already exists for this email or leadId
+  let questionnaireResponse = await QuestionnaireResponse.findOne({ 
+    $or: [
+      { userEmail },
+      ...(leadId ? [{ leadId }] : [])
+    ]
+  });
   
   if (questionnaireResponse) {
     // Update existing response

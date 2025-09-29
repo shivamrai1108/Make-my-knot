@@ -88,8 +88,14 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
       isComplete: true
     }
 
-    // Save to localStorage
-    saveQuestionnaireResponse(response)
+    // Save to localStorage and backend API
+    try {
+      await saveQuestionnaireResponse(response)
+      console.log('✅ Assessment saved successfully!')
+    } catch (error) {
+      console.error('❌ Error saving assessment:', error)
+      // Continue with local save already done
+    }
     
     // Mark assessment as completed immediately to prevent any race conditions
     const effectiveLeadId = leadId || (typeof window !== 'undefined' ? sessionStorage.getItem('leadId') : null)

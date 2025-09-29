@@ -144,10 +144,13 @@ const questionnaireResponseSchema = new mongoose.Schema({
 });
 
 // Indexes for better query performance
-questionnaireResponseSchema.index({ userId: 1 });
+questionnaireResponseSchema.index({ userId: 1 }, { sparse: true }); // Sparse index allows null values
+questionnaireResponseSchema.index({ userEmail: 1 }, { sparse: true }); // Index for public submissions
+questionnaireResponseSchema.index({ leadId: 1 }, { sparse: true }); // Index for lead submissions  
 questionnaireResponseSchema.index({ createdAt: -1 });
 questionnaireResponseSchema.index({ isComplete: 1, createdAt: -1 });
 questionnaireResponseSchema.index({ 'questionnaire.type': 1 });
+questionnaireResponseSchema.index({ userType: 1, createdAt: -1 });
 
 // Virtual for response count
 questionnaireResponseSchema.virtual('responseCount').get(function() {

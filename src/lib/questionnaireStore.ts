@@ -182,10 +182,29 @@ export const essentialQuestions: QuestionnaireQuestion[] = [
   }
 ]
 
+// API Configuration
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
+
 // Local storage functions
 const QUESTIONNAIRE_STORAGE_KEY = 'questionnaire_responses'
 
-export function saveQuestionnaireResponse(response: QuestionnaireResponse): void {
+// Enhanced save function that saves both locally and to backend
+export async function saveQuestionnaireResponse(response: QuestionnaireResponse): Promise<void> {
+  // First save locally for immediate access
+  saveQuestionnaireResponseLocal(response)
+  
+  // Then send to backend API for permanent storage
+  try {
+    await saveQuestionnaireResponseAPI(response)
+    console.log('✅ Questionnaire saved to backend successfully')
+  } catch (error) {
+    console.error('❌ Failed to save questionnaire to backend:', error)
+    // Continue execution - local save is already done
+  }
+}
+
+// Local storage save function
+export function saveQuestionnaireResponseLocal(response: QuestionnaireResponse): void {
   const existing = getQuestionnaireResponses()
   const updated = existing.filter(r => r.id !== response.id)
   
@@ -224,6 +243,42 @@ export function saveQuestionnaireResponse(response: QuestionnaireResponse): void
   
   updated.push(response)
   localStorage.setItem(QUESTIONNAIRE_STORAGE_KEY, JSON.stringify(updated))
+}
+
+// API save function to backend
+export async function saveQuestionnaireResponseAPI(response: QuestionnaireResponse): Promise<void> {
+  const apiData = {
+    userEmail: response.userEmail,
+    userName: response.userName,
+    userPhone: response.userPhone,
+    leadId: response.leadId,
+    userId: response.userId,
+    userType: response.userType || 'lead',
+    source: response.source || 'website',
+    responses: response.responses,
+    completionTime: response.completionTime || 0,
+    metadata: {
+      browser: typeof navigator !== 'undefined' ? navigator.userAgent : 'Unknown',
+      submittedAt: new Date().toISOString(),
+      isComplete: response.isComplete
+    }
+  }
+
+  const response_api = await fetch(`${API_BASE_URL}/questionnaires/public`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(apiData)
+  })
+
+  if (!response_api.ok) {
+    const errorData = await response_api.text()
+    throw new Error(`API Error: ${response_api.status} - ${errorData}`)
+  }
+
+  const result = await response_api.json()
+  return result
 }
 
 export function getQuestionnaireResponses(): QuestionnaireResponse[] {
