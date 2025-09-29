@@ -1948,7 +1948,7 @@ function CRMLeadsTab() {
             console.log('⚠️ Backend leads API returned:', leadsResponse.status)
           }
         } catch (error) {
-          console.log('⚠️ Backend leads API failed:', error.message)
+          console.log('⚠️ Backend leads API failed:', error instanceof Error ? error.message : String(error))
         }
         
         // Fallback to localStorage if API fails
@@ -1970,7 +1970,7 @@ function CRMLeadsTab() {
             console.log('✅ Loaded', allQuestionnaires.length, 'assessments from backend')
           }
         } catch (error) {
-          console.log('⚠️ Backend questionnaires API failed, falling back to localStorage')
+          console.log('⚠️ Backend questionnaires API failed:', error instanceof Error ? error.message : String(error))
         }
         
         // Fallback to localStorage if API fails
@@ -1980,12 +1980,12 @@ function CRMLeadsTab() {
         }
         
         // Get questionnaires specifically from leads
-        const leadQuestionnaires = allQuestionnaires.filter(q => q.leadId)
+        const leadQuestionnaires = allQuestionnaires.filter((q: any) => q.leadId)
         console.log('🎯 Found', leadQuestionnaires.length, 'lead assessments')
         
         // Enhance leads with questionnaire data and scoring
-        const enhancedLeads = allLeads.map(lead => {
-          const questionnaire = leadQuestionnaires.find(q => q.leadId === lead.id || q.leadId === lead._id)
+        const enhancedLeads = allLeads.map((lead: any) => {
+          const questionnaire = leadQuestionnaires.find((q: any) => q.leadId === lead.id || q.leadId === lead._id)
           
           // Ensure required fields exist with defaults
           const enhancedLead = {
