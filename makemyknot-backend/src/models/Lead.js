@@ -2,18 +2,20 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 
 const leadSchema = new mongoose.Schema({
+  // Basic Contact Information
   name: {
     type: String,
-    required: [true, 'Name is required'],
+    required: [true, 'Full name is required'],
     trim: true,
     maxlength: 100
   },
   email: {
     type: String,
-    required: [true, 'Email is required'],
+    required: [true, 'Email address is required'],
     lowercase: true,
     validate: [validator.isEmail, 'Please provide a valid email'],
-    index: true
+    index: true,
+    unique: true
   },
   phone: {
     type: String,
@@ -26,6 +28,73 @@ const leadSchema = new mongoose.Schema({
       message: 'Please provide a valid phone number'
     }
   },
+  password: {
+    type: String,
+    required: false, // Optional for leads, required for user conversion
+    minlength: 6
+  },
+  dateOfBirth: {
+    type: Date,
+    required: false,
+    validate: {
+      validator: function(date) {
+        if (!date) return true; // Optional field
+        const age = (new Date() - date) / (365.25 * 24 * 60 * 60 * 1000);
+        return age >= 18; // Must be at least 18 years old
+      },
+      message: 'Must be at least 18 years old'
+    }
+  },
+  countryCode: {
+    type: String,
+    default: '+91',
+    trim: true
+  },
+  
+  // Lead Questionnaire Specific Fields
+  matchmakingExperience: {
+    type: String,
+    enum: ['Yes', 'No'],
+    required: false
+  },
+  genderIdentity: {
+    type: String,
+    enum: ['Man', 'Woman', 'Non-binary', 'Prefer not to say'],
+    required: false
+  },
+  openToMeeting: {
+    type: String,
+    enum: ['Men', 'Women', 'Non-binary', 'All genders'],
+    required: false
+  },
+  preferredAgeRange: {
+    type: String,
+    trim: true,
+    validate: {
+      validator: function(range) {
+        if (!range) return true; // Optional field
+        return /^\d{2}-\d{2}$/.test(range); // Format: "25-35"
+      },
+      message: 'Age range must be in format "25-35"'
+    }
+  },
+  currentLocation: {
+    type: String,
+    trim: true,
+    maxlength: 200
+  },
+  
+  // Additional Profile Information
+  hasBiodata: {
+    type: Boolean,
+    default: false
+  },
+  biodataFileName: {
+    type: String,
+    trim: true
+  },
+  
+  // Legacy answers field for backward compatibility
   answers: {
     type: mongoose.Schema.Types.Mixed,
     default: {}

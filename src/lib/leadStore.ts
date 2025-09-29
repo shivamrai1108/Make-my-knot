@@ -2,11 +2,28 @@ export interface Lead {
   id: string
   createdAt: string
   updatedAt: string
+  
+  // Basic Contact Information
   name: string
   email: string
   phone: string
   password?: string // Optional password for account creation
-  answers: Record<string, any>
+  dateOfBirth?: string // Date of birth
+  countryCode?: string // Country code for phone number
+  
+  // Lead Questionnaire Specific Fields
+  matchmakingExperience?: 'Yes' | 'No' // Have you used matchmaking platforms before?
+  genderIdentity?: 'Man' | 'Woman' | 'Non-binary' | 'Prefer not to say' // Which gender best describes you?
+  openToMeeting?: 'Men' | 'Women' | 'Non-binary' | 'All genders' // Who are you open to meeting?
+  preferredAgeRange?: string // What is your preferred age range? (e.g., "25-35")
+  currentLocation?: string // Where do you currently live?
+  
+  // Additional Profile Information
+  hasBiodata?: boolean // Whether biodata file was uploaded
+  biodataFileName?: string // Name of uploaded biodata file
+  
+  // Legacy and System Fields
+  answers: Record<string, any> // Legacy answers field for backward compatibility
   status: 'new' | 'verified' | 'deleted' | 'contacted'
   syncedAt?: string
   source?: string
@@ -19,7 +36,7 @@ export interface Lead {
   assignedTo?: string
   followUpDate?: string
   isActive?: boolean
-  biodataFile?: File | null // Biodata upload file
+  biodataFile?: File | null // Biodata upload file (client-side only)
   isPermanent?: boolean // Flag to indicate this lead should persist in CRM
   savedToCRM?: boolean // Flag to confirm lead is saved to CRM
   needsSync?: boolean // Flag to indicate lead needs to be synced to backend
@@ -112,9 +129,27 @@ export async function getLeads(params: {
       id: lead._id,
       createdAt: lead.createdAt,
       updatedAt: lead.updatedAt,
+      
+      // Basic Contact Information
       name: lead.name,
       email: lead.email,
       phone: lead.phone,
+      password: lead.password,
+      dateOfBirth: lead.dateOfBirth,
+      countryCode: lead.countryCode,
+      
+      // Lead Questionnaire Fields
+      matchmakingExperience: lead.matchmakingExperience,
+      genderIdentity: lead.genderIdentity,
+      openToMeeting: lead.openToMeeting,
+      preferredAgeRange: lead.preferredAgeRange,
+      currentLocation: lead.currentLocation,
+      
+      // Additional Profile Information
+      hasBiodata: lead.hasBiodata,
+      biodataFileName: lead.biodataFileName,
+      
+      // System Fields
       answers: lead.answers,
       status: lead.status,
       source: lead.source,
@@ -170,6 +205,9 @@ async function saveLeadToBackendWithRetry(leadInput: Omit<Lead, 'id' | 'createdA
           name: leadInput.name,
           email: leadInput.email,
           phone: leadInput.phone,
+          password: leadInput.password,
+          dateOfBirth: leadInput.answers?.dateOfBirth,
+          countryCode: leadInput.answers?.countryCode,
           answers: leadInput.answers,
           source: leadInput.source || 'website'
         }),
@@ -191,9 +229,27 @@ async function saveLeadToBackendWithRetry(leadInput: Omit<Lead, 'id' | 'createdA
         id: savedLead._id,
         createdAt: savedLead.createdAt,
         updatedAt: savedLead.updatedAt,
+        
+        // Basic Contact Information
         name: savedLead.name,
         email: savedLead.email,
         phone: savedLead.phone,
+        password: savedLead.password,
+        dateOfBirth: savedLead.dateOfBirth,
+        countryCode: savedLead.countryCode,
+        
+        // Lead Questionnaire Fields
+        matchmakingExperience: savedLead.matchmakingExperience,
+        genderIdentity: savedLead.genderIdentity,
+        openToMeeting: savedLead.openToMeeting,
+        preferredAgeRange: savedLead.preferredAgeRange,
+        currentLocation: savedLead.currentLocation,
+        
+        // Additional Profile Information
+        hasBiodata: savedLead.hasBiodata,
+        biodataFileName: savedLead.biodataFileName,
+        
+        // System Fields
         answers: savedLead.answers,
         status: savedLead.status,
         source: savedLead.source,

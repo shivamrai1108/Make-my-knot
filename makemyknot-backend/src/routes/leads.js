@@ -13,16 +13,57 @@ router.post('/', catchAsync(async (req, res) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'POST');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
-  const { name, email, phone, answers, source = 'website' } = req.body;
+  
+  const { 
+    name, 
+    email, 
+    phone, 
+    password,
+    dateOfBirth,
+    countryCode,
+    answers, 
+    source = 'website'
+  } = req.body;
+  
+  // Extract structured fields from answers if they exist
+  const structuredData = {
+    name,
+    email: email.toLowerCase(),
+    phone,
+    password,
+    dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : undefined,
+    countryCode: countryCode || '+91',
+    source,
+    
+    // Lead Questionnaire Fields
+    matchmakingExperience: answers?.matchmaking_experience,
+    genderIdentity: answers?.gender_identity,
+    openToMeeting: answers?.open_to_meeting,
+    preferredAgeRange: answers?.preferred_age_range,
+    currentLocation: answers?.current_location,
+    
+    // Additional Profile Data
+    hasBiodata: answers?.hasBiodata || false,
+    biodataFileName: answers?.biodataFileName,
+    
+    // Keep original answers for backward compatibility
+    answers: answers || {}
+  };
+  
+  // Remove undefined fields
+  Object.keys(structuredData).forEach(key => {
+    if (structuredData[key] === undefined) {
+      delete structuredData[key];
+    }
+  });
   
   // Check if lead with this email already exists
   const existingLead = await Lead.findOne({ email: email.toLowerCase() });
   
   let lead;
   if (existingLead) {
-    // Update existing lead
-    existingLead.name = name || existingLead.name;
-    existingLead.phone = phone || existingLead.phone;
+    // Update existing lead with new structured data
+    Object.assign(existingLead, structuredData);
     existingLead.answers = { ...existingLead.answers, ...answers };
     existingLead.status = existingLead.status === 'deleted' ? 'new' : existingLead.status;
     
@@ -31,14 +72,8 @@ router.post('/', catchAsync(async (req, res) => {
     
     lead = await existingLead.save();
   } else {
-    // Create new lead
-    lead = await Lead.create({
-      name,
-      email,
-      phone,
-      answers,
-      source
-    });
+    // Create new lead with structured data
+    lead = await Lead.create(structuredData);
     
     // Calculate initial lead score
     lead.calculateLeadScore();
