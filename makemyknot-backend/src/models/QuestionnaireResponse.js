@@ -1,25 +1,30 @@
 const mongoose = require('mongoose');
 
 const questionnaireResponseSchema = new mongoose.Schema({
+  // User Identification
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    index: true
+    index: true,
+    sparse: true
   },
-  // For public lead submissions - can be string or ObjectId
   leadId: {
     type: mongoose.Schema.Types.Mixed, // Allow both string and ObjectId
-    index: true
+    index: true,
+    sparse: true
   },
   userEmail: {
     type: String,
+    required: [true, 'User email is required'],
     trim: true,
     lowercase: true,
     index: true
   },
   userName: {
     type: String,
-    trim: true
+    required: [true, 'User name is required'],
+    trim: true,
+    maxlength: 100
   },
   userPhone: {
     type: String,
@@ -28,13 +33,104 @@ const questionnaireResponseSchema = new mongoose.Schema({
   userType: {
     type: String,
     enum: ['user', 'lead', 'guest'],
-    default: 'lead'
+    default: 'lead',
+    index: true
   },
   source: {
     type: String,
     enum: ['website', 'mobile_app', 'referral', 'social_media', 'lead_assessment', 'user_assessment'],
-    default: 'website'
+    default: 'lead_assessment'
   },
+  
+  // Assessment Questions - Structured Fields
+  // Values & Lifestyle
+  spiritualityImportance: {
+    type: String,
+    enum: ['Very important', 'Somewhat important', 'Not important']
+  },
+  premaritalCounseling: {
+    type: String,
+    enum: ["I'm open to it.", "I prefer not to.", "I'm not sure."]
+  },
+  sharedInterestsImportance: {
+    type: String,
+    enum: ['Very important', 'Somewhat important', 'Not important']
+  },
+  relocationOpenness: {
+    type: String,
+    enum: ["Yes, I'm fully open to relocating.", "Yes, but only within a specific region or country.", "No, I would prefer to stay in my current location."]
+  },
+  childrenPerspective: {
+    type: String,
+    enum: ["I definitely want children.", "I am open to it, but it's not a priority.", "I prefer not to have children.", "I'm still undecided."]
+  },
+  casteImportance: {
+    type: String,
+    enum: ['Yes, very much', 'Yes, somewhat', 'Not at all']
+  },
+  
+  // Personal Preferences
+  weekendPreferences: {
+    type: [String],
+    enum: ['Staying in and relaxing', 'Going out for drinks or dinner', 'Engaging in hobbies', 'Spending time with family', 'Exercising or being outdoors', 'Socializing with friends'],
+    validate: {
+      validator: function(arr) {
+        return arr.length <= 3; // Max 3 selections
+      },
+      message: 'Please select up to 3 weekend preferences'
+    }
+  },
+  familyIndependenceScenario: {
+    type: String,
+    enum: [
+      'I would speak with both my parents and my partner to find a compromise, perhaps by living nearby or making a clear plan for how we can all be together.',
+      'I would prioritize my parents\' wishes and explain to my partner that living with my family is a non-negotiable part of my life and values.',
+      'I would stand by my partner and politely explain to my parents that we have decided to live independently after marriage.',
+      'I would make it clear to both sides that we, as a couple, will make the decision that is best for our future, and we would not allow family pressure to influence it.'
+    ]
+  },
+  hobbiesActivities: {
+    type: [String],
+    enum: ['Sports', 'Cooking', 'Reading', 'Listening to music', 'Traveling', 'Art or crafts', 'Trekking', 'Watching movies/shows']
+  },
+  drinkingHabits: {
+    type: String,
+    enum: ['Yes, socially', 'Yes, regularly', 'No']
+  },
+  smokingHabits: {
+    type: String,
+    enum: ['Yes', 'No', 'Sometimes']
+  },
+  relationshipReasons: {
+    type: [String],
+    enum: ['Emotional security', 'Having a partner I can trust', 'Someone to share my free time with', 'To build a family', 'Life is easier with a partner', 'To not be alone'],
+    validate: {
+      validator: function(arr) {
+        return arr.length <= 3; // Max 3 selections
+      },
+      message: 'Please select up to 3 relationship reasons'
+    }
+  },
+  careerOpportunityScenario: {
+    type: String,
+    enum: [
+      'I would fully support them, no questions asked. Their dream is our dream, and we would figure out a way to make it work together.',
+      'I\'d be supportive but would want to have a serious conversation about the practical details, like our jobs, finances, and how we\'d maintain the relationship long-distance.',
+      'I would want to discuss whether this is the right time. I\'d need to feel confident that this big change won\'t negatively impact our relationship.',
+      'I would be willing to put my own life on hold to move with them, because being together is what\'s most important to me.'
+    ]
+  },
+  familyGatheringScenario: {
+    type: String,
+    enum: [
+      'The Compromiser: "I would attend the family gathering for a few hours and then politely excuse ourselves to spend some private time together."',
+      'The Dutiful Relative: "I would prioritize the family gathering, as it is an important obligation, and explain to my partner that we can have our private time later."',
+      'The Partner-First Person: "I would politely decline the family invitation, explaining that we have other plans, and prioritize my partner and our time together."',
+      'The Boundary Setter: "I would communicate to my family that while we love them, we need our personal time, and suggest another time for the gathering that works for everyone."'
+    ]
+  },
+  
+  // Legacy responses field for backward compatibility
   responses: {
     type: mongoose.Schema.Types.Mixed,
     required: [true, 'Responses are required'],

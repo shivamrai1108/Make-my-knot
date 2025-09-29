@@ -19,9 +19,10 @@ router.post('/public', catchAsync(async (req, res) => {
     userName,
     userPhone,
     leadId,
+    userId,
     responses, 
     userType = 'lead',
-    source = 'website',
+    source = 'lead_assessment',
     completionTime = 0,
     metadata = {}
   } = req.body;
@@ -33,48 +34,78 @@ router.post('/public', catchAsync(async (req, res) => {
     });
   }
   
-  // Generate unique ID for this response
-  const responseId = `response_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  // Extract structured assessment fields from responses
+  const structuredData = {
+    userEmail: userEmail.toLowerCase(),
+    userName,
+    userPhone,
+    leadId,
+    userId,
+    userType,
+    source,
+    completionTime,
+    
+    // Values & Lifestyle
+    spiritualityImportance: responses.spirituality_importance,
+    premaritalCounseling: responses.premarital_counseling,
+    sharedInterestsImportance: responses.shared_interests_importance,
+    relocationOpenness: responses.relocation_openness,
+    childrenPerspective: responses.children_perspective,
+    casteImportance: responses.caste_importance,
+    
+    // Personal Preferences
+    weekendPreferences: Array.isArray(responses.weekend_preferences) ? responses.weekend_preferences : [],
+    familyIndependenceScenario: responses.family_independence_scenario,
+    hobbiesActivities: Array.isArray(responses.hobbies_activities) ? responses.hobbies_activities : [],
+    drinkingHabits: responses.drinking_habits,
+    smokingHabits: responses.smoking_habits,
+    relationshipReasons: Array.isArray(responses.relationship_reasons) ? responses.relationship_reasons : [],
+    careerOpportunityScenario: responses.career_opportunity_scenario,
+    familyGatheringScenario: responses.family_gathering_scenario,
+    
+    // Keep original responses for backward compatibility
+    responses: responses,
+    
+    // Metadata
+    metadata: {
+      ipAddress: req.ip,
+      userAgent: req.get('User-Agent'),
+      submittedAt: new Date(),
+      ...metadata
+    }
+  };
+  
+  // Remove undefined fields
+  Object.keys(structuredData).forEach(key => {
+    if (structuredData[key] === undefined) {
+      delete structuredData[key];
+    }
+  });
   
   // Check if questionnaire already exists for this email or leadId
   let questionnaireResponse = await QuestionnaireResponse.findOne({ 
     $or: [
-      { userEmail },
+      { userEmail: userEmail.toLowerCase() },
       ...(leadId ? [{ leadId }] : [])
     ]
   });
   
   if (questionnaireResponse) {
-    // Update existing response
+    // Update existing response with structured data
+    Object.assign(questionnaireResponse, structuredData);
     questionnaireResponse.responses = { ...questionnaireResponse.responses, ...responses };
-    questionnaireResponse.userName = userName || questionnaireResponse.userName;
-    questionnaireResponse.userPhone = userPhone || questionnaireResponse.userPhone;
-    questionnaireResponse.leadId = leadId || questionnaireResponse.leadId;
-    questionnaireResponse.completionTime = completionTime;
     questionnaireResponse.isComplete = true;
     questionnaireResponse.completedAt = new Date();
     
     await questionnaireResponse.save();
+    console.log('✅ Updated existing questionnaire response for:', userEmail);
   } else {
-    // Create new response
-    questionnaireResponse = await QuestionnaireResponse.create({
-      userEmail,
-      userName,
-      userPhone,
-      leadId,
-      userType,
-      source,
-      responses,
-      isComplete: true,
-      completedAt: new Date(),
-      completionTime,
-      metadata: {
-        ipAddress: req.ip,
-        userAgent: req.get('User-Agent'),
-        submittedAt: new Date(),
-        ...metadata
-      }
-    });
+    // Create new response with structured data
+    structuredData.isComplete = true;
+    structuredData.completedAt = new Date();
+    
+    questionnaireResponse = await QuestionnaireResponse.create(structuredData);
+    console.log('✅ Created new questionnaire response for:', userEmail);
   }
   
   res.status(201).json({
