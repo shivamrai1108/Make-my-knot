@@ -89,10 +89,33 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
     console.log('🔄 Completing questionnaire with responses:', finalResponses)
     console.log('📊 Total questions answered:', Object.keys(finalResponses).length, 'out of', essentialQuestions.length)
     
+    // Get user information from lead if available
+    let userEmail = user?.email || ''
+    let userName = user?.name || ''
+    let userPhone = user?.phone || ''
+    
+    if (leadId && typeof window !== 'undefined') {
+      try {
+        const leads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
+        const lead = leads.find((l: any) => l.id === leadId)
+        if (lead) {
+          userEmail = lead.email || userEmail
+          userName = lead.name || userName
+          userPhone = lead.phone || userPhone
+        }
+      } catch (error) {
+        console.warn('Could not retrieve lead information for assessment:', error)
+      }
+    }
+    
     const response: QuestionnaireResponse = {
       id: userId || leadId || `questionnaire_${Date.now()}`,
       userId,
       leadId,
+      userName,
+      userEmail,
+      userPhone,
+      userType: userId ? 'user' : 'lead',
       source: source || (leadId ? 'lead_assessment' : 'user_questionnaire'),
       completionTime,
       createdAt: new Date().toISOString(),

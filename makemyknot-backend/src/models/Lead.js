@@ -31,7 +31,15 @@ const leadSchema = new mongoose.Schema({
   password: {
     type: String,
     required: false, // Optional for leads, required for user conversion
-    minlength: [8, 'Password must be at least 8 characters long']
+    minlength: [8, 'Password must be at least 8 characters long'],
+    validate: {
+      validator: function(password) {
+        if (!password) return true; // Optional field
+        // Require at least 8 characters with uppercase, lowercase, number, and special character
+        return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password);
+      },
+      message: 'Password must contain at least 8 characters including uppercase, lowercase, number, and special character (@$!%*?&)'
+    }
   },
   dateOfBirth: {
     type: Date,

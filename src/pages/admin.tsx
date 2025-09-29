@@ -107,7 +107,8 @@ async function getRealAnalyticsData() {
   
   try {
     // Fetch real leads data from backend API
-    const leadsResponse = await fetch('http://localhost:4000/api/leads/admin', {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://makemyknot-backend-production.up.railway.app/api'
+    const leadsResponse = await fetch(`${API_URL}/leads/admin`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
     })
@@ -143,7 +144,8 @@ async function getRealAnalyticsData() {
   
   // Try to get assessments from new Assessment collection
   try {
-    const assessmentsResponse = await fetch('http://localhost:4000/api/assessments/admin', {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://makemyknot-backend-production.up.railway.app/api'
+    const assessmentsResponse = await fetch(`${API_URL}/assessments/admin`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
     })
@@ -160,7 +162,8 @@ async function getRealAnalyticsData() {
   
   // Also get legacy questionnaires data from backend API
   try {
-    const questionnairesResponse = await fetch('http://localhost:4000/api/questionnaires/admin', {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://makemyknot-backend-production.up.railway.app/api'
+    const questionnairesResponse = await fetch(`${API_URL}/questionnaires/admin`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
     })
@@ -1125,6 +1128,18 @@ function AssessmentsTab() {
           
           return acc
         }, [])
+        
+        console.log('🔍 Assessment loading debug:', {
+          assessmentsFromAssessmentCollection: allAssessments.filter(a => a.dataSource === 'assessment_collection').length,
+          assessmentsFromQuestionnaireCollection: allAssessments.filter(a => a.dataSource === 'questionnaire_collection').length,
+          totalUnique: uniqueAssessments.length,
+          sampleData: uniqueAssessments.slice(0, 2).map(a => ({
+            name: a.userInfo?.name,
+            email: a.userInfo?.email,
+            dataSource: a.dataSource,
+            isComplete: a.isComplete
+          }))
+        })
         
         console.log(`✅ Loaded total ${uniqueAssessments.length} unique assessments (${allAssessments.length} total responses)`)
         setAssessments(uniqueAssessments)
@@ -2175,13 +2190,48 @@ function CRMLeadsTab() {
         const allLeads = leadsResult.leads || []
         console.log('✅ Loaded', allLeads.length, 'leads from MongoDB')
         
-        // Fetch questionnaire responses directly from MongoDB
-        const allQuestionnaires = await getQuestionnaireResponses()
-        console.log('✅ Loaded', allQuestionnaires.length, 'assessments from MongoDB')
+        // Fetch both questionnaire responses and assessments from MongoDB
+        let allQuestionnaires: any[] = []
         
-        // Get questionnaires specifically from leads
-        const leadQuestionnaires = allQuestionnaires.filter((q: any) => q.leadId)
-        console.log('🎯 Found', leadQuestionnaires.length, 'lead assessments')
+        // Try to get assessments from new Assessment collection first
+        try {
+          const assessmentResponses = await getAssessmentResponses()
+          console.log('✅ Loaded', assessmentResponses.length, 'assessments from Assessment collection')
+          allQuestionnaires = [...allQuestionnaires, ...assessmentResponses]
+        } catch (error) {
+          console.warn('⚠️ Could not load from Assessment collection:', error)
+        }
+        
+        // Also get legacy questionnaire responses
+        try {
+          const questionnaireResponses = await getQuestionnaireResponses()
+          console.log('✅ Loaded', questionnaireResponses.length, 'questionnaires from QuestionnaireResponse collection')
+          allQuestionnaires = [...allQuestionnaires, ...questionnaireResponses]
+        } catch (error) {
+          console.warn('⚠️ Could not load from QuestionnaireResponse collection:', error)
+        }
+        
+        console.log('📊 Total assessments/questionnaires loaded:', allQuestionnaires.length)
+        
+        // Get questionnaires specifically from leads (remove duplicates by email)
+        const leadQuestionnaires = allQuestionnaires.reduce((acc, q) => {
+          if (q.leadId) {
+            // Check if we already have an assessment for this lead
+            const existing = acc.find((existing: any) => existing.leadId === q.leadId)
+            if (!existing || (q.dataSource === 'assessment_collection' && existing.dataSource !== 'assessment_collection')) {
+              // Add if not exists, or replace with Assessment collection data if available
+              if (existing) {
+                const index = acc.findIndex((item: any) => item.leadId === q.leadId)
+                acc[index] = q
+              } else {
+                acc.push(q)
+              }
+            }
+          }
+          return acc
+        }, [])
+        
+        console.log('🎯 Found', leadQuestionnaires.length, 'unique lead assessments')
         
         // Enhance leads with questionnaire data and scoring
         const enhancedLeads = allLeads.map((lead: any) => {
