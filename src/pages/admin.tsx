@@ -79,18 +79,99 @@ interface AdminRole {
 const ADMIN_TOKEN_KEY = 'makemyknot_admin_token'
 const ADMIN_PASSWORD = 'admin123'
 
-// Mock analytics data
-function getAnalyticsData() {
-  return {
-    totalUsers: 1247,
-    newUsersThisWeek: 23,
-    totalLeads: 342,
-    newLeadsThisWeek: 15,
-    activeSubscriptions: 89,
-    trialUsers: 156,
-    completedQuestionnaires: 892,
-    verifiedLeads: 287
+// Real analytics data from backend APIs and localStorage
+async function getRealAnalyticsData() {
+  const analytics = {
+    totalUsers: 0,
+    newUsersThisWeek: 0,
+    totalLeads: 0,
+    newLeadsThisWeek: 0,
+    activeSubscriptions: 0,
+    trialUsers: 0,
+    completedQuestionnaires: 0,
+    verifiedLeads: 0,
+    totalRevenue: 0
   }
+  
+  try {
+    // Fetch real leads data from backend API
+    const leadsResponse = await fetch('http://localhost:4000/api/leads/admin', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    })
+    
+    if (leadsResponse.ok) {
+      const leadsData = await leadsResponse.json()
+      const leads = leadsData.data?.leads || []
+      analytics.totalLeads = leads.length
+      analytics.verifiedLeads = leads.filter((l: any) => l.status === 'verified').length
+      
+      // Calculate new leads this week
+      const weekAgo = new Date()
+      weekAgo.setDate(weekAgo.getDate() - 7)
+      analytics.newLeadsThisWeek = leads.filter((l: any) => 
+        new Date(l.createdAt) > weekAgo
+      ).length
+    }
+  } catch (error) {
+    console.log('Using localStorage fallback for leads data')
+    // Fallback to localStorage for leads
+    const localLeads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
+    analytics.totalLeads = localLeads.length
+    analytics.verifiedLeads = localLeads.filter((l: any) => l.status === 'verified').length
+    
+    const weekAgo = new Date()
+    weekAgo.setDate(weekAgo.getDate() - 7)
+    analytics.newLeadsThisWeek = localLeads.filter((l: any) => 
+      new Date(l.createdAt || new Date()) > weekAgo
+    ).length
+  }
+  
+  try {
+    // Fetch real questionnaires data from backend API
+    const questionnairesResponse = await fetch('http://localhost:4000/api/questionnaires/admin', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    })
+    
+    if (questionnairesResponse.ok) {
+      const questionnairesData = await questionnairesResponse.json()
+      const questionnaires = questionnairesData.data?.responses || []
+      analytics.completedQuestionnaires = questionnaires.filter((q: any) => q.isComplete).length
+    }
+  } catch (error) {
+    console.log('Using localStorage fallback for questionnaires data')
+    // Fallback to localStorage for questionnaires
+    const localQuestionnaires = JSON.parse(localStorage.getItem('questionnaire_responses') || '[]')
+    analytics.completedQuestionnaires = localQuestionnaires.filter((q: any) => q.isComplete).length
+  }
+  
+  // Get users data from localStorage (since we don't have a users API yet)
+  try {
+    const users = JSON.parse(localStorage.getItem('makemyknot_users') || '[]')
+    analytics.totalUsers = users.length
+    analytics.activeSubscriptions = users.filter((u: any) => 
+      u.subscription?.status === 'active'
+    ).length
+    analytics.trialUsers = users.filter((u: any) => 
+      u.subscription?.plan === 'trial'
+    ).length
+    
+    // Calculate new users this week
+    const weekAgo = new Date()
+    weekAgo.setDate(weekAgo.getDate() - 7)
+    analytics.newUsersThisWeek = users.filter((u: any) => 
+      new Date(u.createdAt || new Date()) > weekAgo
+    ).length
+    
+    // Calculate total revenue (mock calculation based on subscriptions)
+    analytics.totalRevenue = analytics.activeSubscriptions * 999 // ₹999 per subscription
+  } catch (error) {
+    console.log('No users data available')
+  }
+  
+  console.log('📊 Real Analytics Data:', analytics)
+  return analytics
 }
 
 // Mock notification system
@@ -602,6 +683,7 @@ export default function Admin() {
   const [authed, setAuthed] = useState(false)
   const [password, setPassword] = useState('')
   const [activeTab, setActiveTab] = useState<AdminTab>('dashboard')
+  const [analytics, setAnalytics] = useState<any>(null)
   const router = useRouter()
 
   useEffect(() => {
@@ -611,6 +693,14 @@ export default function Admin() {
       // Initialize lead data protection when admin loads
       preventLeadDataLoss()
       console.log('🔒 Lead data protection initialized for admin session')
+      
+      // Load real analytics data
+      getRealAnalyticsData().then(data => {
+        setAnalytics(data)
+        console.log('📊 Admin analytics loaded:', data)
+      }).catch(error => {
+        console.error('Error loading admin analytics:', error)
+      })
     }
   }, [])
 
@@ -798,12 +888,16 @@ export default function Admin() {
                     </div>
                     <div className="ml-3">
                       <p className="text-sm font-medium text-gray-600">Total Users</p>
-                      <p className="text-2xl font-bold text-gray-900">1,247</p>
+                      <p className="text-2xl font-bold text-gray-900">
+                        {analytics ? analytics.totalUsers : (
+                          <span className="text-gray-400 animate-pulse">Loading...</span>
+                        )}
+                      </p>
                     </div>
                   </div>
                   <div className="mt-3 flex items-center text-sm">
-                    <span className="text-green-600 font-medium">+12%</span>
-                    <span className="text-gray-500 ml-1">vs last month</span>
+                    <span className="text-green-600 font-medium">+{analytics?.newUsersThisWeek || 0}</span>
+                    <span className="text-gray-500 ml-1">this week</span>
                   </div>
                 </div>
 
@@ -813,13 +907,17 @@ export default function Admin() {
                       <MessageCircle className="h-5 w-5 text-green-600" />
                     </div>
                     <div className="ml-3">
-                      <p className="text-sm font-medium text-gray-600">Active Matches</p>
-                      <p className="text-2xl font-bold text-gray-900">342</p>
+                      <p className="text-sm font-medium text-gray-600">Total Leads</p>
+                      <p className="text-2xl font-bold text-gray-900">
+                        {analytics ? analytics.totalLeads : (
+                          <span className="text-gray-400 animate-pulse">Loading...</span>
+                        )}
+                      </p>
                     </div>
                   </div>
                   <div className="mt-3 flex items-center text-sm">
-                    <span className="text-green-600 font-medium">+8%</span>
-                    <span className="text-gray-500 ml-1">vs last month</span>
+                    <span className="text-green-600 font-medium">+{analytics?.newLeadsThisWeek || 0}</span>
+                    <span className="text-gray-500 ml-1">this week</span>
                   </div>
                 </div>
 
@@ -830,12 +928,18 @@ export default function Admin() {
                     </div>
                     <div className="ml-3">
                       <p className="text-sm font-medium text-gray-600">Revenue</p>
-                      <p className="text-2xl font-bold text-gray-900">₹2.1L</p>
+                      <p className="text-2xl font-bold text-gray-900">
+                        {analytics ? (
+                          analytics.totalRevenue ? `₹${(analytics.totalRevenue / 1000).toFixed(1)}K` : '₹0'
+                        ) : (
+                          <span className="text-gray-400 animate-pulse">Loading...</span>
+                        )}
+                      </p>
                     </div>
                   </div>
                   <div className="mt-3 flex items-center text-sm">
-                    <span className="text-green-600 font-medium">+23%</span>
-                    <span className="text-gray-500 ml-1">vs last month</span>
+                    <span className="text-blue-600 font-medium">{analytics?.activeSubscriptions || 0}</span>
+                    <span className="text-gray-500 ml-1">subscriptions</span>
                   </div>
                 </div>
 
@@ -845,19 +949,23 @@ export default function Admin() {
                       <TrendingUp className="h-5 w-5 text-purple-600" />
                     </div>
                     <div className="ml-3">
-                      <p className="text-sm font-medium text-gray-600">Success Rate</p>
-                      <p className="text-2xl font-bold text-gray-900">91%</p>
+                      <p className="text-sm font-medium text-gray-600">Completed Assessments</p>
+                      <p className="text-2xl font-bold text-gray-900">
+                        {analytics ? analytics.completedQuestionnaires : (
+                          <span className="text-gray-400 animate-pulse">Loading...</span>
+                        )}
+                      </p>
                     </div>
                   </div>
                   <div className="mt-3 flex items-center text-sm">
-                    <span className="text-green-600 font-medium">+2%</span>
-                    <span className="text-gray-500 ml-1">vs last month</span>
+                    <span className="text-green-600 font-medium">{analytics?.verifiedLeads || 0}</span>
+                    <span className="text-gray-500 ml-1">verified leads</span>
                   </div>
                 </div>
               </div>
 
           {/* Tab Content */}
-          {activeTab === 'dashboard' && <DashboardTab />}
+          {activeTab === 'dashboard' && <DashboardTab analytics={analytics} />}
           {activeTab === 'users' && <UserManagementTab />}
           {activeTab === 'online-status' && <OnlineStatusTab />}
           {activeTab === 'leads' && <CRMLeadsTab />}
@@ -888,56 +996,67 @@ function AssessmentsTab() {
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false)
 
   useEffect(() => {
-    // Get questionnaire responses
-    const questionnaires = getQuestionnaireResponses()
-    
-    // Get leads with their details
-    const leads = getLeads()
-    
-    // Combine questionnaires with lead/user information
-    const assessmentsData = questionnaires.map(q => {
-      let userInfo = null
+    const loadAssessments = async () => {
+      // Get questionnaire responses
+      const questionnaires = getQuestionnaireResponses()
       
-      if (q.leadId) {
-        const lead = leads.find(l => l.id === q.leadId)
-        if (lead) {
-          userInfo = {
-            name: lead.name,
-            email: lead.email,
-            phone: lead.phone,
-            type: 'lead'
-          }
-        }
-      } else if (q.userId) {
-        // Try to get user info from users storage
-        try {
-          const users = JSON.parse(localStorage.getItem('makemyknot_users') || '[]')
-          const user = users.find((u: any) => u.id === q.userId)
-          if (user) {
+      // Get leads with their details using async function
+      let leads = []
+      try {
+        const leadsResult = await getLeadsFromAPI()
+        leads = leadsResult.leads || []
+      } catch (error) {
+        console.warn('Failed to get leads from API, using localStorage fallback:', error)
+        leads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
+      }
+      
+      // Combine questionnaires with lead/user information
+      const assessmentsData = questionnaires.map(q => {
+        let userInfo = null
+        
+        if (q.leadId) {
+          const lead = leads.find(l => l.id === q.leadId)
+          if (lead) {
             userInfo = {
-              name: user.name,
-              email: user.email,
-              phone: user.phone,
-              type: 'user'
+              name: lead.name,
+              email: lead.email,
+              phone: lead.phone,
+              type: 'lead'
             }
           }
-        } catch (e) {
-          console.error('Error getting user info:', e)
+        } else if (q.userId) {
+          // Try to get user info from users storage
+          try {
+            const users = JSON.parse(localStorage.getItem('makemyknot_users') || '[]')
+            const user = users.find((u: any) => u.id === q.userId)
+            if (user) {
+              userInfo = {
+                name: user.name,
+                email: user.email,
+                phone: user.phone,
+                type: 'user'
+              }
+            }
+          } catch (e) {
+            console.error('Error getting user info:', e)
+          }
         }
-      }
+        
+        return {
+          ...q,
+          userInfo: userInfo || {
+            name: 'Unknown User',
+            email: 'unknown@email.com',
+            phone: 'N/A',
+            type: 'unknown'
+          }
+        }
+      })
       
-      return {
-        ...q,
-        userInfo: userInfo || {
-          name: 'Unknown User',
-          email: 'unknown@email.com',
-          phone: 'N/A',
-          type: 'unknown'
-        }
-      }
-    })
+      setAssessments(assessmentsData)
+    }
     
-    setAssessments(assessmentsData)
+    loadAssessments()
   }, [])
 
   const filteredAssessments = assessments.filter(assessment => {
@@ -1428,87 +1547,122 @@ function AssessmentsTab() {
   )
 }
 
-// Dashboard Overview Tab
-function DashboardTab() {
-  const [analytics, setAnalytics] = useState<any>(null)
+// Dashboard Overview Tab with Real Data
+function DashboardTab({ analytics }: { analytics?: AnalyticsData | null }) {
+  if (!analytics) {
+    return (
+      <div className="flex items-center justify-center p-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+        <span className="ml-3 text-gray-600">Loading real analytics data...</span>
+      </div>
+    )
+  }
   
-  useEffect(() => {
-    setAnalytics(getAnalyticsData())
-  }, [])
-
-  if (!analytics) return <div>Loading...</div>
-
   return (
-    <div className="grid md:grid-cols-4 gap-6">
-      <div className="card hover-lift border-gradient-primary">
-        <div className="flex items-center justify-between">
+    <div className="space-y-6">
+      {/* Real-time Data Notice */}
+      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+        <div className="flex items-center">
+          <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+          <span className="text-sm text-green-700 font-medium">
+            📊 Showing real-time data from live database and localStorage
+          </span>
+        </div>
+      </div>
+      
+      <div className="grid md:grid-cols-4 gap-6">
+        {/* Total Users */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
           <div className="flex items-center">
-            <div className="p-3 rounded-xl gradient-bg mr-4">
-              <Users className="h-8 w-8 text-white" />
+            <div className="p-3 rounded-lg bg-blue-100">
+              <Users className="h-6 w-6 text-blue-600" />
             </div>
-            <div>
-              <div className="text-3xl font-bold gradient-text">{analytics.totalUsers}</div>
+            <div className="ml-4">
+              <div className="text-2xl font-bold text-gray-900">{analytics.totalUsers}</div>
               <div className="text-sm text-gray-600">Total Users</div>
             </div>
           </div>
+          <div className="mt-3 flex items-center text-sm">
+            <span className="text-green-600 font-medium">+{analytics.newUsersThisWeek}</span>
+            <span className="text-gray-500 ml-1">this week</span>
+          </div>
         </div>
-        <div className="mt-4 flex items-center justify-between">
-          <div className="text-sm text-success-600 font-medium">+{analytics.newUsersThisWeek} this week</div>
-          <div className="text-xs text-gray-500">📈 Growing</div>
-        </div>
-      </div>
-      
-      <div className="card hover-lift border-gradient-accent">
-        <div className="flex items-center justify-between">
+        
+        {/* Total Leads */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
           <div className="flex items-center">
-            <div className="p-3 rounded-xl gradient-bg-accent mr-4">
-              <Mail className="h-8 w-8 text-white" />
+            <div className="p-3 rounded-lg bg-green-100">
+              <Mail className="h-6 w-6 text-green-600" />
             </div>
-            <div>
-              <div className="text-3xl font-bold gradient-text-accent">{analytics.totalLeads}</div>
+            <div className="ml-4">
+              <div className="text-2xl font-bold text-gray-900">{analytics.totalLeads}</div>
               <div className="text-sm text-gray-600">Total Leads</div>
             </div>
           </div>
+          <div className="mt-3 flex items-center text-sm">
+            <span className="text-green-600 font-medium">+{analytics.newLeadsThisWeek}</span>
+            <span className="text-gray-500 ml-1">this week</span>
+          </div>
         </div>
-        <div className="mt-4 flex items-center justify-between">
-          <div className="text-sm text-success-600 font-medium">+{analytics.newLeadsThisWeek} this week</div>
-          <div className="text-xs text-gray-500">💼 Active</div>
+        
+        {/* Revenue */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+          <div className="flex items-center">
+            <div className="p-3 rounded-lg bg-yellow-100">
+              <DollarSign className="h-6 w-6 text-yellow-600" />
+            </div>
+            <div className="ml-4">
+              <div className="text-2xl font-bold text-gray-900">₹{(analytics.totalRevenue / 1000).toFixed(1)}K</div>
+              <div className="text-sm text-gray-600">Revenue</div>
+            </div>
+          </div>
+          <div className="mt-3 flex items-center text-sm">
+            <span className="text-blue-600 font-medium">{analytics.activeSubscriptions}</span>
+            <span className="text-gray-500 ml-1">active subscriptions</span>
+          </div>
+        </div>
+        
+        {/* Completed Assessments */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+          <div className="flex items-center">
+            <div className="p-3 rounded-lg bg-purple-100">
+              <Activity className="h-6 w-6 text-purple-600" />
+            </div>
+            <div className="ml-4">
+              <div className="text-2xl font-bold text-gray-900">{analytics.completedQuestionnaires}</div>
+              <div className="text-sm text-gray-600">Completed Assessments</div>
+            </div>
+          </div>
+          <div className="mt-3 flex items-center text-sm">
+            <span className="text-purple-600 font-medium">{analytics.verifiedLeads}</span>
+            <span className="text-gray-500 ml-1">verified leads</span>
+          </div>
         </div>
       </div>
       
-      <div className="card hover-lift">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <div className="p-3 rounded-xl gradient-bg-sunset mr-4">
-              <DollarSign className="h-8 w-8 text-white" />
-            </div>
-            <div>
-              <div className="text-3xl font-bold gradient-text-gold">{analytics.activeSubscriptions}</div>
-              <div className="text-sm text-gray-600">Active Subscriptions</div>
-            </div>
+      {/* Additional Stats Row */}
+      <div className="grid md:grid-cols-3 gap-6">
+        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+          <div className="text-center">
+            <div className="text-3xl font-bold text-indigo-600">{analytics.trialUsers}</div>
+            <div className="text-sm text-gray-600 mt-1">Trial Users</div>
           </div>
         </div>
-        <div className="mt-4 flex items-center justify-between">
-          <div className="text-sm text-warning-600 font-medium">{analytics.trialUsers} on trial</div>
-          <div className="text-xs text-gray-500">💰 Revenue</div>
-        </div>
-      </div>
-      
-      <div className="card hover-lift">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <div className="p-3 rounded-xl gradient-bg-secondary mr-4">
-              <Activity className="h-8 w-8 text-white" />
-            </div>
-            <div>
-              <div className="text-3xl font-bold gradient-text">{analytics.completedQuestionnaires}</div>
-              <div className="text-sm text-gray-600">Questionnaires</div>
-            </div>
+        
+        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+          <div className="text-center">
+            <div className="text-3xl font-bold text-green-600">{analytics.verifiedLeads}</div>
+            <div className="text-sm text-gray-600 mt-1">Verified Leads</div>
           </div>
         </div>
-        <div className="mt-4 flex items-center justify-between">
-          <div className="text-sm text-primary-600 font-medium">Completed assessments</div>
-          <div className="text-xs text-gray-500">📊 Insights</div>
+        
+        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+          <div className="text-center">
+            <div className="text-3xl font-bold text-blue-600">
+              {analytics.totalLeads > 0 ? Math.round((analytics.completedQuestionnaires / analytics.totalLeads) * 100) : 0}%
+            </div>
+            <div className="text-sm text-gray-600 mt-1">Assessment Completion Rate</div>
+          </div>
         </div>
       </div>
     </div>
@@ -3608,7 +3762,8 @@ function QuestionnairesTab() {
             age = user.age || ''
           }
         } else if (q.leadId) {
-          const leads = getLeads()
+          // Use localStorage fallback directly for export functionality
+          const leads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
           const lead = leads.find((l: any) => l.id === q.leadId)
           if (lead) {
             name = lead.name || ''
