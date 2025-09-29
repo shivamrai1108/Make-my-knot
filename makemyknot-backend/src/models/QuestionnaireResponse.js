@@ -4,9 +4,37 @@ const questionnaireResponseSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: [true, 'User ID is required'],
-    unique: true,
     index: true
+  },
+  // For public lead submissions
+  leadId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Lead',
+    index: true
+  },
+  userEmail: {
+    type: String,
+    trim: true,
+    lowercase: true,
+    index: true
+  },
+  userName: {
+    type: String,
+    trim: true
+  },
+  userPhone: {
+    type: String,
+    trim: true
+  },
+  userType: {
+    type: String,
+    enum: ['user', 'lead', 'guest'],
+    default: 'lead'
+  },
+  source: {
+    type: String,
+    enum: ['website', 'mobile_app', 'referral', 'social_media'],
+    default: 'website'
   },
   responses: {
     type: mongoose.Schema.Types.Mixed,
@@ -87,9 +115,12 @@ const questionnaireResponseSchema = new mongoose.Schema({
     }
   },
   completionTime: {
-    type: Number, // in minutes
+    type: Number, // in seconds
     min: 0,
     default: 0
+  },
+  completedAt: {
+    type: Date
   },
   isComplete: {
     type: Boolean,

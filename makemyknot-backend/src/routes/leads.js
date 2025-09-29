@@ -6,9 +6,13 @@ const AppError = require('../utils/AppError');
 
 const router = express.Router();
 
-// Public routes (no auth required)
-// POST /api/leads - Create a new lead
+// Public routes (no auth required) - Allow anyone to submit leads
+// POST /api/leads - Create a new lead (PUBLIC ACCESS)
 router.post('/', catchAsync(async (req, res) => {
+  // Add CORS headers for public access
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'POST');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
   const { name, email, phone, answers, source = 'website' } = req.body;
   
   // Check if lead with this email already exists

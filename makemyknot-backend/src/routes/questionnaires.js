@@ -6,7 +6,113 @@ const AppError = require('../utils/AppError');
 
 const router = express.Router();
 
-// All routes require authentication
+// Public routes (no auth required) for lead questionnaires
+// POST /api/questionnaires/public - Create questionnaire response from lead (PUBLIC ACCESS)
+router.post('/public', catchAsync(async (req, res) => {
+  // Add CORS headers for public access
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'POST');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  
+  const { 
+    userEmail,
+    userName,
+    userPhone,
+    leadId,
+    responses, 
+    userType = 'lead',
+    source = 'website',
+    completionTime = 0,
+    metadata = {}
+  } = req.body;
+  
+  if (!userEmail || !responses) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'Email and responses are required'
+    });
+  }
+  
+  // Check if questionnaire already exists for this email
+  let questionnaireResponse = await QuestionnaireResponse.findOne({ userEmail });
+  
+  if (questionnaireResponse) {
+    // Update existing response
+    questionnaireResponse.responses = { ...questionnaireResponse.responses, ...responses };
+    questionnaireResponse.userName = userName || questionnaireResponse.userName;
+    questionnaireResponse.userPhone = userPhone || questionnaireResponse.userPhone;
+    questionnaireResponse.leadId = leadId || questionnaireResponse.leadId;
+    questionnaireResponse.completionTime = completionTime;
+    questionnaireResponse.isComplete = true;
+    questionnaireResponse.completedAt = new Date();
+    
+    await questionnaireResponse.save();
+  } else {
+    // Create new response
+    questionnaireResponse = await QuestionnaireResponse.create({
+      userEmail,
+      userName,
+      userPhone,
+      leadId,
+      userType,
+      source,
+      responses,
+      isComplete: true,
+      completedAt: new Date(),
+      completionTime,
+      metadata: {
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent'),
+        submittedAt: new Date(),
+        ...metadata
+      }
+    });
+  }
+  
+  res.status(201).json({
+    status: 'success',
+    message: 'Questionnaire submitted successfully',
+    data: {
+      response: {
+        id: questionnaireResponse._id,
+        userEmail: questionnaireResponse.userEmail,
+        userName: questionnaireResponse.userName,
+        isComplete: questionnaireResponse.isComplete,
+        completedAt: questionnaireResponse.completedAt
+      }
+    }
+  });
+}));
+
+// GET /api/questionnaires/public/:email - Get questionnaire by email (PUBLIC ACCESS)
+router.get('/public/:email', catchAsync(async (req, res) => {
+  const response = await QuestionnaireResponse.findOne({ 
+    userEmail: req.params.email 
+  }).select('-metadata -__v');
+  
+  if (!response) {
+    return res.status(404).json({
+      status: 'error',
+      message: 'Questionnaire not found'
+    });
+  }
+  
+  res.json({
+    status: 'success',
+    data: {
+      response: {
+        id: response._id,
+        userEmail: response.userEmail,
+        userName: response.userName,
+        isComplete: response.isComplete,
+        completedAt: response.completedAt,
+        responses: response.responses
+      }
+    }
+  });
+}));
+
+// Protected routes require authentication
 router.use(protect);
 
 // GET /api/questionnaires/me - Get current user's questionnaire response

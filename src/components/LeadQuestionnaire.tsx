@@ -561,9 +561,9 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                   id="biodata-upload"
                 />
-                <div className="border-2 border-dashed border-white/30 rounded-lg p-3 sm:p-4 text-center hover:border-white/50 hover:bg-white/10 transition-colors">
-                  <Upload className="h-6 w-6 sm:h-8 sm:w-8 text-white/70 mx-auto mb-1 sm:mb-2" />
-                  <p className="text-xs sm:text-sm text-white/80 mb-1">Click to upload biodata</p>
+                <div className="border-2 border-dashed border-white/30 rounded-lg p-2 sm:p-3 text-center hover:border-white/50 hover:bg-white/10 transition-colors">
+                  <Upload className="h-4 w-4 sm:h-5 sm:w-5 text-white/70 mx-auto mb-1" />
+                  <p className="text-xs text-white/80 mb-0.5">Click to upload biodata</p>
                   <p className="text-xs text-white/60">PDF or JPEG files only</p>
                 </div>
               </div>

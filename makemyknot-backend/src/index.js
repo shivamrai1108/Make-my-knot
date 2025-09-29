@@ -10,6 +10,7 @@ const { Server } = require('socket.io');
 require('dotenv').config();
 
 const authRoutes = require('./routes/auth');
+const adminRoutes = require('./routes/admin');
 const userRoutes = require('./routes/users');
 const matchRoutes = require('./routes/matches');
 const chatRoutes = require('./routes/chats');
@@ -35,14 +36,43 @@ app.use(helmet());
 app.use(compression());
 app.use(morgan('combined'));
 
-// CORS configuration
+// CORS configuration for public access
 app.use(cors({
-  origin: [
-    process.env.CLIENT_URL || 'http://localhost:3000',
-    process.env.MOBILE_CLIENT_URL || 'exp://localhost:19000',
-    'http://localhost:19006' // Expo web
-  ],
-  credentials: true
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, Postman, etc.)
+    if (!origin) return callback(null, true);
+    
+    // List of allowed origins
+    const allowedOrigins = [
+      process.env.CLIENT_URL || 'http://localhost:3000',
+      process.env.MOBILE_CLIENT_URL || 'exp://localhost:19000',
+      'http://localhost:19006', // Expo web
+      'https://makemyknot.com', // Your production domain
+      'https://www.makemyknot.com', // Your production domain with www
+      /^https:\/\/.*\.makemyknot\.com$/, // Subdomains
+      /^https:\/\/.*\.vercel\.app$/, // Vercel deployments
+      /^https:\/\/.*\.netlify\.app$/, // Netlify deployments
+    ];
+    
+    // Check if origin is allowed
+    const isAllowed = allowedOrigins.some(allowedOrigin => {
+      if (typeof allowedOrigin === 'string') {
+        return allowedOrigin === origin;
+      } else if (allowedOrigin instanceof RegExp) {
+        return allowedOrigin.test(origin);
+      }
+      return false;
+    });
+    
+    if (isAllowed || process.env.NODE_ENV === 'development') {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
 // Rate limiting
@@ -100,6 +130,7 @@ app.set('io', io);
 
 // API routes
 app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/matches', matchRoutes);
 app.use('/api/chats', chatRoutes);

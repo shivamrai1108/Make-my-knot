@@ -964,9 +964,9 @@ export default function Home() {
                 <div className="mb-6">
                   <div className="w-16 h-1 bg-gray-900 mb-4"></div>
                 </div>
-                <h3 className="text-xl font-serif font-bold text-gray-900 mb-4 leading-tight">Meaningful Connections</h3>
+                <h3 className="text-xl font-serif font-bold text-gray-900 mb-4 leading-tight">{t('difference.meaningfulConnections.title', 'Meaningful Connections')}</h3>
                 <p className="text-gray-600 leading-relaxed flex-grow font-light text-base">
-                  Connections on Make My Knot aren't random interactions—they're thoughtful. You can send voice notes, reactions, or thoughtful comments, so every connection feels personal and genuine.
+                  {t('difference.meaningfulConnections.description', 'Connections on Make My Knot aren\'t random interactions—they\'re thoughtful. You can send voice notes, reactions, or thoughtful comments, so every connection feels personal and genuine.')}
                 </p>
               </div>
 
@@ -975,9 +975,9 @@ export default function Home() {
                 <div className="mb-6">
                   <div className="w-16 h-1 bg-gray-900 mb-4"></div>
                 </div>
-                <h3 className="text-xl font-serif font-bold text-gray-900 mb-4 leading-tight">AI Compatibility Analysis</h3>
+                <h3 className="text-xl font-serif font-bold text-gray-900 mb-4 leading-tight">{t('difference.aiCompatibility.title', 'AI Compatibility Analysis')}</h3>
                 <p className="text-gray-600 leading-relaxed flex-grow font-light text-base">
-                  Our proprietary AI engine calculates compatibility not just between two people, but also considers family expectations, lifestyle choices, and values—making every match more meaningful and lasting.
+                  {t('difference.aiCompatibility.description', 'Our proprietary AI engine calculates compatibility not just between two people, but also considers family expectations, lifestyle choices, and values—making every match more meaningful and lasting.')}
                 </p>
               </div>
 
@@ -986,9 +986,9 @@ export default function Home() {
                 <div className="mb-6">
                   <div className="w-16 h-1 bg-gray-900 mb-4"></div>
                 </div>
-                <h3 className="text-xl font-serif font-bold text-gray-900 mb-4 leading-tight">Transparent Intentions</h3>
+                <h3 className="text-xl font-serif font-bold text-gray-900 mb-4 leading-tight">{t('difference.transparentIntentions.title', 'Transparent Intentions')}</h3>
                 <p className="text-gray-600 leading-relaxed flex-grow font-light text-base">
-                  No guessing games. Profiles highlight key details like education, family background, and optional income visibility—so you know exactly who you're connecting with from the start.
+                  {t('difference.transparentIntentions.description', 'No guessing games. Profiles highlight key details like education, family background, and optional income visibility—so you know exactly who you\'re connecting with from the start.')}
                 </p>
               </div>
 
@@ -997,9 +997,9 @@ export default function Home() {
                 <div className="mb-6">
                   <div className="w-16 h-1 bg-gray-900 mb-4"></div>
                 </div>
-                <h3 className="text-xl font-serif font-bold text-gray-900 mb-4 leading-tight">Personalized Guidance</h3>
+                <h3 className="text-xl font-serif font-bold text-gray-900 mb-4 leading-tight">{t('difference.personalizedGuidance.title', 'Personalized Guidance')}</h3>
                 <p className="text-gray-600 leading-relaxed flex-grow font-light text-base">
-                  We provide comprehensive support throughout your journey. From intelligent conversation starters to AI-generated interaction prompts, we ensure you never feel uncertain about how to connect naturally.
+                  {t('difference.personalizedGuidance.description', 'We provide comprehensive support throughout your journey. From intelligent conversation starters to AI-generated interaction prompts, we ensure you never feel uncertain about how to connect naturally.')}
                 </p>
               </div>
 
@@ -1008,9 +1008,9 @@ export default function Home() {
                 <div className="mb-6">
                   <div className="w-16 h-1 bg-gray-900 mb-4"></div>
                 </div>
-                <h3 className="text-xl font-serif font-bold text-gray-900 mb-4 leading-tight">Premium Services</h3>
+                <h3 className="text-xl font-serif font-bold text-gray-900 mb-4 leading-tight">{t('difference.premiumServices.title', 'Premium Services')}</h3>
                 <p className="text-gray-600 leading-relaxed flex-grow font-light text-base">
-                  Access exclusive experiences beyond standard matchmaking. Our premium services include numerology insights, curated private events, and AI-powered relationship counseling through our expert advisors.
+                  {t('difference.premiumServices.description', 'Access exclusive experiences beyond standard matchmaking. Our premium services include numerology insights, curated private events, and AI-powered relationship counseling through our expert advisors.')}
                 </p>
               </div>
             </div>
