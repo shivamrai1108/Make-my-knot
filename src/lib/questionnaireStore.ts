@@ -202,47 +202,6 @@ export async function saveQuestionnaireResponse(response: QuestionnaireResponse)
   }
 }
 
-// Local storage save function
-export function saveQuestionnaireResponseLocal(response: QuestionnaireResponse): void {
-  const existing = getQuestionnaireResponses()
-  const updated = existing.filter(r => r.id !== response.id)
-  
-  // Auto-populate user information if not provided
-  if (!response.userName || !response.userEmail) {
-    if (response.leadId) {
-      // Try to get lead information
-      try {
-        const leads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
-        const lead = leads.find((l: any) => l.id === response.leadId)
-        if (lead) {
-          response.userName = lead.name
-          response.userEmail = lead.email
-          response.userPhone = lead.phone
-          response.userType = 'lead'
-        }
-      } catch (error) {
-        console.error('Error loading lead data:', error)
-      }
-    } else if (response.userId) {
-      // Try to get user information
-      try {
-        const users = JSON.parse(localStorage.getItem('makemyknot_users') || '[]')
-        const user = users.find((u: any) => u.id === response.userId)
-        if (user) {
-          response.userName = user.name
-          response.userEmail = user.email
-          response.userPhone = user.phone
-          response.userType = 'user'
-        }
-      } catch (error) {
-        console.error('Error loading user data:', error)
-      }
-    }
-  }
-  
-  updated.push(response)
-  localStorage.setItem(QUESTIONNAIRE_STORAGE_KEY, JSON.stringify(updated))
-}
 
 // API save function to backend with retry logic
 async function saveQuestionnaireResponseAPIWithRetry(response: QuestionnaireResponse, maxRetries: number = 3): Promise<void> {
@@ -352,20 +311,47 @@ export async function getQuestionnaireResponses(): Promise<QuestionnaireResponse
   }
 }
 
-export function getQuestionnaireResponseByUser(userId: string): QuestionnaireResponse | null {
-  const responses = getQuestionnaireResponses()
-  return responses.find(r => r.userId === userId) || null
+export async function getQuestionnaireResponseByUser(userId: string): Promise<QuestionnaireResponse | null> {
+  try {
+    const responses = await getQuestionnaireResponses()
+    return responses.find(r => r.userId === userId) || null
+  } catch (error) {
+    console.error('Error fetching questionnaire response by user:', error)
+    return null
+  }
 }
 
-export function getQuestionnaireResponseByLead(leadId: string): QuestionnaireResponse | null {
-  const responses = getQuestionnaireResponses()
-  return responses.find(r => r.leadId === leadId) || null
+export async function getQuestionnaireResponseByLead(leadId: string): Promise<QuestionnaireResponse | null> {
+  try {
+    const responses = await getQuestionnaireResponses()
+    return responses.find(r => r.leadId === leadId) || null
+  } catch (error) {
+    console.error('Error fetching questionnaire response by lead:', error)
+    return null
+  }
 }
 
-export function deleteQuestionnaireResponse(id: string): void {
-  const existing = getQuestionnaireResponses()
-  const filtered = existing.filter(r => r.id !== id)
-  localStorage.setItem(QUESTIONNAIRE_STORAGE_KEY, JSON.stringify(filtered))
+// Note: deleteQuestionnaireResponse should be updated to call backend API instead of localStorage
+export async function deleteQuestionnaireResponse(id: string): Promise<void> {
+  try {
+    console.log('🗑️ Deleting questionnaire response from MongoDB:', id)
+    
+    const response = await fetch(`${API_BASE_URL}/questionnaires/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    
+    console.log('✅ Successfully deleted questionnaire response from MongoDB:', id)
+  } catch (error) {
+    console.error('❌ Error deleting questionnaire response:', error)
+    throw new Error(`Failed to delete questionnaire response: ${error}`)
+  }
 }
 
 // Helper function to calculate compatibility score

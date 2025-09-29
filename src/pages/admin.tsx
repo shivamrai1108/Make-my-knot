@@ -6,7 +6,7 @@ import {
 } from 'lucide-react'
 import { useOnlineStatus } from '@/lib/OnlineStatusContext'
 import { OnlineUsersList, OnlineStatusBadge, OnlineStatusIndicator } from '@/components/OnlineStatusIndicator'
-import { getQuestionnaireResponses, essentialQuestions, calculateCompatibilityScore, QuestionnaireResponse } from '@/lib/questionnaireStore'
+import { getQuestionnaireResponses, essentialQuestions, calculateCompatibilityScore, QuestionnaireResponse, deleteQuestionnaireResponse } from '@/lib/questionnaireStore'
 import { deleteLead as deleteLeadFromCRM, preventLeadDataLoss, getLeads as getLeadsFromAPI } from '@/lib/leadStore'
 import jsPDF from 'jspdf'
 import * as XLSX from 'xlsx'
@@ -73,6 +73,18 @@ interface AdminRole {
   id: string
   name: string
   permissions: string[]
+}
+
+interface AnalyticsData {
+  totalUsers: number
+  newUsersThisWeek: number
+  totalLeads: number
+  newLeadsThisWeek: number
+  activeSubscriptions: number
+  trialUsers: number
+  completedQuestionnaires: number
+  verifiedLeads: number
+  totalRevenue: number
 }
 
 // Simple admin auth constants
@@ -683,7 +695,7 @@ export default function Admin() {
   const [authed, setAuthed] = useState(false)
   const [password, setPassword] = useState('')
   const [activeTab, setActiveTab] = useState<AdminTab>('dashboard')
-  const [analytics, setAnalytics] = useState<any>(null)
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
   const router = useRouter()
 
   useEffect(() => {
@@ -1123,16 +1135,20 @@ function AssessmentsTab() {
     }
   }
 
-  const handleDeleteAssessment = (assessmentId: string) => {
+  const handleDeleteAssessment = async (assessmentId: string) => {
     if (confirm('Delete this assessment? This action cannot be undone.')) {
-      const allAssessments = getQuestionnaireResponses()
-      const filteredAssessments = allAssessments.filter(q => q.id !== assessmentId)
-      localStorage.setItem('questionnaire_responses', JSON.stringify(filteredAssessments))
-      
-      // Update state
-      setAssessments(prev => prev.filter(a => a.id !== assessmentId))
-      
-      alert('Assessment deleted successfully')
+      try {
+        // Call the backend API to delete from MongoDB
+        await deleteQuestionnaireResponse(assessmentId)
+        
+        // Update state
+        setAssessments(prev => prev.filter(a => a.id !== assessmentId))
+        
+        alert('Assessment deleted successfully')
+      } catch (error) {
+        console.error('Error deleting assessment:', error)
+        alert('Failed to delete assessment. Please try again.')
+      }
     }
   }
   return (
@@ -3561,7 +3577,12 @@ function AnalyticsTab() {
   const [analytics, setAnalytics] = useState<any>(null)
   
   useEffect(() => {
-    setAnalytics(getAnalyticsData())
+    getRealAnalyticsData().then(data => {
+      setAnalytics(data)
+    }).catch(error => {
+      console.error('Error loading analytics:', error)
+      setAnalytics(null)
+    })
   }, [])
 
   if (!analytics) return <div>Loading...</div>
@@ -3638,8 +3659,16 @@ function QuestionnairesTab() {
   const [isGeneratingExcel, setIsGeneratingExcel] = useState(false)
 
   useEffect(() => {
-    const responses = getQuestionnaireResponses()
-    setQuestionnaires(responses)
+    const loadQuestionnaires = async () => {
+      try {
+        const responses = await getQuestionnaireResponses()
+        setQuestionnaires(responses)
+      } catch (error) {
+        console.error('Error loading questionnaires:', error)
+        setQuestionnaires([])
+      }
+    }
+    loadQuestionnaires()
   }, [])
 
   const exportQuestionnaireToExcel = (q: QuestionnaireResponse) => {
@@ -3724,11 +3753,15 @@ function QuestionnairesTab() {
     return matchesSearch && matchesFilter
   })
 
-  const handleDeleteQuestionnaire = (id: string) => {
+  const handleDeleteQuestionnaire = async (id: string) => {
     if (confirm('Are you sure you want to delete this questionnaire response?')) {
-      const updated = questionnaires.filter(q => q.id !== id)
-      setQuestionnaires(updated)
-      localStorage.setItem('questionnaire_responses', JSON.stringify(updated))
+      try {
+        await deleteQuestionnaireResponse(id)
+        setQuestionnaires(prev => prev.filter(q => q.id !== id))
+      } catch (error) {
+        console.error('Error deleting questionnaire:', error)
+        alert('Failed to delete questionnaire. Please try again.')
+      }
     }
   }
 

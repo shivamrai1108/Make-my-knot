@@ -51,63 +51,67 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
 
   // Check if already submitted to prevent double submissions
   useEffect(() => {
-    const alreadySubmitted = sessionStorage.getItem('leadSubmitted')
-    const storedLeadId = sessionStorage.getItem('leadId')
-    
-    console.log('LeadQuestionnaire useEffect - Checking submission state:', {
-      alreadySubmitted,
-      storedLeadId
-    })
-    
-    // Enhanced check - look for assessment completion in multiple places
-    if (storedLeadId) {
-      // Check if assessment was already completed for this lead
-      const assessmentCompleted = sessionStorage.getItem(`assessment_completed_${storedLeadId}`)
+    const checkSubmissionState = async () => {
+      const alreadySubmitted = sessionStorage.getItem('leadSubmitted')
+      const storedLeadId = sessionStorage.getItem('leadId')
       
-      // Also check localStorage for completed questionnaire responses
-      let hasCompletedAssessment = assessmentCompleted === 'true'
-      
-      if (!hasCompletedAssessment) {
-        try {
-          // Use helper function for more reliable check
-          const leadAssessment = getQuestionnaireResponseByLead(storedLeadId)
-          hasCompletedAssessment = leadAssessment?.isComplete === true
-          
-          if (hasCompletedAssessment) {
-            // Update session storage for faster future checks
-            sessionStorage.setItem(`assessment_completed_${storedLeadId}`, 'true')
-            console.log('🎯 Found completed assessment in localStorage for lead:', storedLeadId)
-          }
-        } catch (error) {
-          console.error('Error checking questionnaire responses:', error)
-        }
-      }
-      
-      console.log('Enhanced completion check:', {
-        leadId: storedLeadId,
-        sessionFlag: assessmentCompleted === 'true',
-        hasCompletedAssessment,
-        alreadySubmitted
+      console.log('LeadQuestionnaire useEffect - Checking submission state:', {
+        alreadySubmitted,
+        storedLeadId
       })
       
-      if (hasCompletedAssessment) {
-        // Assessment is completed - lead data remains in CRM permanently
-        console.log('✅ Assessment already completed for lead:', storedLeadId, '- Showing fresh questionnaire')
-        // DO NOT show countdown screen - user has completed everything
-        return // Don't show the countdown screen - stay on normal home page
+      // Enhanced check - look for assessment completion in multiple places
+      if (storedLeadId) {
+        // Check if assessment was already completed for this lead
+        const assessmentCompleted = sessionStorage.getItem(`assessment_completed_${storedLeadId}`)
+        
+        // Also check localStorage for completed questionnaire responses
+        let hasCompletedAssessment = assessmentCompleted === 'true'
+        
+        if (!hasCompletedAssessment) {
+          try {
+            // Use helper function for more reliable check
+            const leadAssessment = await getQuestionnaireResponseByLead(storedLeadId)
+            hasCompletedAssessment = leadAssessment?.isComplete === true
+            
+            if (hasCompletedAssessment) {
+              // Update session storage for faster future checks
+              sessionStorage.setItem(`assessment_completed_${storedLeadId}`, 'true')
+              console.log('🎯 Found completed assessment in MongoDB for lead:', storedLeadId)
+            }
+          } catch (error) {
+            console.error('Error checking questionnaire responses:', error)
+          }
+        }
+        
+        console.log('Enhanced completion check:', {
+          leadId: storedLeadId,
+          sessionFlag: assessmentCompleted === 'true',
+          hasCompletedAssessment,
+          alreadySubmitted
+        })
+        
+        if (hasCompletedAssessment) {
+          // Assessment is completed - lead data remains in CRM permanently
+          console.log('✅ Assessment already completed for lead:', storedLeadId, '- Showing fresh questionnaire')
+          // DO NOT show countdown screen - user has completed everything
+          return // Don't show the countdown screen - stay on normal home page
+        }
+        
+        // Only show countdown if lead was submitted but assessment not completed
+        if (alreadySubmitted && !hasCompletedAssessment) {
+          console.log('⏳ Lead submitted but assessment not completed - showing countdown screen')
+          setSubmitted(true)
+          setLeadId(storedLeadId)
+        } else if (alreadySubmitted && hasCompletedAssessment) {
+          console.log('🎯 Both lead and assessment completed - no countdown needed')
+        }
+      } else {
+        console.log('🆕 No existing lead found, showing fresh questionnaire')
       }
-      
-      // Only show countdown if lead was submitted but assessment not completed
-      if (alreadySubmitted && !hasCompletedAssessment) {
-        console.log('⏳ Lead submitted but assessment not completed - showing countdown screen')
-        setSubmitted(true)
-        setLeadId(storedLeadId)
-      } else if (alreadySubmitted && hasCompletedAssessment) {
-        console.log('🎯 Both lead and assessment completed - no countdown needed')
-      }
-    } else {
-      console.log('🆕 No existing lead found, showing fresh questionnaire')
     }
+    
+    checkSubmissionState()
   }, [])
 
   // Countdown timer for success screen

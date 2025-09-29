@@ -24,47 +24,52 @@ export interface MatchResult {
 }
 
 // Advanced AI matching algorithm with gender filtering
-export function findCompatibleMatches(
+export async function findCompatibleMatches(
   userResponse: QuestionnaireResponse,
   minCompatibilityScore: number = 70,
   maxResults: number = 10
-): MatchResult[] {
-  const allResponses = getQuestionnaireResponses()
-  const potentialMatches: MatchResult[] = []
+): Promise<MatchResult[]> {
+  try {
+    const allResponses = await getQuestionnaireResponses()
+    const potentialMatches: MatchResult[] = []
 
-  // Get user's gender and preference
-  const userGender = userResponse.responses.gender
-  const lookingForGender = userResponse.responses.looking_for_gender
+    // Get user's gender and preference
+    const userGender = userResponse.responses.gender
+    const lookingForGender = userResponse.responses.looking_for_gender
 
-  // Filter candidates based on gender compatibility
-  const otherResponses = allResponses.filter(r => {
-    if (r.id === userResponse.id || !r.isComplete) return false
-    
-    const candidateGender = r.responses.gender
-    const candidateLookingFor = r.responses.looking_for_gender
-    
-    // Check if genders match preferences (mutual compatibility)
-    const userWantsCandidate = lookingForGender === 'Any gender' || lookingForGender === candidateGender
-    const candidateWantsUser = candidateLookingFor === 'Any gender' || candidateLookingFor === userGender
-    
-    return userWantsCandidate && candidateWantsUser
-  })
+    // Filter candidates based on gender compatibility
+    const otherResponses = allResponses.filter(r => {
+      if (r.id === userResponse.id || !r.isComplete) return false
+      
+      const candidateGender = r.responses.gender
+      const candidateLookingFor = r.responses.looking_for_gender
+      
+      // Check if genders match preferences (mutual compatibility)
+      const userWantsCandidate = lookingForGender === 'Any gender' || lookingForGender === candidateGender
+      const candidateWantsUser = candidateLookingFor === 'Any gender' || candidateLookingFor === userGender
+      
+      return userWantsCandidate && candidateWantsUser
+    })
 
-  otherResponses.forEach(otherResponse => {
-    const compatibilityScore = calculateCompatibilityScore(userResponse, otherResponse)
-    
-    if (compatibilityScore >= minCompatibilityScore) {
-      const matchResult = analyzeCompatibility(userResponse, otherResponse, compatibilityScore)
-      if (matchResult) {
-        potentialMatches.push(matchResult)
+    otherResponses.forEach(otherResponse => {
+      const compatibilityScore = calculateCompatibilityScore(userResponse, otherResponse)
+      
+      if (compatibilityScore >= minCompatibilityScore) {
+        const matchResult = analyzeCompatibility(userResponse, otherResponse, compatibilityScore)
+        if (matchResult) {
+          potentialMatches.push(matchResult)
+        }
       }
-    }
-  })
+    })
 
-  // Sort by compatibility score (descending)
-  potentialMatches.sort((a, b) => b.compatibilityScore - a.compatibilityScore)
+    // Sort by compatibility score (descending)
+    potentialMatches.sort((a, b) => b.compatibilityScore - a.compatibilityScore)
 
-  return potentialMatches.slice(0, maxResults)
+    return potentialMatches.slice(0, maxResults)
+  } catch (error) {
+    console.error('Error finding compatible matches:', error)
+    return []
+  }
 }
 
 // Detailed compatibility analysis
@@ -286,20 +291,25 @@ function generateMatchSummary(
 }
 
 // Get match recommendations for a user
-export function getMatchRecommendations(userId?: string, leadId?: string): MatchResult[] {
-  const allResponses = getQuestionnaireResponses()
-  
-  const userResponse = userId 
-    ? allResponses.find(r => r.userId === userId)
-    : leadId 
-      ? allResponses.find(r => r.leadId === leadId)
-      : null
+export async function getMatchRecommendations(userId?: string, leadId?: string): Promise<MatchResult[]> {
+  try {
+    const allResponses = await getQuestionnaireResponses()
+    
+    const userResponse = userId 
+      ? allResponses.find(r => r.userId === userId)
+      : leadId 
+        ? allResponses.find(r => r.leadId === leadId)
+        : null
 
-  if (!userResponse || !userResponse.isComplete) {
+    if (!userResponse || !userResponse.isComplete) {
+      return []
+    }
+
+    return await findCompatibleMatches(userResponse, 70, 10)
+  } catch (error) {
+    console.error('Error getting match recommendations:', error)
     return []
   }
-
-  return findCompatibleMatches(userResponse, 70, 10)
 }
 
 // Calculate relationship strength prediction

@@ -25,7 +25,7 @@ function useAIMatches(userId?: string) {
         return
       }
 
-      const aiMatches = getMatchRecommendations(userId)
+      const aiMatches = await getMatchRecommendations(userId)
       setMatches(aiMatches)
     } catch (err) {
       console.error('Error loading matches:', err)
