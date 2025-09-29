@@ -7,7 +7,7 @@ import {
 import { useOnlineStatus } from '@/lib/OnlineStatusContext'
 import { OnlineUsersList, OnlineStatusBadge, OnlineStatusIndicator } from '@/components/OnlineStatusIndicator'
 import { getQuestionnaireResponses, essentialQuestions, calculateCompatibilityScore, QuestionnaireResponse } from '@/lib/questionnaireStore'
-import { deleteLead as deleteLeadFromCRM, preventLeadDataLoss } from '@/lib/leadStore'
+import { deleteLead as deleteLeadFromCRM, preventLeadDataLoss, getLeads as getLeadsFromAPI } from '@/lib/leadStore'
 import jsPDF from 'jspdf'
 import * as XLSX from 'xlsx'
 
@@ -1951,10 +1951,17 @@ function CRMLeadsTab() {
           console.log('⚠️ Backend leads API failed:', error instanceof Error ? error.message : String(error))
         }
         
-        // Fallback to localStorage if API fails
+        // Fallback to async getLeads if API fails
         if (allLeads.length === 0) {
-          allLeads = getLeads()
-          console.log('📦 Loaded', allLeads.length, 'leads from localStorage')
+          try {
+            const leadsResult = await getLeadsFromAPI()
+            allLeads = leadsResult.leads || []
+            console.log('📦 Loaded', allLeads.length, 'leads from leadStore API/localStorage')
+          } catch (error) {
+            console.log('⚠️ Fallback getLeads failed:', error)
+            allLeads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
+            console.log('📦 Final fallback to raw localStorage:', allLeads.length, 'leads')
+          }
         }
         
         // Fetch questionnaires from backend API (public endpoint)
@@ -2017,12 +2024,18 @@ function CRMLeadsTab() {
       } catch (error) {
         console.error('❌ Error refreshing data from API:', error)
         // Fallback to localStorage completely
-        const allLeads = getLeads()
+        let allLeads = []
+        try {
+          const leadsResult = await getLeadsFromAPI()
+          allLeads = leadsResult.leads || []
+        } catch {
+          allLeads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
+        }
         const allQuestionnaires = getQuestionnaireResponses()
-        const leadQuestionnaires = allQuestionnaires.filter(q => q.leadId)
+        const leadQuestionnaires = allQuestionnaires.filter((q: any) => q.leadId)
         
-        const enhancedLeads = allLeads.map(lead => {
-          const questionnaire = leadQuestionnaires.find(q => q.leadId === lead.id)
+        const enhancedLeads = allLeads.map((lead: any) => {
+          const questionnaire = leadQuestionnaires.find((q: any) => q.leadId === lead.id)
           const enhancedLead = {
             ...lead,
             source: lead.source || 'website',
@@ -2046,38 +2059,68 @@ function CRMLeadsTab() {
     refreshFromAPI()
   }, [])
 
-  const refresh = () => {
-    const allLeads = getLeads()
-    const allQuestionnaires = getQuestionnaireResponses()
-    
-    const leadQuestionnaires = allQuestionnaires.filter(q => q.leadId)
-    
-    const enhancedLeads = allLeads.map(lead => {
-      const questionnaire = leadQuestionnaires.find(q => q.leadId === lead.id)
+  const refresh = async () => {
+    try {
+      const leadsResult = await getLeadsFromAPI()
+      const allLeads = leadsResult.leads || []
+      const allQuestionnaires = getQuestionnaireResponses()
       
-      const enhancedLead = {
-        ...lead,
-        source: lead.source || 'website',
-        tags: lead.tags || [],
-        createdAt: lead.createdAt || new Date().toISOString(),
-        updatedAt: lead.updatedAt || new Date().toISOString(),
-        questionnaire: questionnaire || null,
-        hasQuestionnaire: !!questionnaire,
-        questionnaireComplete: questionnaire?.isComplete || false
-      }
+      const leadQuestionnaires = allQuestionnaires.filter((q: any) => q.leadId)
       
-      const score = calculateLeadScore(enhancedLead, questionnaire)
-      const qualificationLevel = getQualificationLevel(score)
+      const enhancedLeads = allLeads.map((lead: any) => {
+        const questionnaire = leadQuestionnaires.find((q: any) => q.leadId === lead.id || q.leadId === lead._id)
+        
+        const enhancedLead = {
+          ...lead,
+          id: lead._id || lead.id,
+          source: lead.source || 'website',
+          tags: lead.tags || [],
+          createdAt: lead.createdAt || new Date().toISOString(),
+          updatedAt: lead.updatedAt || new Date().toISOString(),
+          questionnaire: questionnaire || null,
+          hasQuestionnaire: !!questionnaire,
+          questionnaireComplete: questionnaire?.isComplete || false
+        }
+        
+        const score = calculateLeadScore(enhancedLead, questionnaire)
+        const qualificationLevel = getQualificationLevel(score)
+        
+        return {
+          ...enhancedLead,
+          score,
+          qualificationLevel
+        }
+      })
       
-      return {
-        ...enhancedLead,
-        score,
-        qualificationLevel
-      }
-    })
-    
-    setLeads(enhancedLeads)
-    setLeadQuestionnaires(leadQuestionnaires)
+      setLeads(enhancedLeads)
+      setLeadQuestionnaires(leadQuestionnaires)
+    } catch (error) {
+      console.error('Error in refresh:', error)
+      // Fallback to localStorage
+      const allLeads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
+      const allQuestionnaires = getQuestionnaireResponses()
+      const leadQuestionnaires = allQuestionnaires.filter((q: any) => q.leadId)
+      
+      const enhancedLeads = allLeads.map((lead: any) => {
+        const questionnaire = leadQuestionnaires.find((q: any) => q.leadId === lead.id)
+        const enhancedLead = {
+          ...lead,
+          source: lead.source || 'website',
+          tags: lead.tags || [],
+          createdAt: lead.createdAt || new Date().toISOString(),
+          updatedAt: lead.updatedAt || new Date().toISOString(),
+          questionnaire: questionnaire || null,
+          hasQuestionnaire: !!questionnaire,
+          questionnaireComplete: questionnaire?.isComplete || false
+        }
+        const score = calculateLeadScore(enhancedLead, questionnaire)
+        const qualificationLevel = getQualificationLevel(score)
+        return { ...enhancedLead, score, qualificationLevel }
+      })
+      
+      setLeads(enhancedLeads)
+      setLeadQuestionnaires(leadQuestionnaires)
+    }
   }
 
   const handleDelete = async (id: string) => {
@@ -2092,7 +2135,7 @@ function CRMLeadsTab() {
           const filtered = allQuestionnaires.filter(q => q.id !== questionnaire.id)
           localStorage.setItem('questionnaire_responses', JSON.stringify(filtered))
         }
-        refresh()
+        await refresh()
         alert('✅ Lead permanently deleted from CRM')
       } catch (error) {
         console.error('Delete failed:', error)
@@ -2101,18 +2144,18 @@ function CRMLeadsTab() {
     }
   }
 
-  const handleVerify = (id: string) => {
+  const handleVerify = async (id: string) => {
     verifyLead(id)
-    refresh()
+    await refresh()
   }
 
   // Enhanced CRM sync handler
-  const handleSyncToCRM = (lead: Lead) => {
+  const handleSyncToCRM = async (lead: Lead) => {
     const result = syncLeadToCRM(lead)
     if (result.success) {
       const updatedLead = { ...lead, syncedAt: new Date().toISOString(), lastActivityAt: new Date().toISOString() }
       saveLead(updatedLead)
-      refresh()
+      await refresh()
       alert(result.message || 'Lead synced to CRM successfully!')
     } else {
       alert(result.error || 'Failed to sync lead to CRM')
