@@ -189,6 +189,21 @@ export async function saveLead(leadInput: Omit<Lead, 'id' | 'createdAt' | 'updat
 
 // Helper function to save lead to backend with retry logic
 async function saveLeadToBackendWithRetry(leadInput: Omit<Lead, 'id' | 'createdAt' | 'updatedAt'> | Lead, maxRetries: number = 3): Promise<Lead> {
+  const payload = {
+    name: leadInput.name,
+    email: leadInput.email,
+    phone: leadInput.phone,
+    password: leadInput.password,
+    dateOfBirth: leadInput.dateOfBirth || leadInput.answers?.dateOfBirth,
+    countryCode: leadInput.countryCode || leadInput.answers?.countryCode,
+    answers: leadInput.answers,
+    source: leadInput.source || 'website'
+  }
+  
+  console.log('🔍 DEBUG: API_BASE_URL:', API_BASE_URL)
+  console.log('🔍 DEBUG: Full API URL:', `${API_BASE_URL}/leads`)
+  console.log('🔍 DEBUG: Payload to send:', payload)
+  
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       console.log(`🔄 Attempt ${attempt} to save lead to MongoDB:`, leadInput.email)
@@ -201,27 +216,23 @@ async function saveLeadToBackendWithRetry(leadInput: Omit<Lead, 'id' | 'createdA
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          name: leadInput.name,
-          email: leadInput.email,
-          phone: leadInput.phone,
-          password: leadInput.password,
-          dateOfBirth: leadInput.dateOfBirth || leadInput.answers?.dateOfBirth,
-          countryCode: leadInput.countryCode || leadInput.answers?.countryCode,
-          answers: leadInput.answers,
-          source: leadInput.source || 'website'
-        }),
+        body: JSON.stringify(payload),
         signal: controller.signal
       })
       
       clearTimeout(timeoutId)
       
+      console.log('🔍 DEBUG: Response status:', response.status)
+      console.log('🔍 DEBUG: Response headers:', [...response.headers.entries()])
+      
       if (!response.ok) {
         const errorText = await response.text()
+        console.error('❌ DEBUG: Error response text:', errorText)
         throw new Error(`HTTP ${response.status}: ${errorText}`)
       }
       
       const result = await response.json()
+      console.log('✅ DEBUG: Success response:', result)
       const savedLead = result.data.lead
       
       // Convert MongoDB response to Lead interface
