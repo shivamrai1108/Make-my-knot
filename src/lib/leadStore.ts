@@ -22,6 +22,7 @@ export interface Lead {
   biodataFile?: File | null // Biodata upload file
   isPermanent?: boolean // Flag to indicate this lead should persist in CRM
   savedToCRM?: boolean // Flag to confirm lead is saved to CRM
+  needsSync?: boolean // Flag to indicate lead needs to be synced to backend
 }
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
@@ -128,88 +129,101 @@ export async function getLeads(params: {
 }
 
 export async function saveLead(leadInput: Omit<Lead, 'id' | 'createdAt' | 'updatedAt'> | Lead): Promise<Lead> {
+  // ALWAYS save to localStorage first for immediate access
+  let localLead: Lead
+  
+  if ('id' in leadInput && leadInput.id) {
+    console.log('🔒 PERMANENT CRM STORAGE: Saving lead with existing ID to localStorage:', leadInput.id)
+    localLead = { ...leadInput as Lead, isPermanent: true, savedToCRM: false }
+  } else {
+    localLead = {
+      ...leadInput,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      isPermanent: true,
+      savedToCRM: false
+    }
+  }
+  
+  // Save to localStorage immediately
+  const leads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
+  const filteredLeads = leads.filter((l: Lead) => l.id !== localLead.id && l.email !== localLead.email)
+  filteredLeads.push(localLead)
+  localStorage.setItem('makemyknot_leads', JSON.stringify(filteredLeads))
+  console.log('🔒 Lead stored in localStorage. Total leads:', filteredLeads.length)
+  
+  // Now try to sync to backend with retry mechanism
   try {
-    // PERMANENT CRM STORAGE: Leads are stored permanently until admin deletion
-    // If lead already has an ID, it's coming from LeadQuestionnaire, use it as-is for localStorage first
-    if ('id' in leadInput && leadInput.id) {
-      console.log('🔒 PERMANENT CRM STORAGE: Saving lead with existing ID to localStorage:', leadInput.id)
-      const leads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
-      // Remove any existing lead with the same ID to update it
-      const filteredLeads = leads.filter((l: Lead) => l.id !== leadInput.id)
-      const permanentLead = { ...leadInput, isPermanent: true, savedToCRM: true }
-      filteredLeads.push(permanentLead)
-      localStorage.setItem('makemyknot_leads', JSON.stringify(filteredLeads))
-      console.log('🔒 Lead stored permanently in CRM. Total leads in CRM:', filteredLeads.length)
-    }
-
-    // Use direct fetch to public endpoint instead of apiCall (which expects auth)
-    const response = await fetch(`${API_BASE_URL}/leads`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        name: leadInput.name,
-        email: leadInput.email,
-        phone: leadInput.phone,
-        answers: leadInput.answers,
-        source: leadInput.source || 'website'
-      })
-    })
+    await saveLeadToBackendWithRetry(localLead)
     
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
+    // Mark as synced if successful
+    localLead.savedToCRM = true
+    const updatedLeads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
+    const syncedLeads = updatedLeads.map((l: Lead) => l.id === localLead.id ? localLead : l)
+    localStorage.setItem('makemyknot_leads', JSON.stringify(syncedLeads))
+    console.log('✅ Lead successfully synced to backend')
     
-    const result = await response.json()
-    
-    const savedLead = result.data.lead
-    const apiLead = {
-      id: savedLead._id,
-      createdAt: savedLead.createdAt,
-      updatedAt: savedLead.updatedAt,
-      name: savedLead.name,
-      email: savedLead.email,
-      phone: savedLead.phone,
-      answers: savedLead.answers,
-      status: savedLead.status,
-      source: savedLead.source,
-      leadScore: savedLead.leadScore,
-      isActive: savedLead.isActive
-    }
-    
-    // Update localStorage with API response
-    const leads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
-    const idx = leads.findIndex((l: Lead) => l.email === apiLead.email)
-    if (idx >= 0) {
-      leads[idx] = apiLead
-    } else {
-      leads.push(apiLead)
-    }
-    localStorage.setItem('makemyknot_leads', JSON.stringify(leads))
-    
-    return apiLead
   } catch (error) {
-    console.error('Error saving lead to API, using localStorage fallback:', error)
-    // Fallback to localStorage if API fails - STILL PERMANENT STORAGE
-    const localLead = 'id' in leadInput && leadInput.id ? 
-      { ...leadInput as Lead, isPermanent: true, savedToCRM: true } : 
-      {
-        ...leadInput,
-        id: Date.now().toString(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        isPermanent: true,
-        savedToCRM: true
+    console.error('❌ Failed to sync lead to backend after retries:', error)
+    // Mark for later sync
+    localLead.savedToCRM = false
+    localLead.needsSync = true
+    const unsyncedLeads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
+    const markedLeads = unsyncedLeads.map((l: Lead) => l.id === localLead.id ? localLead : l)
+    localStorage.setItem('makemyknot_leads', JSON.stringify(markedLeads))
+    console.log('⚠️ Lead marked for later sync')
+  }
+  
+  return localLead
+}
+
+// Helper function to save lead to backend with retry logic
+async function saveLeadToBackendWithRetry(lead: Lead, maxRetries: number = 3): Promise<void> {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`🔄 Attempt ${attempt} to save lead to backend:`, lead.email)
+      
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
+      
+      const response = await fetch(`${API_BASE_URL}/leads`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: lead.name,
+          email: lead.email,
+          phone: lead.phone,
+          answers: lead.answers,
+          source: lead.source || 'website'
+        }),
+        signal: controller.signal
+      })
+      
+      clearTimeout(timeoutId)
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
-    
-    const leads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
-    // Remove any existing lead with the same ID or email
-    const filteredLeads = leads.filter((l: Lead) => l.id !== localLead.id && l.email !== localLead.email)
-    filteredLeads.push(localLead)
-    localStorage.setItem('makemyknot_leads', JSON.stringify(filteredLeads))
-    console.log('Lead saved to localStorage:', localLead)
-    return localLead
+      
+      const result = await response.json()
+      console.log('✅ Backend save successful:', result.data.lead.email)
+      return // Success, exit retry loop
+      
+    } catch (error: any) {
+      console.error(`❌ Attempt ${attempt} failed:`, error.message)
+      
+      if (attempt === maxRetries) {
+        throw new Error(`Failed to save to backend after ${maxRetries} attempts: ${error.message}`)
+      }
+      
+      // Wait before retry (exponential backoff)
+      const delay = Math.pow(2, attempt) * 1000 // 2s, 4s, 8s
+      console.log(`⏳ Retrying in ${delay/1000} seconds...`)
+      await new Promise(resolve => setTimeout(resolve, delay))
+    }
   }
 }
 

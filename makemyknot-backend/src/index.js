@@ -47,11 +47,13 @@ app.use(cors({
       process.env.CLIENT_URL || 'http://localhost:3000',
       process.env.MOBILE_CLIENT_URL || 'exp://localhost:19000',
       'http://localhost:19006', // Expo web
+      'http://192.168.29.212:3000', // Network access for frontend
       'https://makemyknot.com', // Your production domain
       'https://www.makemyknot.com', // Your production domain with www
       /^https:\/\/.*\.makemyknot\.com$/, // Subdomains
       /^https:\/\/.*\.vercel\.app$/, // Vercel deployments
       /^https:\/\/.*\.netlify\.app$/, // Netlify deployments
+      /^http:\/\/192\.168\.[0-9]+\.[0-9]+:3000$/, // Allow all local network IPs
     ];
     
     // Check if origin is allowed
@@ -162,10 +164,13 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 4000;
 
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🌐 Server accessible on all network interfaces`);
   console.log(`📱 Environment: ${process.env.NODE_ENV}`);
   console.log(`🔗 MongoDB: ${process.env.MONGODB_URI ? 'Connected' : 'Local'}`);
+  console.log(`🖥️  Local access: http://localhost:${PORT}`);
+  console.log(`🌍 Network access: http://192.168.29.212:${PORT}`);
 });
 
 module.exports = { app, io };

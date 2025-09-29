@@ -13,6 +13,7 @@ export interface QuestionnaireResponse {
   isComplete: boolean
   source?: string // Where the questionnaire was initiated from
   completionTime?: number // Time taken to complete in minutes
+  needsSync?: boolean // Flag to indicate response needs to be synced to backend
 }
 
 export interface QuestionnaireQuestion {
@@ -188,18 +189,22 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/a
 // Local storage functions
 const QUESTIONNAIRE_STORAGE_KEY = 'questionnaire_responses'
 
-// Enhanced save function that saves both locally and to backend
+// Enhanced save function that saves both locally and to backend with retry
 export async function saveQuestionnaireResponse(response: QuestionnaireResponse): Promise<void> {
-  // First save locally for immediate access
+  // Always save locally first for immediate access
   saveQuestionnaireResponseLocal(response)
+  console.log('🔒 Questionnaire saved to localStorage')
   
-  // Then send to backend API for permanent storage
+  // Try to sync to backend with retry mechanism
   try {
-    await saveQuestionnaireResponseAPI(response)
-    console.log('✅ Questionnaire saved to backend successfully')
+    await saveQuestionnaireResponseAPIWithRetry(response)
+    console.log('✅ Questionnaire successfully synced to backend')
   } catch (error) {
-    console.error('❌ Failed to save questionnaire to backend:', error)
-    // Continue execution - local save is already done
+    console.error('❌ Failed to sync questionnaire to backend after retries:', error)
+    // Mark for later sync in localStorage
+    response.needsSync = true
+    saveQuestionnaireResponseLocal(response)
+    console.log('⚠️ Questionnaire marked for later sync')
   }
 }
 
@@ -245,8 +250,8 @@ export function saveQuestionnaireResponseLocal(response: QuestionnaireResponse):
   localStorage.setItem(QUESTIONNAIRE_STORAGE_KEY, JSON.stringify(updated))
 }
 
-// API save function to backend
-export async function saveQuestionnaireResponseAPI(response: QuestionnaireResponse): Promise<void> {
+// API save function to backend with retry logic
+async function saveQuestionnaireResponseAPIWithRetry(response: QuestionnaireResponse, maxRetries: number = 3): Promise<void> {
   const apiData = {
     userEmail: response.userEmail,
     userName: response.userName,
@@ -264,21 +269,51 @@ export async function saveQuestionnaireResponseAPI(response: QuestionnaireRespon
     }
   }
 
-  const response_api = await fetch(`${API_BASE_URL}/questionnaires/public`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(apiData)
-  })
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`🔄 Attempt ${attempt} to save questionnaire to backend:`, response.userEmail)
+      
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
+      
+      const response_api = await fetch(`${API_BASE_URL}/questionnaires/public`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(apiData),
+        signal: controller.signal
+      })
+      
+      clearTimeout(timeoutId)
 
-  if (!response_api.ok) {
-    const errorData = await response_api.text()
-    throw new Error(`API Error: ${response_api.status} - ${errorData}`)
+      if (!response_api.ok) {
+        const errorData = await response_api.text()
+        throw new Error(`API Error: ${response_api.status} - ${errorData}`)
+      }
+
+      const result = await response_api.json()
+      console.log('✅ Backend questionnaire save successful:', response.userEmail)
+      return // Success, exit retry loop
+      
+    } catch (error: any) {
+      console.error(`❌ Questionnaire attempt ${attempt} failed:`, error.message)
+      
+      if (attempt === maxRetries) {
+        throw new Error(`Failed to save questionnaire to backend after ${maxRetries} attempts: ${error.message}`)
+      }
+      
+      // Wait before retry (exponential backoff)
+      const delay = Math.pow(2, attempt) * 1000 // 2s, 4s, 8s
+      console.log(`⏳ Retrying questionnaire in ${delay/1000} seconds...`)
+      await new Promise(resolve => setTimeout(resolve, delay))
+    }
   }
+}
 
-  const result = await response_api.json()
-  return result
+// Legacy API save function (kept for backward compatibility)
+export async function saveQuestionnaireResponseAPI(response: QuestionnaireResponse): Promise<void> {
+  return saveQuestionnaireResponseAPIWithRetry(response, 1) // Single attempt for legacy use
 }
 
 export function getQuestionnaireResponses(): QuestionnaireResponse[] {
