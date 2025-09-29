@@ -189,22 +189,16 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/a
 // Local storage functions
 const QUESTIONNAIRE_STORAGE_KEY = 'questionnaire_responses'
 
-// Enhanced save function that saves both locally and to backend with retry
+// Save questionnaire response DIRECTLY to MongoDB only
 export async function saveQuestionnaireResponse(response: QuestionnaireResponse): Promise<void> {
-  // Always save locally first for immediate access
-  saveQuestionnaireResponseLocal(response)
-  console.log('🔒 Questionnaire saved to localStorage')
+  console.log('💾 Saving questionnaire DIRECTLY to MongoDB:', response.userEmail)
   
-  // Try to sync to backend with retry mechanism
   try {
     await saveQuestionnaireResponseAPIWithRetry(response)
-    console.log('✅ Questionnaire successfully synced to backend')
+    console.log('✅ Questionnaire successfully saved to MongoDB:', response.userEmail)
   } catch (error) {
-    console.error('❌ Failed to sync questionnaire to backend after retries:', error)
-    // Mark for later sync in localStorage
-    response.needsSync = true
-    saveQuestionnaireResponseLocal(response)
-    console.log('⚠️ Questionnaire marked for later sync')
+    console.error('❌ FAILED to save questionnaire to MongoDB after all retries:', error)
+    throw new Error(`Failed to save questionnaire to database: ${error}`)
   }
 }
 
@@ -316,13 +310,45 @@ export async function saveQuestionnaireResponseAPI(response: QuestionnaireRespon
   return saveQuestionnaireResponseAPIWithRetry(response, 1) // Single attempt for legacy use
 }
 
-export function getQuestionnaireResponses(): QuestionnaireResponse[] {
+export async function getQuestionnaireResponses(): Promise<QuestionnaireResponse[]> {
   try {
-    const data = localStorage.getItem(QUESTIONNAIRE_STORAGE_KEY)
-    return data ? JSON.parse(data) : []
+    console.log('🔍 Fetching questionnaire responses from MongoDB...')
+    
+    const response = await fetch(`${API_BASE_URL}/questionnaires/admin`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    
+    const result = await response.json()
+    const responses = result.data.responses.map((resp: any) => ({
+      id: resp._id,
+      userId: resp.userId,
+      leadId: resp.leadId,
+      userName: resp.userName,
+      userEmail: resp.userEmail,
+      userPhone: resp.userPhone,
+      userType: resp.userType,
+      createdAt: resp.createdAt,
+      updatedAt: resp.updatedAt,
+      responses: resp.responses,
+      completedAt: resp.completedAt,
+      isComplete: resp.isComplete,
+      source: resp.source,
+      completionTime: resp.completionTime
+    }))
+    
+    console.log(`✅ Fetched ${responses.length} questionnaire responses from MongoDB`)
+    return responses
+    
   } catch (error) {
-    console.error('Error loading questionnaire responses:', error)
-    return []
+    console.error('❌ Error fetching questionnaire responses from MongoDB:', error)
+    throw new Error(`Failed to fetch questionnaire responses: ${error}`)
   }
 }
 

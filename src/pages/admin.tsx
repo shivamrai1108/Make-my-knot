@@ -997,63 +997,58 @@ function AssessmentsTab() {
 
   useEffect(() => {
     const loadAssessments = async () => {
-      // Get questionnaire responses
-      const questionnaires = getQuestionnaireResponses()
-      
-      // Get leads with their details using async function
-      let leads = []
       try {
-        const leadsResult = await getLeadsFromAPI()
-        leads = leadsResult.leads || []
-      } catch (error) {
-        console.warn('Failed to get leads from API, using localStorage fallback:', error)
-        leads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
-      }
-      
-      // Combine questionnaires with lead/user information
-      const assessmentsData = questionnaires.map(q => {
-        let userInfo = null
+        console.log('📊 Loading assessments from MongoDB...')
         
-        if (q.leadId) {
-          const lead = leads.find(l => l.id === q.leadId)
-          if (lead) {
-            userInfo = {
-              name: lead.name,
-              email: lead.email,
-              phone: lead.phone,
-              type: 'lead'
-            }
-          }
-        } else if (q.userId) {
-          // Try to get user info from users storage
-          try {
-            const users = JSON.parse(localStorage.getItem('makemyknot_users') || '[]')
-            const user = users.find((u: any) => u.id === q.userId)
-            if (user) {
+        // Get questionnaire responses from MongoDB
+        const questionnaires = await getQuestionnaireResponses()
+        
+        // Get leads from MongoDB
+        const leadsResult = await getLeadsFromAPI()
+        const leads = leadsResult.leads || []
+        
+        // Combine questionnaires with lead/user information
+        const assessmentsData = questionnaires.map(q => {
+          let userInfo = null
+          
+          if (q.leadId) {
+            const lead = leads.find(l => l.id === q.leadId)
+            if (lead) {
               userInfo = {
-                name: user.name,
-                email: user.email,
-                phone: user.phone,
-                type: 'user'
+                name: lead.name,
+                email: lead.email,
+                phone: lead.phone,
+                type: 'lead'
               }
             }
-          } catch (e) {
-            console.error('Error getting user info:', e)
+          } else if (q.userId) {
+            // For now, mark as user type since we don't have user API yet
+            userInfo = {
+              name: q.userName || 'Unknown User',
+              email: q.userEmail || 'unknown@email.com',
+              phone: q.userPhone || 'N/A',
+              type: 'user'
+            }
           }
-        }
+          
+          return {
+            ...q,
+            userInfo: userInfo || {
+              name: 'Unknown User',
+              email: 'unknown@email.com',
+              phone: 'N/A',
+              type: 'unknown'
+            }
+          }
+        })
         
-        return {
-          ...q,
-          userInfo: userInfo || {
-            name: 'Unknown User',
-            email: 'unknown@email.com',
-            phone: 'N/A',
-            type: 'unknown'
-          }
-        }
-      })
-      
-      setAssessments(assessmentsData)
+        console.log(`✅ Loaded ${assessmentsData.length} assessments from MongoDB`)
+        setAssessments(assessmentsData)
+        
+      } catch (error) {
+        console.error('❌ Failed to load assessments from MongoDB:', error)
+        setAssessments([]) // Set empty array on error
+      }
     }
     
     loadAssessments()
@@ -2085,60 +2080,16 @@ function CRMLeadsTab() {
   useEffect(() => {
     const refreshFromAPI = async () => {
       try {
-        console.log('🔄 Loading leads and assessments from live backend API...')
+        console.log('🔄 Loading leads and assessments from MongoDB...')
         
-        // Fetch leads from backend API (admin endpoint)
-        let allLeads = [];
-        try {
-          const leadsResponse = await fetch('http://localhost:4000/api/leads/admin', {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
-          })
-          if (leadsResponse.ok) {
-            const leadsData = await leadsResponse.json()
-            allLeads = leadsData.data?.leads || []
-            console.log('✅ Loaded', allLeads.length, 'leads from backend')
-          } else {
-            console.log('⚠️ Backend leads API returned:', leadsResponse.status)
-          }
-        } catch (error) {
-          console.log('⚠️ Backend leads API failed:', error instanceof Error ? error.message : String(error))
-        }
+        // Fetch leads directly from MongoDB
+        const leadsResult = await getLeadsFromAPI()
+        const allLeads = leadsResult.leads || []
+        console.log('✅ Loaded', allLeads.length, 'leads from MongoDB')
         
-        // Fallback to async getLeads if API fails
-        if (allLeads.length === 0) {
-          try {
-            const leadsResult = await getLeadsFromAPI()
-            allLeads = leadsResult.leads || []
-            console.log('📦 Loaded', allLeads.length, 'leads from leadStore API/localStorage')
-          } catch (error) {
-            console.log('⚠️ Fallback getLeads failed:', error)
-            allLeads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
-            console.log('📦 Final fallback to raw localStorage:', allLeads.length, 'leads')
-          }
-        }
-        
-        // Fetch questionnaires from backend API (public endpoint)
-        let allQuestionnaires = []
-        try {
-          const questionnairesResponse = await fetch('http://localhost:4000/api/questionnaires/admin', {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
-          })
-          if (questionnairesResponse.ok) {
-            const questionnaireData = await questionnairesResponse.json()
-            allQuestionnaires = questionnaireData.data?.responses || []
-            console.log('✅ Loaded', allQuestionnaires.length, 'assessments from backend')
-          }
-        } catch (error) {
-          console.log('⚠️ Backend questionnaires API failed:', error instanceof Error ? error.message : String(error))
-        }
-        
-        // Fallback to localStorage if API fails
-        if (allQuestionnaires.length === 0) {
-          allQuestionnaires = getQuestionnaireResponses()
-          console.log('📦 Loaded', allQuestionnaires.length, 'assessments from localStorage')
-        }
+        // Fetch questionnaire responses directly from MongoDB
+        const allQuestionnaires = await getQuestionnaireResponses()
+        console.log('✅ Loaded', allQuestionnaires.length, 'assessments from MongoDB')
         
         // Get questionnaires specifically from leads
         const leadQuestionnaires = allQuestionnaires.filter((q: any) => q.leadId)
@@ -2176,37 +2127,10 @@ function CRMLeadsTab() {
         setLeads(enhancedLeads)
         setLeadQuestionnaires(leadQuestionnaires)
       } catch (error) {
-        console.error('❌ Error refreshing data from API:', error)
-        // Fallback to localStorage completely
-        let allLeads = []
-        try {
-          const leadsResult = await getLeadsFromAPI()
-          allLeads = leadsResult.leads || []
-        } catch {
-          allLeads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
-        }
-        const allQuestionnaires = getQuestionnaireResponses()
-        const leadQuestionnaires = allQuestionnaires.filter((q: any) => q.leadId)
-        
-        const enhancedLeads = allLeads.map((lead: any) => {
-          const questionnaire = leadQuestionnaires.find((q: any) => q.leadId === lead.id)
-          const enhancedLead = {
-            ...lead,
-            source: lead.source || 'website',
-            tags: lead.tags || [],
-            createdAt: lead.createdAt || new Date().toISOString(),
-            updatedAt: lead.updatedAt || new Date().toISOString(),
-            questionnaire: questionnaire || null,
-            hasQuestionnaire: !!questionnaire,
-            questionnaireComplete: questionnaire?.isComplete || false
-          }
-          const score = calculateLeadScore(enhancedLead, questionnaire)
-          const qualificationLevel = getQualificationLevel(score)
-          return { ...enhancedLead, score, qualificationLevel }
-        })
-        
-        setLeads(enhancedLeads)
-        setLeadQuestionnaires(leadQuestionnaires)
+        console.error('❌ Error loading data from MongoDB:', error)
+        // Set empty arrays on error - no localStorage fallback
+        setLeads([])
+        setLeadQuestionnaires([])
       }
     }
     
@@ -2215,9 +2139,11 @@ function CRMLeadsTab() {
 
   const refresh = async () => {
     try {
+      console.log('🔄 Refreshing data from MongoDB...')
+      
       const leadsResult = await getLeadsFromAPI()
       const allLeads = leadsResult.leads || []
-      const allQuestionnaires = getQuestionnaireResponses()
+      const allQuestionnaires = await getQuestionnaireResponses()
       
       const leadQuestionnaires = allQuestionnaires.filter((q: any) => q.leadId)
       
@@ -2246,51 +2172,24 @@ function CRMLeadsTab() {
         }
       })
       
+      console.log('✅ Refreshed', enhancedLeads.length, 'leads from MongoDB')
       setLeads(enhancedLeads)
       setLeadQuestionnaires(leadQuestionnaires)
     } catch (error) {
-      console.error('Error in refresh:', error)
-      // Fallback to localStorage
-      const allLeads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
-      const allQuestionnaires = getQuestionnaireResponses()
-      const leadQuestionnaires = allQuestionnaires.filter((q: any) => q.leadId)
-      
-      const enhancedLeads = allLeads.map((lead: any) => {
-        const questionnaire = leadQuestionnaires.find((q: any) => q.leadId === lead.id)
-        const enhancedLead = {
-          ...lead,
-          source: lead.source || 'website',
-          tags: lead.tags || [],
-          createdAt: lead.createdAt || new Date().toISOString(),
-          updatedAt: lead.updatedAt || new Date().toISOString(),
-          questionnaire: questionnaire || null,
-          hasQuestionnaire: !!questionnaire,
-          questionnaireComplete: questionnaire?.isComplete || false
-        }
-        const score = calculateLeadScore(enhancedLead, questionnaire)
-        const qualificationLevel = getQualificationLevel(score)
-        return { ...enhancedLead, score, qualificationLevel }
-      })
-      
-      setLeads(enhancedLeads)
-      setLeadQuestionnaires(leadQuestionnaires)
+      console.error('❌ Error refreshing data from MongoDB:', error)
+      // No localStorage fallback - show error state
+      setLeads([])
+      setLeadQuestionnaires([])
     }
   }
 
   const handleDelete = async (id: string) => {
-    const confirmDelete = confirm('🗑️ PERMANENT DELETION: Delete this lead from CRM?\n\nThis action cannot be undone and will remove all lead data permanently.')
+    const confirmDelete = confirm('🗑️ PERMANENT DELETION: Delete this lead from MongoDB?\n\nThis action cannot be undone and will remove all lead data permanently.')
     if (confirmDelete) {
       try {
         await deleteLeadFromCRM(id, true) // Pass admin confirmation = true
-        // Also delete questionnaire if exists
-        const questionnaire = leadQuestionnaires.find(q => q.leadId === id)
-        if (questionnaire) {
-          const allQuestionnaires = getQuestionnaireResponses()
-          const filtered = allQuestionnaires.filter(q => q.id !== questionnaire.id)
-          localStorage.setItem('questionnaire_responses', JSON.stringify(filtered))
-        }
-        await refresh()
-        alert('✅ Lead permanently deleted from CRM')
+        await refresh() // Refresh from MongoDB
+        alert('✅ Lead permanently deleted from MongoDB')
       } catch (error) {
         console.error('Delete failed:', error)
         alert('⚠️ Error deleting lead: ' + (error as Error).message)

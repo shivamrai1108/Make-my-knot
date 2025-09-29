@@ -93,99 +93,73 @@ export async function getLeads(params: {
   search?: string
 } = {}): Promise<{ leads: Lead[], pagination: any }> {
   try {
-    const queryParams = new URLSearchParams()
-    Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined) {
-        queryParams.append(key, value.toString())
-      }
+    console.log('🔍 Fetching leads from MongoDB...')
+    
+    // Use admin endpoint for direct MongoDB access
+    const response = await fetch(`${API_BASE_URL}/leads/admin`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
     })
     
-    const result = await apiCall(`/leads?${queryParams}`)
-    return {
-      leads: result.data.leads.map((lead: any) => ({
-        id: lead._id,
-        createdAt: lead.createdAt,
-        updatedAt: lead.updatedAt,
-        name: lead.name,
-        email: lead.email,
-        phone: lead.phone,
-        answers: lead.answers,
-        status: lead.status,
-        source: lead.source,
-        leadScore: lead.leadScore,
-        notes: lead.notes,
-        assignedTo: lead.assignedTo,
-        followUpDate: lead.followUpDate,
-        isActive: lead.isActive
-      })),
-      pagination: result.data.pagination
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
     }
+    
+    const result = await response.json()
+    const leads = result.data.leads.map((lead: any) => ({
+      id: lead._id,
+      createdAt: lead.createdAt,
+      updatedAt: lead.updatedAt,
+      name: lead.name,
+      email: lead.email,
+      phone: lead.phone,
+      answers: lead.answers,
+      status: lead.status,
+      source: lead.source,
+      leadScore: lead.leadScore,
+      notes: lead.notes,
+      assignedTo: lead.assignedTo,
+      followUpDate: lead.followUpDate,
+      isActive: lead.isActive
+    }))
+    
+    console.log(`✅ Fetched ${leads.length} leads from MongoDB`)
+    return {
+      leads,
+      pagination: { page: 1, limit: leads.length, total: leads.length, pages: 1 }
+    }
+    
   } catch (error) {
-    console.error('Error fetching leads:', error)
-    // Fallback to localStorage if API fails
-    const localLeads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
-    return { leads: localLeads, pagination: { page: 1, limit: 10, total: localLeads.length, pages: 1 } }
+    console.error('❌ Error fetching leads from MongoDB:', error)
+    throw new Error(`Failed to fetch leads: ${error}`)
   }
 }
 
 export async function saveLead(leadInput: Omit<Lead, 'id' | 'createdAt' | 'updatedAt'> | Lead): Promise<Lead> {
-  // ALWAYS save to localStorage first for immediate access
-  let localLead: Lead
+  console.log('💾 Saving lead DIRECTLY to MongoDB:', leadInput.email)
   
-  if ('id' in leadInput && leadInput.id) {
-    console.log('🔒 PERMANENT CRM STORAGE: Saving lead with existing ID to localStorage:', leadInput.id)
-    localLead = { ...leadInput as Lead, isPermanent: true, savedToCRM: false }
-  } else {
-    localLead = {
-      ...leadInput,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      isPermanent: true,
-      savedToCRM: false
-    }
-  }
-  
-  // Save to localStorage immediately
-  const leads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
-  const filteredLeads = leads.filter((l: Lead) => l.id !== localLead.id && l.email !== localLead.email)
-  filteredLeads.push(localLead)
-  localStorage.setItem('makemyknot_leads', JSON.stringify(filteredLeads))
-  console.log('🔒 Lead stored in localStorage. Total leads:', filteredLeads.length)
-  
-  // Now try to sync to backend with retry mechanism
   try {
-    await saveLeadToBackendWithRetry(localLead)
-    
-    // Mark as synced if successful
-    localLead.savedToCRM = true
-    const updatedLeads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
-    const syncedLeads = updatedLeads.map((l: Lead) => l.id === localLead.id ? localLead : l)
-    localStorage.setItem('makemyknot_leads', JSON.stringify(syncedLeads))
-    console.log('✅ Lead successfully synced to backend')
+    // Save directly to MongoDB with retry mechanism - NO localStorage
+    const savedLead = await saveLeadToBackendWithRetry(leadInput)
+    console.log('✅ Lead successfully saved to MongoDB:', savedLead.email)
+    return savedLead
     
   } catch (error) {
-    console.error('❌ Failed to sync lead to backend after retries:', error)
-    // Mark for later sync
-    localLead.savedToCRM = false
-    localLead.needsSync = true
-    const unsyncedLeads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
-    const markedLeads = unsyncedLeads.map((l: Lead) => l.id === localLead.id ? localLead : l)
-    localStorage.setItem('makemyknot_leads', JSON.stringify(markedLeads))
-    console.log('⚠️ Lead marked for later sync')
+    console.error('❌ FAILED to save lead to MongoDB after all retries:', error)
+    throw new Error(`Failed to save lead to database: ${error}`)
   }
-  
-  return localLead
 }
 
 // Helper function to save lead to backend with retry logic
-async function saveLeadToBackendWithRetry(lead: Lead, maxRetries: number = 3): Promise<void> {
+async function saveLeadToBackendWithRetry(leadInput: Omit<Lead, 'id' | 'createdAt' | 'updatedAt'> | Lead, maxRetries: number = 3): Promise<Lead> {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      console.log(`🔄 Attempt ${attempt} to save lead to backend:`, lead.email)
+      console.log(`🔄 Attempt ${attempt} to save lead to MongoDB:`, leadInput.email)
       
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 15000) // 15 second timeout
       
       const response = await fetch(`${API_BASE_URL}/leads`, {
         method: 'POST',
@@ -193,11 +167,11 @@ async function saveLeadToBackendWithRetry(lead: Lead, maxRetries: number = 3): P
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: lead.name,
-          email: lead.email,
-          phone: lead.phone,
-          answers: lead.answers,
-          source: lead.source || 'website'
+          name: leadInput.name,
+          email: leadInput.email,
+          phone: leadInput.phone,
+          answers: leadInput.answers,
+          source: leadInput.source || 'website'
         }),
         signal: controller.signal
       })
@@ -205,26 +179,46 @@ async function saveLeadToBackendWithRetry(lead: Lead, maxRetries: number = 3): P
       clearTimeout(timeoutId)
       
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        const errorText = await response.text()
+        throw new Error(`HTTP ${response.status}: ${errorText}`)
       }
       
       const result = await response.json()
-      console.log('✅ Backend save successful:', result.data.lead.email)
-      return // Success, exit retry loop
+      const savedLead = result.data.lead
+      
+      // Convert MongoDB response to Lead interface
+      const lead: Lead = {
+        id: savedLead._id,
+        createdAt: savedLead.createdAt,
+        updatedAt: savedLead.updatedAt,
+        name: savedLead.name,
+        email: savedLead.email,
+        phone: savedLead.phone,
+        answers: savedLead.answers,
+        status: savedLead.status,
+        source: savedLead.source,
+        leadScore: savedLead.leadScore,
+        isActive: savedLead.isActive
+      }
+      
+      console.log('✅ Lead saved to MongoDB successfully:', lead.email)
+      return lead // Return the saved lead
       
     } catch (error: any) {
-      console.error(`❌ Attempt ${attempt} failed:`, error.message)
+      console.error(`❌ MongoDB save attempt ${attempt} failed:`, error.message)
       
       if (attempt === maxRetries) {
-        throw new Error(`Failed to save to backend after ${maxRetries} attempts: ${error.message}`)
+        throw new Error(`Failed to save lead to MongoDB after ${maxRetries} attempts: ${error.message}`)
       }
       
       // Wait before retry (exponential backoff)
       const delay = Math.pow(2, attempt) * 1000 // 2s, 4s, 8s
-      console.log(`⏳ Retrying in ${delay/1000} seconds...`)
+      console.log(`⏳ Retrying MongoDB save in ${delay/1000} seconds...`)
       await new Promise(resolve => setTimeout(resolve, delay))
     }
   }
+  
+  throw new Error('This should never be reached')
 }
 
 export async function deleteLead(id: string, adminConfirmation: boolean = false): Promise<void> {
