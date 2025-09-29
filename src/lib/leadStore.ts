@@ -223,7 +223,7 @@ async function saveLeadToBackendWithRetry(leadInput: Omit<Lead, 'id' | 'createdA
       clearTimeout(timeoutId)
       
       console.log('🔍 DEBUG: Response status:', response.status)
-      console.log('🔍 DEBUG: Response headers:', [...response.headers.entries()])
+      console.log('🔍 DEBUG: Response headers:', response.headers)
       
       if (!response.ok) {
         const errorText = await response.text()
