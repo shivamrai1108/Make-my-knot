@@ -203,6 +203,9 @@ export async function saveQuestionnaireResponse(response: QuestionnaireResponse)
 }
 
 
+// Import Google Sheets service
+import { appendAssessmentToGoogleSheets } from './googleSheetsService'
+
 // API save function to backend with retry logic
 async function saveQuestionnaireResponseAPIWithRetry(response: QuestionnaireResponse, maxRetries: number = 3): Promise<void> {
   const apiData = {
@@ -247,6 +250,21 @@ async function saveQuestionnaireResponseAPIWithRetry(response: QuestionnaireResp
 
       const result = await response_api.json()
       console.log('✅ Backend questionnaire save successful:', response.userEmail)
+      
+      // Also save to Google Sheets (non-blocking)
+      try {
+        await appendAssessmentToGoogleSheets({
+          ...response,
+          _id: result.data?.response?._id || response.id,
+          createdAt: result.data?.response?.createdAt || new Date().toISOString(),
+          completedAt: result.data?.response?.completedAt || (response.isComplete ? new Date().toISOString() : null)
+        })
+        console.log('📊 Assessment successfully saved to Google Sheets:', response.userEmail)
+      } catch (sheetsError) {
+        console.warn('⚠️ Google Sheets sync failed (non-critical):', sheetsError)
+        // Don't fail the whole operation if Google Sheets fails
+      }
+      
       return // Success, exit retry loop
       
     } catch (error: any) {

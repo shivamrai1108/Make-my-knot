@@ -44,6 +44,9 @@ export interface Lead {
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
 
+// Import Google Sheets service for automatic data export
+import { appendLeadToGoogleSheets } from './googleSheetsService'
+
 // Helper function to get auth token
 function getAuthToken(): string | null {
   return localStorage.getItem('makemyknot_token')
@@ -207,11 +210,20 @@ export async function saveLead(leadInput: Omit<Lead, 'id' | 'createdAt' | 'updat
   localStorage.setItem('makemyknot_leads', JSON.stringify(leads))
   console.log('✅ Lead saved to localStorage:', lead.email)
   
-  // Step 2: Attempt to sync to MongoDB in background (non-blocking)
+  // Step 2: Attempt to sync to MongoDB and Google Sheets in background (non-blocking)
   setTimeout(async () => {
     try {
       const savedLead = await saveLeadToBackendWithRetry(lead)
       console.log('✅ Lead successfully synced to MongoDB:', savedLead.email)
+      
+      // Step 3: Also save to Google Sheets
+      try {
+        await appendLeadToGoogleSheets(savedLead)
+        console.log('📊 Lead successfully saved to Google Sheets:', savedLead.email)
+      } catch (sheetsError) {
+        console.warn('⚠️ Google Sheets sync failed (non-critical):', sheetsError)
+        // Don't fail the whole operation if Google Sheets fails
+      }
       
       // Update localStorage to mark as synced
       const updatedLeads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
