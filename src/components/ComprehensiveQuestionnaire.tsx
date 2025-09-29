@@ -44,6 +44,7 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
   const currentQuestion = essentialQuestions[currentStep]
 
   const handleAnswer = (questionId: string, answer: any, questionType?: string) => {
+    // Update responses state
     setResponses(prev => ({ ...prev, [questionId]: answer }))
     
     // Auto-advance for single choice and scale questions with smooth transition
@@ -51,7 +52,12 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
       setTimeout(() => {
         setIsTransitioning(true)
         setTimeout(() => {
-          handleNext()
+          // For the last question, pass the final answer directly to avoid race condition
+          if (currentStep === essentialQuestions.length - 1) {
+            handleComplete(questionId, answer)
+          } else {
+            handleNext()
+          }
           setIsTransitioning(false)
         }, 200)
       }, 400)
@@ -62,7 +68,7 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
     if (currentStep < essentialQuestions.length - 1) {
       setCurrentStep(prev => prev + 1)
     } else {
-      handleComplete()
+      handleComplete() // No parameters when called through normal flow
     }
   }
 
@@ -72,8 +78,16 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
     }
   }
 
-  const handleComplete = async () => {
+  const handleComplete = async (finalQuestionId?: string, finalAnswer?: any) => {
     const completionTime = Math.round((Date.now() - startTime) / (1000 * 60)) // in minutes
+    
+    // Ensure the final answer is included in responses if provided
+    const finalResponses = finalQuestionId && finalAnswer 
+      ? { ...responses, [finalQuestionId]: finalAnswer }
+      : responses
+    
+    console.log('🔄 Completing questionnaire with responses:', finalResponses)
+    console.log('📊 Total questions answered:', Object.keys(finalResponses).length, 'out of', essentialQuestions.length)
     
     const response: QuestionnaireResponse = {
       id: userId || leadId || `questionnaire_${Date.now()}`,
@@ -84,7 +98,7 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       completedAt: new Date().toISOString(),
-      responses,
+      responses: finalResponses,
       isComplete: true
     }
 
@@ -119,7 +133,7 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
           userType: 'user',
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
-          responses: responses,
+          responses: finalResponses,
           completedAt: new Date().toISOString(),
           isComplete: true,
           source: source || 'user_questionnaire',
