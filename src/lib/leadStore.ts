@@ -173,18 +173,63 @@ export async function getLeads(params: {
 }
 
 export async function saveLead(leadInput: Omit<Lead, 'id' | 'createdAt' | 'updatedAt'> | Lead): Promise<Lead> {
-  console.log('💾 Saving lead DIRECTLY to MongoDB:', leadInput.email)
+  console.log('💾 Saving lead with LOCAL-FIRST approach:', leadInput.email)
   
-  try {
-    // Save directly to MongoDB with retry mechanism - NO localStorage
-    const savedLead = await saveLeadToBackendWithRetry(leadInput)
-    console.log('✅ Lead successfully saved to MongoDB:', savedLead.email)
-    return savedLead
-    
-  } catch (error) {
-    console.error('❌ FAILED to save lead to MongoDB after all retries:', error)
-    throw new Error(`Failed to save lead to database: ${error}`)
+  // Step 1: Save to localStorage immediately for instant user feedback
+  const lead: Lead = {
+    id: leadInput.id || Date.now().toString(),
+    createdAt: leadInput.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    name: leadInput.name,
+    email: leadInput.email,
+    phone: leadInput.phone,
+    password: leadInput.password,
+    dateOfBirth: leadInput.dateOfBirth,
+    countryCode: leadInput.countryCode,
+    answers: leadInput.answers,
+    status: leadInput.status || 'new',
+    source: leadInput.source || 'website',
+    isActive: true,
+    needsSync: true, // Mark for background sync
+    savedToCRM: false // Not yet saved to database
   }
+  
+  // Save to localStorage first
+  const leads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
+  const existingIndex = leads.findIndex((l: Lead) => l.email === lead.email)
+  
+  if (existingIndex >= 0) {
+    leads[existingIndex] = { ...leads[existingIndex], ...lead }
+  } else {
+    leads.push(lead)
+  }
+  
+  localStorage.setItem('makemyknot_leads', JSON.stringify(leads))
+  console.log('✅ Lead saved to localStorage:', lead.email)
+  
+  // Step 2: Attempt to sync to MongoDB in background (non-blocking)
+  setTimeout(async () => {
+    try {
+      const savedLead = await saveLeadToBackendWithRetry(lead)
+      console.log('✅ Lead successfully synced to MongoDB:', savedLead.email)
+      
+      // Update localStorage to mark as synced
+      const updatedLeads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
+      const syncIndex = updatedLeads.findIndex((l: Lead) => l.id === lead.id)
+      if (syncIndex >= 0) {
+        updatedLeads[syncIndex].savedToCRM = true
+        updatedLeads[syncIndex].needsSync = false
+        updatedLeads[syncIndex].syncedAt = new Date().toISOString()
+        localStorage.setItem('makemyknot_leads', JSON.stringify(updatedLeads))
+      }
+      
+    } catch (error) {
+      console.warn('⚠️ Background sync to MongoDB failed, will retry later:', error)
+      // Keep needsSync = true for retry later
+    }
+  }, 100) // Small delay to ensure immediate user feedback first
+  
+  return lead
 }
 
 // Helper function to save lead to backend with retry logic
@@ -312,6 +357,40 @@ export async function deleteLead(id: string, adminConfirmation: boolean = false)
       const filteredLeads = leads.filter((l: Lead) => l.id !== id)
       localStorage.setItem('makemyknot_leads', JSON.stringify(filteredLeads))
       console.log('🗑️ ADMIN ACTION: Lead deleted from localStorage (API failed)')
+    }
+  }
+}
+
+// Background sync function to retry failed syncs
+export async function syncPendingLeads(): Promise<void> {
+  const leads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
+  const pendingLeads = leads.filter((lead: Lead) => lead.needsSync && !lead.savedToCRM)
+  
+  if (pendingLeads.length === 0) {
+    console.log('✅ No pending leads to sync')
+    return
+  }
+  
+  console.log(`🔄 Syncing ${pendingLeads.length} pending leads to MongoDB...`)
+  
+  for (const lead of pendingLeads) {
+    try {
+      const savedLead = await saveLeadToBackendWithRetry(lead, 1) // Single attempt
+      console.log('✅ Synced pending lead:', savedLead.email)
+      
+      // Update localStorage
+      const updatedLeads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
+      const syncIndex = updatedLeads.findIndex((l: Lead) => l.id === lead.id)
+      if (syncIndex >= 0) {
+        updatedLeads[syncIndex].savedToCRM = true
+        updatedLeads[syncIndex].needsSync = false
+        updatedLeads[syncIndex].syncedAt = new Date().toISOString()
+        localStorage.setItem('makemyknot_leads', JSON.stringify(updatedLeads))
+      }
+      
+    } catch (error) {
+      console.warn('⚠️ Failed to sync lead:', lead.email, error)
+      // Will retry on next sync attempt
     }
   }
 }

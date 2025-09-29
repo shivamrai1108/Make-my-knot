@@ -5,7 +5,7 @@ import { OnlineStatusProvider } from '@/lib/OnlineStatusContext'
 import { LanguageProvider } from '@/contexts/LanguageContext'
 import Analytics from '@/components/Analytics'
 import SplashScreen from '@/components/SplashScreen'
-import { preventLeadDataLoss } from '@/lib/leadStore'
+import { preventLeadDataLoss, syncPendingLeads } from '@/lib/leadStore'
 import { useState, useEffect } from 'react'
 
 export default function App({ Component, pageProps }: AppProps) {
@@ -16,6 +16,21 @@ export default function App({ Component, pageProps }: AppProps) {
     // Initialize lead data protection
     if (typeof window !== 'undefined') {
       preventLeadDataLoss()
+      
+      // Try to sync any pending leads immediately
+      syncPendingLeads().catch(err => {
+        console.warn('Initial sync failed:', err)
+      })
+      
+      // Set up periodic sync every 30 seconds
+      const syncInterval = setInterval(() => {
+        syncPendingLeads().catch(err => {
+          console.warn('Periodic sync failed:', err)
+        })
+      }, 30000)
+      
+      // Cleanup interval on unmount
+      return () => clearInterval(syncInterval)
     }
     
     // Check if this is the first visit
