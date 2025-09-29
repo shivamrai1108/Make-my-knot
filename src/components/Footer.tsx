@@ -74,7 +74,7 @@ export default function Footer() {
                 <Phone className="h-5 w-5 text-primary-400 mr-3" />
                 <div className="flex flex-col">
                   <a href="tel:+919220511631" className="text-gray-400 hover:text-white transition-colors">+91 92205 11631</a>
-                  <a href="tel:+919315643044" className="text-gray-400 hover:text-white transition-colors">+91 93156 43044</a>
+                  <a href="tel:+919758909099" className="text-gray-400 hover:text-white transition-colors">+91 97589 09099</a>
                 </div>
               </div>
               <div className="flex items-start">
@@ -89,7 +89,7 @@ export default function Footer() {
               {/* WhatsApp Button */}
               <div className="mt-4">
                 <a 
-                  href="https://wa.me/919315643044?text=Hi%2C%20I%27m%20interested%20in%20Make%20My%20Knot%20services" 
+                  href="https://wa.me/919220511631?text=Hi%2C%20I%27m%20interested%20in%20Make%20My%20Knot%20services"
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="inline-flex items-center bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors group"

@@ -269,7 +269,7 @@ export default function PrivacyPolicy() {
                   <strong>How to Exercise Your Rights:</strong> Contact our privacy team at{' '}
                   <a href="mailto:privacy@makemyknot.com" className="text-primary-600 hover:text-primary-800">privacy@makemyknot.com</a>
                   {' '}or call us at{' '}
-                  <a href="tel:+919315643044" className="text-primary-600 hover:text-primary-800">+91 93156 43044</a>.
+                  <a href="tel:+919758909099" className="text-primary-600 hover:text-primary-800">+91 97589 09099</a>.
                 </p>
               </div>
             </div>
@@ -345,11 +345,11 @@ export default function PrivacyPolicy() {
                       </div>
                       <div className="flex items-center">
                         <Phone className="h-4 w-4 mr-2 text-primary-300" />
-                        <span>+91 93156 43044</span>
+                        <span>+91 97589 09099</span>
                       </div>
                       <div className="flex items-center">
                         <MessageCircle className="h-4 w-4 mr-2 text-primary-300" />
-                        <a href="https://wa.me/919315643044" className="hover:text-white transition-colors">WhatsApp Support</a>
+                        <a href="https://wa.me/919220511631" className="hover:text-white transition-colors">WhatsApp Support</a>
                       </div>
                     </div>
                   </div>

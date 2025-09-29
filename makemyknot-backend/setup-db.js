@@ -26,7 +26,7 @@ async function setupDatabase() {
         password: 'admin123',
         firstName: 'Super',
         lastName: 'Admin',
-        phoneNumber: '+919315643044',
+        phoneNumber: '+919758909099',
         role: 'super_admin',
         permissions: Admin.getDefaultPermissions('super_admin'),
         isVerified: true,
