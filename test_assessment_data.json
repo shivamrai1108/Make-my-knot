@@ -1,0 +1,22 @@
+{
+  "userEmail": "testassessment@example.com",
+  "userName": "Test Assessment User",
+  "userPhone": "9876543210",
+  "leadId": "test_lead_assessment_123",
+  "responses": {
+    "spirituality_importance": "Very important",
+    "premarital_counseling": "I'm open to it.",
+    "shared_interests_importance": "Very important",
+    "relocation_openness": "Yes, I'm fully open to relocating.",
+    "children_perspective": "I definitely want children.",
+    "caste_importance": "Not at all",
+    "weekend_preferences": ["Staying in and relaxing", "Spending time with family"],
+    "family_independence_scenario": "I would speak with both my parents and my partner to find a compromise",
+    "hobbies_activities": ["Reading", "Traveling", "Cooking"],
+    "drinking_habits": "No",
+    "smoking_habits": "No",
+    "relationship_reasons": ["Emotional security", "To build a family"]
+  },
+  "source": "lead_assessment",
+  "completionTime": 5
+}

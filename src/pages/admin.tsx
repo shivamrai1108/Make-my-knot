@@ -6,7 +6,7 @@ import {
 } from 'lucide-react'
 import { useOnlineStatus } from '@/lib/OnlineStatusContext'
 import { OnlineUsersList, OnlineStatusBadge, OnlineStatusIndicator } from '@/components/OnlineStatusIndicator'
-import { getQuestionnaireResponses, essentialQuestions, calculateCompatibilityScore, QuestionnaireResponse, deleteQuestionnaireResponse } from '@/lib/questionnaireStore'
+import { getQuestionnaireResponses, getAssessmentResponses, essentialQuestions, calculateCompatibilityScore, QuestionnaireResponse, deleteQuestionnaireResponse } from '@/lib/questionnaireStore'
 import { deleteLead as deleteLeadFromCRM, preventLeadDataLoss, getLeads as getLeadsFromAPI } from '@/lib/leadStore'
 import jsPDF from 'jspdf'
 import * as XLSX from 'xlsx'
@@ -139,8 +139,27 @@ async function getRealAnalyticsData() {
     ).length
   }
   
+  let totalCompletedAssessments = 0
+  
+  // Try to get assessments from new Assessment collection
   try {
-    // Fetch real questionnaires data from backend API
+    const assessmentsResponse = await fetch('http://localhost:4000/api/assessments/admin', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    })
+    
+    if (assessmentsResponse.ok) {
+      const assessmentsData = await assessmentsResponse.json()
+      const assessments = assessmentsData.data?.assessments || []
+      totalCompletedAssessments += assessments.filter((a: any) => a.isComplete).length
+      console.log(`Found ${assessments.length} assessments from Assessment collection`)
+    }
+  } catch (error) {
+    console.log('Assessment collection not available:', error)
+  }
+  
+  // Also get legacy questionnaires data from backend API
+  try {
     const questionnairesResponse = await fetch('http://localhost:4000/api/questionnaires/admin', {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
@@ -149,14 +168,17 @@ async function getRealAnalyticsData() {
     if (questionnairesResponse.ok) {
       const questionnairesData = await questionnairesResponse.json()
       const questionnaires = questionnairesData.data?.responses || []
-      analytics.completedQuestionnaires = questionnaires.filter((q: any) => q.isComplete).length
+      totalCompletedAssessments += questionnaires.filter((q: any) => q.isComplete).length
+      console.log(`Found ${questionnaires.length} questionnaires from QuestionnaireResponse collection`)
     }
   } catch (error) {
     console.log('Using localStorage fallback for questionnaires data')
     // Fallback to localStorage for questionnaires
     const localQuestionnaires = JSON.parse(localStorage.getItem('questionnaire_responses') || '[]')
-    analytics.completedQuestionnaires = localQuestionnaires.filter((q: any) => q.isComplete).length
+    totalCompletedAssessments += localQuestionnaires.filter((q: any) => q.isComplete).length
   }
+  
+  analytics.completedQuestionnaires = totalCompletedAssessments
   
   // Get users data from localStorage (since we don't have a users API yet)
   try {
@@ -1012,53 +1034,103 @@ function AssessmentsTab() {
       try {
         console.log('📊 Loading assessments from MongoDB...')
         
-        // Get questionnaire responses from MongoDB
-        const questionnaires = await getQuestionnaireResponses()
+        let allAssessments: any[] = []
         
-        // Get leads from MongoDB
-        const leadsResult = await getLeadsFromAPI()
-        const leads = leadsResult.leads || []
-        
-        // Combine questionnaires with lead/user information
-        const assessmentsData = questionnaires.map(q => {
-          let userInfo = null
+        // Try to get assessments from new Assessment collection first
+        try {
+          console.log('🎯 Fetching from Assessment collection...')
+          const assessmentResponses = await getAssessmentResponses()
+          console.log(`✅ Loaded ${assessmentResponses.length} assessments from Assessment collection`)
           
-          if (q.leadId) {
-            const lead = leads.find(l => l.id === q.leadId)
-            if (lead) {
+          // Transform assessment responses to include userInfo
+          const transformedAssessments = assessmentResponses.map(a => ({
+            ...a,
+            userInfo: {
+              name: a.userName || 'Unknown User',
+              email: a.userEmail || 'unknown@email.com',
+              phone: a.userPhone || 'N/A',
+              type: 'assessment'
+            },
+            source: a.source || 'assessment',
+            dataSource: 'assessment_collection'
+          }))
+          
+          allAssessments = [...allAssessments, ...transformedAssessments]
+        } catch (error) {
+          console.warn('⚠️ Failed to load from Assessment collection:', error)
+        }
+        
+        // Also get legacy questionnaire responses from QuestionnaireResponse collection
+        try {
+          console.log('🗃️ Fetching from QuestionnaireResponse collection...')
+          const questionnaires = await getQuestionnaireResponses()
+          console.log(`✅ Loaded ${questionnaires.length} questionnaires from QuestionnaireResponse collection`)
+          
+          // Get leads from MongoDB for enrichment
+          const leadsResult = await getLeadsFromAPI()
+          const leads = leadsResult.leads || []
+          
+          // Combine questionnaires with lead/user information
+          const questionnaireAssessments = questionnaires.map(q => {
+            let userInfo = null
+            
+            if (q.leadId) {
+              const lead = leads.find(l => l.id === q.leadId)
+              if (lead) {
+                userInfo = {
+                  name: lead.name,
+                  email: lead.email,
+                  phone: lead.phone,
+                  type: 'lead'
+                }
+              }
+            } else if (q.userId) {
               userInfo = {
-                name: lead.name,
-                email: lead.email,
-                phone: lead.phone,
-                type: 'lead'
+                name: q.userName || 'Unknown User',
+                email: q.userEmail || 'unknown@email.com',
+                phone: q.userPhone || 'N/A',
+                type: 'user'
               }
             }
-          } else if (q.userId) {
-            // For now, mark as user type since we don't have user API yet
-            userInfo = {
-              name: q.userName || 'Unknown User',
-              email: q.userEmail || 'unknown@email.com',
-              phone: q.userPhone || 'N/A',
-              type: 'user'
+            
+            return {
+              ...q,
+              userInfo: userInfo || {
+                name: 'Unknown User',
+                email: 'unknown@email.com',
+                phone: 'N/A',
+                type: 'unknown'
+              },
+              dataSource: 'questionnaire_collection'
             }
+          })
+          
+          allAssessments = [...allAssessments, ...questionnaireAssessments]
+        } catch (error) {
+          console.warn('⚠️ Failed to load from QuestionnaireResponse collection:', error)
+        }
+        
+        // Remove duplicates based on email (prefer Assessment collection data)
+        const uniqueAssessments = allAssessments.reduce((acc, curr) => {
+          const email = curr.userInfo?.email || curr.userEmail
+          const existing = acc.find(a => (a.userInfo?.email || a.userEmail) === email)
+          
+          if (!existing) {
+            acc.push(curr)
+          } else if (curr.dataSource === 'assessment_collection') {
+            // Replace with Assessment collection data if available
+            const index = acc.findIndex(a => (a.userInfo?.email || a.userEmail) === email)
+            acc[index] = curr
           }
           
-          return {
-            ...q,
-            userInfo: userInfo || {
-              name: 'Unknown User',
-              email: 'unknown@email.com',
-              phone: 'N/A',
-              type: 'unknown'
-            }
-          }
-        })
+          return acc
+        }, [])
         
-        console.log(`✅ Loaded ${assessmentsData.length} assessments from MongoDB`)
-        setAssessments(assessmentsData)
+        console.log(`✅ Loaded total ${uniqueAssessments.length} unique assessments (${allAssessments.length} total responses)`)
+        setAssessments(uniqueAssessments)
         
       } catch (error) {
-        console.error('❌ Failed to load assessments from MongoDB:', error)
+        console.error('❌ Failed to load assessments:', error)
         setAssessments([]) // Set empty array on error
       }
     }

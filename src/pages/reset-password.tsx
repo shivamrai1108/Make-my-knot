@@ -111,8 +111,6 @@ const ResetPasswordPage: React.FC = () => {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 8) {
       newErrors.password = 'Password must be at least 8 characters long';
-    } else if (getPasswordStrengthScore() < 3) {
-      newErrors.password = 'Password is too weak. Please meet more requirements.';
     }
 
     if (!formData.confirmPassword) {

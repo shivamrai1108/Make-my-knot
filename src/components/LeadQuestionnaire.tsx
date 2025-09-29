@@ -159,8 +159,29 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
     }, 200)
   }
 
+  // Validate age range format (e.g., "25-35")
+  const validateAgeRange = (range: string) => {
+    if (!range || range.trim() === '') return false
+    // Match format: two digits, hyphen, two digits (e.g., "25-35")
+    return /^\d{2}-\d{2}$/.test(range.trim())
+  }
+
+  // Validate email format
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
+
   const handleNextFromInput = () => {
-    if (!answers[current.id] || answers[current.id].trim() === '') return
+    const value = answers[current.id]?.trim()
+    if (!value) return
+    
+    // Special validation for age range
+    if (current.id === 'preferred_age_range' && !validateAgeRange(value)) {
+      alert('Please enter age range in format "25-35" (two digits, hyphen, two digits)')
+      return
+    }
+    
     if (step < steps.length) {
       setStep(step + 1)
     }
@@ -190,14 +211,10 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
     return age >= 18
   }
 
-  // Password validation - at least 8 characters, one uppercase, one lowercase, one number
+  // Password validation - at least 8 characters only
   const validatePassword = (password: string) => {
     if (!password) return false
-    const minLength = password.length >= 8
-    const hasUppercase = /[A-Z]/.test(password)
-    const hasLowercase = /[a-z]/.test(password)
-    const hasNumber = /\d/.test(password)
-    return minLength && hasUppercase && hasLowercase && hasNumber
+    return password.length >= 8
   }
 
   const getPasswordStrength = (password: string) => {
@@ -281,13 +298,39 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
     setUploadError('')
   }
 
-  const canSubmitContact = contact.name && contact.email && validatePhone(contact.phone) && validateAge(contact.dateOfBirth) && validatePassword(contact.password)
+  const canSubmitContact = contact.name && contact.email && validateEmail(contact.email) && validatePhone(contact.phone) && validateAge(contact.dateOfBirth) && validatePassword(contact.password)
 
   const handleSubmitLead = async () => {
-    if (!canSubmitContact || isProcessing) return
+    console.log('🔍 FORM DEBUG: handleSubmitLead called');
+    console.log('🔍 FORM DEBUG: canSubmitContact:', canSubmitContact);
+    console.log('🔍 FORM DEBUG: isProcessing:', isProcessing);
+    console.log('🔍 FORM DEBUG: API URL from env:', process.env.NEXT_PUBLIC_API_URL);
+    console.log('🔍 FORM DEBUG: Contact data:', contact);
+    console.log('🔍 FORM DEBUG: Answers data:', answers);
+    
+    if (!canSubmitContact || isProcessing) {
+      console.log('❌ FORM DEBUG: Submission blocked - validation failed or already processing');
+      
+      // Show specific validation errors
+      if (!contact.name) alert('Please enter your full name')
+      else if (!validateEmail(contact.email)) alert('Please enter a valid email address')
+      else if (!validatePhone(contact.phone)) alert('Please enter a valid 10-digit phone number')
+      else if (!validateAge(contact.dateOfBirth)) alert('You must be at least 18 years old')
+      else if (!validatePassword(contact.password)) alert('Password must be at least 8 characters')
+      
+      return;
+    }
+    
+    // Validate age range if provided
+    if (answers.preferred_age_range && !validateAgeRange(answers.preferred_age_range)) {
+      alert('Please enter age range in correct format (e.g., "25-35")');
+      setIsProcessing(false);
+      return;
+    }
     
     setIsProcessing(true)
     const leadId = Date.now().toString()
+    console.log('🔍 FORM DEBUG: Generated leadId:', leadId);
     
     // Include additional profile data in answers
     const enhancedAnswers = {
@@ -315,10 +358,13 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
       biodataFile: biodataFile // Store file for admin access
     }
     
+    console.log('🔍 FORM DEBUG: Lead object created:', lead);
+    
     try {
+      console.log('📦 FORM DEBUG: About to call saveLead with:', lead);
       // Use local-first saving approach - this will save to localStorage immediately
       const savedLead = await saveLead(lead)
-      console.log('Lead saved locally:', savedLead)
+      console.log('✅ FORM DEBUG: Lead saved successfully:', savedLead);
       
       sessionStorage.setItem('leadSubmitted', 'true')
       sessionStorage.setItem('leadId', leadId)
@@ -410,6 +456,9 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
                   }
                 }}
               />
+              {current.id === 'preferred_age_range' && answers[current.id] && !validateAgeRange(answers[current.id]) && (
+                <p className="text-red-300 text-sm">Please enter age range in format "25-35"</p>
+              )}
               <button 
                 onClick={handleNextFromInput} 
                 disabled={!answers[current.id] || answers[current.id].trim() === ''}
@@ -444,12 +493,19 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
             <div className="min-w-0">
               <label className="block text-xs sm:text-sm font-medium text-white/90 mb-1 sm:mb-2">Email Address *</label>
               <input
-                className="w-full px-2 sm:px-3 py-2 bg-white/20 border border-white/30 rounded-lg focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white placeholder-white/70 text-sm min-w-0"
+                className={`w-full px-2 sm:px-3 py-2 bg-white/20 border rounded-lg focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white placeholder-white/70 text-sm min-w-0 ${
+                  contact.email && !validateEmail(contact.email) 
+                    ? 'border-red-400 focus:border-red-400' 
+                    : 'border-white/30'
+                }`}
                 placeholder="Enter your email"
                 type="email"
                 value={contact.email}
                 onChange={(e)=>setContact({...contact, email: e.target.value})}
               />
+              {contact.email && !validateEmail(contact.email) && (
+                <p className="text-red-300 text-xs mt-1">Please enter a valid email address</p>
+              )}
             </div>
           </div>
 
@@ -493,7 +549,7 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
               )}
               {contact.password && !validatePassword(contact.password) && (
                 <p className="text-red-400 text-xs mt-1">
-                  Password must have 8+ chars, uppercase, lowercase, and number
+                  Password must be at least 8 characters long
                 </p>
               )}
             </div>

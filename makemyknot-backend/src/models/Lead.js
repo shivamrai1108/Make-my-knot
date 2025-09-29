@@ -31,7 +31,7 @@ const leadSchema = new mongoose.Schema({
   password: {
     type: String,
     required: false, // Optional for leads, required for user conversion
-    minlength: 6
+    minlength: [8, 'Password must be at least 8 characters long']
   },
   dateOfBirth: {
     type: Date,

@@ -189,9 +189,28 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/a
 // Local storage functions
 const QUESTIONNAIRE_STORAGE_KEY = 'questionnaire_responses'
 
-// Save questionnaire response DIRECTLY to MongoDB only
+// Save assessment response to new Assessment collection
+export async function saveAssessmentResponse(response: QuestionnaireResponse): Promise<void> {
+  console.log('💾 Saving assessment to new Assessment collection:', response.userEmail)
+  
+  try {
+    await saveAssessmentResponseAPIWithRetry(response)
+    console.log('✅ Assessment successfully saved to Assessment collection:', response.userEmail)
+  } catch (error) {
+    console.error('❌ FAILED to save assessment to database after all retries:', error)
+    throw new Error(`Failed to save assessment to database: ${error}`)
+  }
+}
+
+// Save questionnaire response DIRECTLY to MongoDB only (legacy)
 export async function saveQuestionnaireResponse(response: QuestionnaireResponse): Promise<void> {
   console.log('💾 Saving questionnaire DIRECTLY to MongoDB:', response.userEmail)
+  
+  // For assessment flow, use the new Assessment API
+  if (response.source === 'lead_assessment' || response.source === 'direct_assessment') {
+    await saveAssessmentResponse(response)
+    return
+  }
   
   try {
     await saveQuestionnaireResponseAPIWithRetry(response)
@@ -205,6 +224,96 @@ export async function saveQuestionnaireResponse(response: QuestionnaireResponse)
 
 // Import Google Sheets service
 import { appendAssessmentToGoogleSheets } from './googleSheetsService'
+
+// Assessment API save function with retry logic
+async function saveAssessmentResponseAPIWithRetry(response: QuestionnaireResponse, maxRetries: number = 3): Promise<void> {
+  // Get user information from leadId if available
+  let name = response.userName || 'Anonymous'
+  let phone = response.userPhone || ''
+  
+  // Try to get lead information if leadId exists
+  if (response.leadId && typeof window !== 'undefined') {
+    try {
+      const leads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
+      const lead = leads.find((l: any) => l.id === response.leadId)
+      if (lead) {
+        name = lead.name || name
+        phone = lead.phone || phone
+      }
+    } catch (error) {
+      console.warn('Could not retrieve lead information:', error)
+    }
+  }
+  
+  const assessmentData = {
+    name,
+    email: response.userEmail || 'anonymous@example.com',
+    phone,
+    responses: response.responses,
+    leadId: response.leadId,
+    userId: response.userId,
+    completionTime: response.completionTime || 0,
+    source: response.source || 'direct_assessment'
+  }
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`🔄 Attempt ${attempt} to save assessment to backend:`, assessmentData.email)
+      
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
+      
+      const response_api = await fetch(`${API_BASE_URL}/assessments/public`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(assessmentData),
+        signal: controller.signal
+      })
+      
+      clearTimeout(timeoutId)
+
+      if (!response_api.ok) {
+        const errorData = await response_api.text()
+        throw new Error(`API Error: ${response_api.status} - ${errorData}`)
+      }
+
+      const result = await response_api.json()
+      console.log('✅ Backend assessment save successful:', assessmentData.email)
+      
+      // Also save to Google Sheets (non-blocking)
+      try {
+        await appendAssessmentToGoogleSheets({
+          ...response,
+          name,
+          phone,
+          _id: result.data?.assessment?.id || response.id,
+          createdAt: result.data?.assessment?.completedAt || new Date().toISOString(),
+          completedAt: result.data?.assessment?.completedAt || (response.isComplete ? new Date().toISOString() : null)
+        })
+        console.log('📊 Assessment successfully saved to Google Sheets:', assessmentData.email)
+      } catch (sheetsError) {
+        console.warn('⚠️ Google Sheets sync failed (non-critical):', sheetsError)
+        // Don't fail the whole operation if Google Sheets fails
+      }
+      
+      return // Success, exit retry loop
+      
+    } catch (error: any) {
+      console.error(`❌ Assessment attempt ${attempt} failed:`, error.message)
+      
+      if (attempt === maxRetries) {
+        throw new Error(`Failed to save assessment to backend after ${maxRetries} attempts: ${error.message}`)
+      }
+      
+      // Wait before retry (exponential backoff)
+      const delay = Math.pow(2, attempt) * 1000 // 2s, 4s, 8s
+      console.log(`⏳ Retrying assessment in ${delay/1000} seconds...`)
+      await new Promise(resolve => setTimeout(resolve, delay))
+    }
+  }
+}
 
 // API save function to backend with retry logic
 async function saveQuestionnaireResponseAPIWithRetry(response: QuestionnaireResponse, maxRetries: number = 3): Promise<void> {
@@ -287,6 +396,51 @@ export async function saveQuestionnaireResponseAPI(response: QuestionnaireRespon
   return saveQuestionnaireResponseAPIWithRetry(response, 1) // Single attempt for legacy use
 }
 
+// Get assessments from new Assessment collection
+export async function getAssessmentResponses(): Promise<QuestionnaireResponse[]> {
+  try {
+    console.log('🔍 Fetching assessment responses from Assessment collection...')
+    
+    const response = await fetch(`${API_BASE_URL}/assessments/admin`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    
+    const result = await response.json()
+    const assessments = result.data.assessments.map((assessment: any) => ({
+      id: assessment.id,
+      userId: assessment.userId,
+      leadId: assessment.leadId,
+      userName: assessment.name,
+      userEmail: assessment.email,
+      userPhone: assessment.phone,
+      userType: 'lead', // Most assessments are from leads
+      createdAt: assessment.createdAt,
+      updatedAt: assessment.createdAt,
+      responses: assessment.responses,
+      completedAt: assessment.completedAt,
+      isComplete: assessment.isComplete,
+      source: assessment.source,
+      completionTime: assessment.completionTime,
+      completionPercentage: assessment.completionPercentage
+    }))
+    
+    console.log(`✅ Fetched ${assessments.length} assessment responses from Assessment collection`)
+    return assessments
+    
+  } catch (error) {
+    console.error('❌ Error fetching assessment responses:', error)
+    throw new Error(`Failed to fetch assessment responses: ${error}`)
+  }
+}
+
+// Legacy function for questionnaire responses
 export async function getQuestionnaireResponses(): Promise<QuestionnaireResponse[]> {
   try {
     console.log('🔍 Fetching questionnaire responses from MongoDB...')
