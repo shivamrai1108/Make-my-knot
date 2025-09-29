@@ -306,8 +306,10 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
       updatedAt: new Date().toISOString(),
       name: contact.name,
       email: contact.email,
-      phone: contact.countryCode + contact.phone, // Store full international phone number
+      phone: contact.phone, // Store just the phone number
       password: contact.password, // Store password for account creation
+      dateOfBirth: contact.dateOfBirth, // Set as direct field
+      countryCode: contact.countryCode, // Set as direct field
       answers: enhancedAnswers,
       status: 'new',
       biodataFile: biodataFile // Store file for admin access

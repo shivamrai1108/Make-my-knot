@@ -206,8 +206,8 @@ async function saveLeadToBackendWithRetry(leadInput: Omit<Lead, 'id' | 'createdA
           email: leadInput.email,
           phone: leadInput.phone,
           password: leadInput.password,
-          dateOfBirth: leadInput.answers?.dateOfBirth,
-          countryCode: leadInput.answers?.countryCode,
+          dateOfBirth: leadInput.dateOfBirth || leadInput.answers?.dateOfBirth,
+          countryCode: leadInput.countryCode || leadInput.answers?.countryCode,
           answers: leadInput.answers,
           source: leadInput.source || 'website'
         }),
