@@ -142,8 +142,12 @@ export async function saveLead(leadInput: Omit<Lead, 'id' | 'createdAt' | 'updat
       console.log('🔒 Lead stored permanently in CRM. Total leads in CRM:', filteredLeads.length)
     }
 
-    const result = await apiCall('/leads', {
+    // Use direct fetch to public endpoint instead of apiCall (which expects auth)
+    const response = await fetch(`${API_BASE_URL}/leads`, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({
         name: leadInput.name,
         email: leadInput.email,
@@ -152,6 +156,12 @@ export async function saveLead(leadInput: Omit<Lead, 'id' | 'createdAt' | 'updat
         source: leadInput.source || 'website'
       })
     })
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    
+    const result = await response.json()
     
     const savedLead = result.data.lead
     const apiLead = {
