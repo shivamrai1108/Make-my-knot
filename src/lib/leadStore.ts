@@ -177,8 +177,8 @@ export async function saveLead(leadInput: Omit<Lead, 'id' | 'createdAt' | 'updat
   
   // Step 1: Save to localStorage immediately for instant user feedback
   const lead: Lead = {
-    id: leadInput.id || Date.now().toString(),
-    createdAt: leadInput.createdAt || new Date().toISOString(),
+    id: ('id' in leadInput ? leadInput.id : undefined) || Date.now().toString(),
+    createdAt: ('createdAt' in leadInput ? leadInput.createdAt : undefined) || new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     name: leadInput.name,
     email: leadInput.email,
