@@ -75,7 +75,7 @@ const ResetPasswordPage: React.FC = () => {
 
   const checkPasswordStrength = (password: string) => {
     setPasswordStrength({
-      minLength: password.length >= 6,
+      minLength: password.length >= 8,
       hasUppercase: /[A-Z]/.test(password),
       hasLowercase: /[a-z]/.test(password),
       hasNumber: /\d/.test(password),
@@ -109,8 +109,8 @@ const ResetPasswordPage: React.FC = () => {
 
     if (!formData.password) {
       newErrors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters long';
+    } else if (formData.password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters long';
     }
 
     if (!formData.confirmPassword) {

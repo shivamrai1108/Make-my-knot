@@ -18,6 +18,7 @@ const leadRoutes = require('./routes/leads');
 const notificationRoutes = require('./routes/notifications');
 const questionnaireRoutes = require('./routes/questionnaires');
 const assessmentRoutes = require('./routes/assessments');
+const blogRoutes = require('./routes/blog');
 const migrationRoutes = require('./routes/migration');
 const errorHandler = require('./middleware/errorHandler');
 
@@ -141,6 +142,7 @@ app.use('/api/leads', leadRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/questionnaires', questionnaireRoutes);
 app.use('/api/assessments', assessmentRoutes);
+app.use('/api/blog', blogRoutes);
 app.use('/api/migration', migrationRoutes);
 
 // Health check endpoint

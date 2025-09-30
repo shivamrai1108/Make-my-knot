@@ -1,18 +1,14 @@
 import Link from 'next/link'
-import Head from 'next/head'
 import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
+import SEO from '@/components/SEO'
+import { pageConfigs } from '@/lib/seo'
 import { Clock, Heart, ArrowRight } from 'lucide-react'
 
 export default function PricingPage() {
   return (
     <>
-      <Head>
-        <title>Pricing Coming Soon - Make My Knot</title>
-        <meta name="description" content="From Handshakes to Pheras - Our pricing plans are coming soon. Join the waitlist to get early access to our trusted matchmaking services." />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+      <SEO config={pageConfigs.pricing} page="pricing" />
 
       <main className="min-h-screen bg-gray-50">
         <Navigation variant="white" />

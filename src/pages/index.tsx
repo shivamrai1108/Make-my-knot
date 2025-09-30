@@ -1,4 +1,3 @@
-import Head from 'next/head'
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -8,8 +7,10 @@ import LeadQuestionnaire from '@/components/LeadQuestionnaire'
 import Navigation from '@/components/Navigation'
 import NominationMarquee from '@/components/NominationMarquee'
 import WhatsAppButton from '@/components/WhatsAppButton'
+import SEO from '@/components/SEO'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { NAVIGATION_CONSTANTS } from '@/lib/constants/navigation'
+import { pageConfigs } from '@/lib/seo'
 import { useState, useEffect, useRef } from 'react'
 
 // Image Slider Component
@@ -515,12 +516,7 @@ export default function Home() {
 
   return (
     <>
-      <Head>
-        <title>Make My Knot - From Handshakes to Pheras</title>
-        <meta name="description" content="From Handshakes to Pheras - Find your perfect life partner with our trusted matchmaking service. Quality matches, personalized service, and 50 years of experience." />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+      <SEO config={pageConfigs.home} />
 
       <main className="min-h-screen bg-white">
         {/* Navigation */}

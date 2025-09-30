@@ -2,6 +2,8 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import ComprehensiveQuestionnaire from '@/components/ComprehensiveQuestionnaire'
 import { QuestionnaireResponse } from '@/lib/questionnaireStore'
+import SEO from '@/components/SEO'
+import { pageConfigs } from '@/lib/seo'
 
 export default function AssessmentPage() {
   const router = useRouter()
@@ -171,11 +173,14 @@ export default function AssessmentPage() {
   }
 
   return (
-    <ComprehensiveQuestionnaire
-      userId={userId as string}
-      leadId={leadId as string}
-      showIntro={true}
-      source={source as string || (leadId ? 'lead_assessment' : 'user_assessment')}
-    />
+    <>
+      <SEO config={pageConfigs.assessment} page="assessment" />
+      <ComprehensiveQuestionnaire
+        userId={userId as string}
+        leadId={leadId as string}
+        showIntro={true}
+        source={source as string || (leadId ? 'lead_assessment' : 'user_assessment')}
+      />
+    </>
   )
 }

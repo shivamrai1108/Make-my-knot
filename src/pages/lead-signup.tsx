@@ -63,7 +63,7 @@ export default function LeadSignup() {
     switch (name) {
       case 'password':
         if (!value) return 'Password is required'
-        if (value.length < 6) return 'Password must be at least 6 characters long'
+        if (value.length < 8) return 'Password must be at least 8 characters long'
         if (value.length > 128) return 'Password is too long (max 128 characters)'
         return ''
       
@@ -303,9 +303,9 @@ export default function LeadSignup() {
                     className={`block w-full pl-10 pr-10 py-3 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent transition-colors ${
                       fieldErrors.password ? 'border-red-300 bg-red-50' : 'border-gray-300'
                     }`}
-                    placeholder="Create a strong password"
+                    placeholder="Create a password (8+ characters)"
                     required
-                    minLength={6}
+                    minLength={8}
                   />
                   <button
                     type="button"
@@ -324,18 +324,9 @@ export default function LeadSignup() {
                 )}
                 {!fieldErrors.password && password && (
                   <div className="mt-1 text-xs text-gray-500">
-                    <p>Password must contain:</p>
-                    <ul className="list-disc list-inside ml-2 space-y-0.5">
-                      <li className={password.length >= 6 ? 'text-green-600' : 'text-gray-500'}>
-                        At least 6 characters
-                      </li>
-                      <li className={/(?=.*[a-z])/.test(password) ? 'text-green-600' : 'text-gray-500'}>
-                        One lowercase letter
-                      </li>
-                      <li className={/(?=.*\d)/.test(password) ? 'text-green-600' : 'text-gray-500'}>
-                        One number
-                      </li>
-                    </ul>
+                    <p className={password.length >= 8 ? 'text-green-600' : 'text-gray-500'}>
+                      ✓ Password must be at least 8 characters long
+                    </p>
                   </div>
                 )}
               </div>

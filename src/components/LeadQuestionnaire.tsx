@@ -214,8 +214,8 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
   // Password validation - minimum length requirement
   const validatePassword = (password: string) => {
     if (!password) return false
-    // Require at least 6 characters
-    return password.length >= 6
+    // Require at least 8 characters
+    return password.length >= 8
   }
 
   const getPasswordStrength = (password: string) => {
@@ -317,7 +317,7 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
       else if (!validateEmail(contact.email)) alert('Please enter a valid email address')
       else if (!validatePhone(contact.phone)) alert('Please enter a valid 10-digit phone number')
       else if (!validateAge(contact.dateOfBirth)) alert('You must be at least 18 years old')
-      else if (!validatePassword(contact.password)) alert('Password must be at least 6 characters long')
+      else if (!validatePassword(contact.password)) alert('Password must be at least 8 characters long')
       
       return;
     }

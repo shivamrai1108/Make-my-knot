@@ -1,20 +1,16 @@
-import Head from 'next/head'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Heart, Clock, Users, Award, ArrowRight, CheckCircle } from 'lucide-react'
 import Footer from '@/components/Footer'
 import BrandLogo from '@/components/BrandLogo'
 import WhatsAppButton from '@/components/WhatsAppButton'
+import SEO from '@/components/SEO'
+import { pageConfigs } from '@/lib/seo'
 
 export default function About() {
   return (
     <>
-      <Head>
-        <title>About Us - Make My Knot | Our Legacy: From 1975 to 2025</title>
-        <meta name="description" content="From Handshakes to Pheras - Discover our 3-generation legacy since 1975. 50 years of trusted matchmaking from Chaman Prakash Goyal's foundation to today's personalized platform." />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+      <SEO config={pageConfigs.about} page="about" />
 
       <main className="min-h-screen bg-white">
         {/* Navigation */}

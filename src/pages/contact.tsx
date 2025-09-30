@@ -1,4 +1,3 @@
-import Head from 'next/head'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useRef } from 'react'
@@ -20,6 +19,8 @@ import {
 import Footer from '@/components/Footer'
 import BrandLogo from '@/components/BrandLogo'
 import ProfileCard from '@/components/ProfileCard'
+import SEO from '@/components/SEO'
+import { pageConfigs } from '@/lib/seo'
 
 interface FormData {
   name: string
@@ -160,15 +161,7 @@ export default function Contact() {
 
   return (
     <>
-      <Head>
-        <title>Contact Us - Make My Knot | Get in Touch for Your Perfect Match</title>
-        <meta 
-          name="description" 
-          content="From Handshakes to Pheras - Contact Make My Knot for personalized matchmaking services. Get in touch with our CEO Moulik Goyal and our expert team to find your perfect life partner." 
-        />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+      <SEO config={pageConfigs.contact} page="contact" />
 
       <main className="min-h-screen bg-white">
         {/* Navigation */}
