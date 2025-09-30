@@ -153,6 +153,27 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Assessment collection initialization endpoint
+app.post('/api/init/assessment', async (req, res) => {
+  try {
+    const { initializeAssessmentCollection } = require('../init-assessment-db');
+    const result = await initializeAssessmentCollection();
+    
+    res.json({
+      status: 'success',
+      message: 'Assessment collection initialized successfully',
+      data: result
+    });
+  } catch (error) {
+    console.error('Assessment initialization failed:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to initialize Assessment collection',
+      error: error.message
+    });
+  }
+});
+
 // 404 handler
 app.use('*', (req, res) => {
   res.status(404).json({

@@ -107,7 +107,7 @@ async function getRealAnalyticsData() {
   
   try {
     // Fetch real leads data from backend API
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://makemyknot-backend-production.up.railway.app/api'
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://make-my-knot-production.up.railway.app/api'
     const leadsResponse = await fetch(`${API_URL}/leads/admin`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
@@ -144,7 +144,7 @@ async function getRealAnalyticsData() {
   
   // Try to get assessments from new Assessment collection
   try {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://makemyknot-backend-production.up.railway.app/api'
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://make-my-knot-production.up.railway.app/api'
     const assessmentsResponse = await fetch(`${API_URL}/assessments/admin`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
@@ -162,7 +162,7 @@ async function getRealAnalyticsData() {
   
   // Also get legacy questionnaires data from backend API
   try {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://makemyknot-backend-production.up.railway.app/api'
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://make-my-knot-production.up.railway.app/api'
     const questionnairesResponse = await fetch(`${API_URL}/questionnaires/admin`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
@@ -1114,15 +1114,15 @@ function AssessmentsTab() {
         }
         
         // Remove duplicates based on email (prefer Assessment collection data)
-        const uniqueAssessments = allAssessments.reduce((acc, curr) => {
+        const uniqueAssessments = allAssessments.reduce((acc: any[], curr) => {
           const email = curr.userInfo?.email || curr.userEmail
-          const existing = acc.find(a => (a.userInfo?.email || a.userEmail) === email)
+          const existing = acc.find((a: any) => (a.userInfo?.email || a.userEmail) === email)
           
           if (!existing) {
             acc.push(curr)
           } else if (curr.dataSource === 'assessment_collection') {
             // Replace with Assessment collection data if available
-            const index = acc.findIndex(a => (a.userInfo?.email || a.userEmail) === email)
+            const index = acc.findIndex((a: any) => (a.userInfo?.email || a.userEmail) === email)
             acc[index] = curr
           }
           
