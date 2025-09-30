@@ -7,10 +7,15 @@ import Analytics from '@/components/Analytics'
 import SplashScreen from '@/components/SplashScreen'
 import { preventLeadDataLoss, syncPendingLeads } from '@/lib/leadStore'
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/router'
 
 export default function App({ Component, pageProps }: AppProps) {
+  const router = useRouter()
   const [showSplash, setShowSplash] = useState(true)
   const [isFirstLoad, setIsFirstLoad] = useState(true)
+  
+  // Only show splash screen on homepage
+  const isHomepage = router.pathname === '/'
 
   useEffect(() => {
     // Initialize lead data protection
@@ -52,7 +57,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <UserProvider>
         <OnlineStatusProvider>
           <Analytics />
-          {showSplash && isFirstLoad ? (
+          {showSplash && isFirstLoad && isHomepage ? (
             <SplashScreen onComplete={handleSplashComplete} duration={4000} />
           ) : (
             <Component {...pageProps} />
