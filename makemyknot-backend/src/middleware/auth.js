@@ -157,6 +157,18 @@ const requireEmailVerification = (req, res, next) => {
   next();
 };
 
+// Middleware to check if user is admin
+const adminOnly = (req, res, next) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({
+      status: 'fail',
+      message: 'Access denied. Admin privileges required.',
+      code: 'ADMIN_REQUIRED'
+    });
+  }
+  next();
+};
+
 // Middleware to check subscription level
 const requireSubscription = (requiredLevel) => {
   const subscriptionHierarchy = {
@@ -188,6 +200,7 @@ module.exports = {
   createSendToken,
   protect,
   restrictTo,
+  adminOnly,
   optionalAuth,
   requireEmailVerification,
   requireSubscription

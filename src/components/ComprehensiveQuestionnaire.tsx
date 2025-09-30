@@ -30,6 +30,7 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
   const [startTime] = useState(Date.now())
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submissionProgress, setSubmissionProgress] = useState(0)
 
   useEffect(() => {
     // Always start fresh - no automatic loading of previous incomplete responses
@@ -84,6 +85,7 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
   const handleComplete = async (finalQuestionId?: string, finalAnswer?: any) => {
     if (isSubmitting) return
     setIsSubmitting(true)
+    setSubmissionProgress(10) // Start progress
     const completionTime = Math.round((Date.now() - startTime) / (1000 * 60)) // in minutes
     
     // Ensure the final answer is included in responses if provided
@@ -93,6 +95,7 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
     
     console.log('🔄 Completing questionnaire with responses:', finalResponses)
     console.log('📊 Total questions answered:', Object.keys(finalResponses).length, 'out of', essentialQuestions.length)
+    setSubmissionProgress(25) // Processing responses
     
     // Get user information from lead if available
     let userEmail = user?.email || ''
@@ -131,11 +134,14 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
     }
 
     // Save to localStorage and backend API
+    setSubmissionProgress(50) // Saving data
     try {
       await saveQuestionnaireResponse(response)
       console.log('✅ Assessment saved successfully!')
+      setSubmissionProgress(75) // Data saved
     } catch (error) {
       console.error('❌ Error saving assessment:', error)
+      setSubmissionProgress(60) // Partial save
       // Continue with local save already done
     }
     
@@ -147,6 +153,7 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
         console.log('Marked assessment as completed for leadId:', effectiveLeadId)
       }
     }
+    setSubmissionProgress(90) // Finalizing
     
     // If user is authenticated, also save to UserContext and update questionnaireComplete flag
     if (user && userId === user.id) {
@@ -174,15 +181,18 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
     }
     
     // If onComplete callback is provided (assessment flow), use it instead of showing completion screen
+    setSubmissionProgress(100) // Complete
     if (onComplete) {
       console.log('Using onComplete callback for assessment flow')
-      onComplete(response)
+      setTimeout(() => onComplete(response), 500) // Small delay to show 100% progress
     } else {
       console.log('No onComplete callback - showing congratulations screen')
-      setShowCongrats(true)
       setTimeout(() => {
-        setIsComplete(true)
-      }, 3000) // Show congrats for 3 seconds before final screen
+        setShowCongrats(true)
+        setTimeout(() => {
+          setIsComplete(true)
+        }, 3000) // Show congrats for 3 seconds before final screen
+      }, 500) // Small delay to show 100% progress
     }
   }
 
@@ -548,7 +558,78 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-purple-50 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-purple-50 p-4 relative">
+      {/* Special Loading Overlay for Q14 Submission */}
+      {isSubmitting && currentStep === essentialQuestions.length - 1 && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-3xl p-8 max-w-md w-full mx-4 text-center shadow-2xl">
+            <div className="mb-6">
+              <div className="w-20 h-20 bg-gradient-to-r from-primary-500 to-gold-500 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <Sparkles className="w-10 h-10 text-white animate-spin" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">Processing Your Assessment</h3>
+              <p className="text-gray-600">Saving your responses and preparing matches...</p>
+            </div>
+            
+            {/* Progress Bar */}
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-gray-600">Progress</span>
+                <span className="text-sm font-medium text-primary-600">{submissionProgress}%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3">
+                <div 
+                  className="bg-gradient-to-r from-primary-600 to-gold-500 h-3 rounded-full transition-all duration-500 ease-out"
+                  style={{ width: `${submissionProgress}%` }}
+                />
+              </div>
+            </div>
+            
+            {/* Progress Steps */}
+            <div className="space-y-2 text-left">
+              <div className={`flex items-center text-sm ${
+                submissionProgress >= 25 ? 'text-primary-600' : 'text-gray-400'
+              }`}>
+                <CheckCircle className={`w-4 h-4 mr-2 ${
+                  submissionProgress >= 25 ? 'text-primary-600' : 'text-gray-300'
+                }`} />
+                Processing your responses
+              </div>
+              <div className={`flex items-center text-sm ${
+                submissionProgress >= 50 ? 'text-primary-600' : 'text-gray-400'
+              }`}>
+                <CheckCircle className={`w-4 h-4 mr-2 ${
+                  submissionProgress >= 50 ? 'text-primary-600' : 'text-gray-300'
+                }`} />
+                Saving to secure database
+              </div>
+              <div className={`flex items-center text-sm ${
+                submissionProgress >= 75 ? 'text-primary-600' : 'text-gray-400'
+              }`}>
+                <CheckCircle className={`w-4 h-4 mr-2 ${
+                  submissionProgress >= 75 ? 'text-primary-600' : 'text-gray-300'
+                }`} />
+                Activating AI matchmaker
+              </div>
+              <div className={`flex items-center text-sm ${
+                submissionProgress >= 100 ? 'text-primary-600' : 'text-gray-400'
+              }`}>
+                <CheckCircle className={`w-4 h-4 mr-2 ${
+                  submissionProgress >= 100 ? 'text-primary-600' : 'text-gray-300'
+                }`} />
+                Assessment complete!
+              </div>
+            </div>
+            
+            <div className="mt-6 flex items-center justify-center space-x-1">
+              <div className="w-2 h-2 bg-primary-500 rounded-full animate-bounce"></div>
+              <div className="w-2 h-2 bg-primary-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+              <div className="w-2 h-2 bg-primary-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+            </div>
+          </div>
+        </div>
+      )}
+      
       <div className="max-w-4xl mx-auto">
         {/* Progress Bar */}
         <div className="mb-8">
@@ -607,18 +688,33 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
             {currentQuestion.type === 'multiple_choice' ? (
               <button
                 onClick={handleNext}
-                disabled={!canProceed()}
-                className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={!canProceed() || isSubmitting}
+                className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed relative"
               >
-                {currentStep === essentialQuestions.length - 1 ? 'Complete' : 'Next'}
-                <ChevronRight className="w-5 h-5 ml-2" />
+                {isSubmitting && currentStep === essentialQuestions.length - 1 ? (
+                  <div className="flex items-center">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                    Completing...
+                  </div>
+                ) : (
+                  <>
+                    {currentStep === essentialQuestions.length - 1 ? 'Complete Assessment' : 'Next'}
+                    <ChevronRight className="w-5 h-5 ml-2" />
+                  </>
+                )}
               </button>
             ) : (
               <div className="text-sm text-gray-400 italic">
-                {currentQuestion.type === 'single_choice' || currentQuestion.type === 'scale' 
-                  ? 'Click an option to continue'
-                  : 'Select to proceed'
-                }
+                {isSubmitting && currentStep === essentialQuestions.length - 1 ? (
+                  <div className="flex items-center text-primary-600">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-600 mr-2"></div>
+                    Completing assessment...
+                  </div>
+                ) : (
+                  currentQuestion.type === 'single_choice' || currentQuestion.type === 'scale' 
+                    ? (currentStep === essentialQuestions.length - 1 ? 'Click an option to complete assessment' : 'Click an option to continue')
+                    : 'Select to proceed'
+                )}
               </div>
             )}
           </div>

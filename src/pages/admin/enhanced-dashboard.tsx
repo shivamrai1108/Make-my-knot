@@ -50,6 +50,8 @@ import {
 } from 'lucide-react'
 import BrandLogo from '@/components/BrandLogo'
 import { getRecentContactSubmissions, getContactSubmissionCount } from '../api/contact'
+import { getLeads } from '../../lib/leadStore'
+import { getAssessmentResponses } from '../../lib/questionnaireStore'
 
 // Enhanced interfaces
 interface UserProfile {
@@ -140,7 +142,7 @@ const adminRoles: AdminRole[] = [
 
 export default function EnhancedAdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'messages' | 'contacts' | 'offers' | 'webinars' | 'analytics' | 'roles'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'leads' | 'assessments' | 'messages' | 'contacts' | 'offers' | 'webinars' | 'analytics' | 'roles'>('overview')
   const [users, setUsers] = useState<UserProfile[]>(mockUsers)
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null)
   const [showUserDetails, setShowUserDetails] = useState(false)
@@ -151,11 +153,16 @@ export default function EnhancedAdminDashboard() {
   const [selectedUserForMessage, setSelectedUserForMessage] = useState<string | null>(null)
   const [currentAdminRole, setCurrentAdminRole] = useState('super')
   const [contactSubmissions, setContactSubmissions] = useState<any[]>([])
+  const [leads, setLeads] = useState<any[]>([])
+  const [assessments, setAssessments] = useState<any[]>([])
+  const [leadsLoading, setLeadsLoading] = useState(false)
+  const [assessmentsLoading, setAssessmentsLoading] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
     // Mock authentication check
     setIsAuthenticated(true)
+    
     // Load contact submissions
     try {
       const submissions = getRecentContactSubmissions()
@@ -163,7 +170,41 @@ export default function EnhancedAdminDashboard() {
     } catch (error) {
       console.error('Error loading contact submissions:', error)
     }
+
+    // Load leads data
+    loadLeads()
+    
+    // Load assessments data
+    loadAssessments()
   }, [])
+  
+  const loadLeads = async () => {
+    setLeadsLoading(true)
+    try {
+      const leadsData = await getLeads()
+      setLeads(leadsData.leads || [])
+      console.log('✅ Loaded leads data for admin:', leadsData.leads?.length || 0)
+    } catch (error) {
+      console.error('❌ Error loading leads:', error)
+      setLeads([])
+    } finally {
+      setLeadsLoading(false)
+    }
+  }
+  
+  const loadAssessments = async () => {
+    setAssessmentsLoading(true)
+    try {
+      const assessmentsData = await getAssessmentResponses()
+      setAssessments(assessmentsData || [])
+      console.log('✅ Loaded assessments data for admin:', assessmentsData?.length || 0)
+    } catch (error) {
+      console.error('❌ Error loading assessments:', error)
+      setAssessments([])
+    } finally {
+      setAssessmentsLoading(false)
+    }
+  }
 
   const hasPermission = (permission: string): boolean => {
     const role = adminRoles.find(r => r.id === currentAdminRole)
@@ -328,6 +369,8 @@ export default function EnhancedAdminDashboard() {
               {[
                 { id: 'overview', label: 'Overview', icon: BarChart3, permission: 'overview' },
                 { id: 'users', label: 'User Management', icon: Users, permission: 'users' },
+                { id: 'leads', label: 'Leads CRM', icon: UserPlus, permission: 'leads' },
+                { id: 'assessments', label: 'Assessments', icon: FileText, permission: 'assessments' },
                 { id: 'messages', label: 'Messages', icon: MessageSquare, permission: 'messages' },
                 { id: 'contacts', label: 'Contact Forms', icon: Mail, permission: 'contacts' },
                 { id: 'offers', label: 'Offers', icon: Gift, permission: 'offers' },
@@ -389,25 +432,25 @@ export default function EnhancedAdminDashboard() {
 
                 <div className="bg-white rounded-xl p-6 shadow-sm border">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-medium text-gray-600">Contact Forms</h3>
-                    <Mail className="h-5 w-5 text-purple-600" />
+                    <h3 className="text-sm font-medium text-gray-600">Leads Generated</h3>
+                    <UserPlus className="h-5 w-5 text-purple-600" />
                   </div>
-                  <div className="text-2xl font-bold text-gray-900">{getContactSubmissionCount() || 0}</div>
+                  <div className="text-2xl font-bold text-gray-900">{leads.length || 0}</div>
                   <div className="text-sm text-green-600 mt-1 flex items-center">
                     <TrendingUp className="h-3 w-3 mr-1" />
-                    New inquiries
+                    Active leads in CRM
                   </div>
                 </div>
 
                 <div className="bg-white rounded-xl p-6 shadow-sm border">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-medium text-gray-600">Monthly Revenue</h3>
-                    <DollarSign className="h-5 w-5 text-gold-600" />
+                    <h3 className="text-sm font-medium text-gray-600">Assessments Completed</h3>
+                    <FileText className="h-5 w-5 text-gold-600" />
                   </div>
-                  <div className="text-2xl font-bold text-gray-900">₹45,600</div>
+                  <div className="text-2xl font-bold text-gray-900">{assessments.length || 0}</div>
                   <div className="text-sm text-green-600 mt-1 flex items-center">
                     <TrendingUp className="h-3 w-3 mr-1" />
-                    +18% from last month
+                    Ready for matching
                   </div>
                 </div>
               </div>
@@ -852,6 +895,403 @@ export default function EnhancedAdminDashboard() {
             </div>
           )}
 
+          {/* Leads CRM Tab */}
+          {activeTab === 'leads' && (
+            <div className="bg-white rounded-xl shadow-sm border">
+              <div className="p-6 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-xl font-semibold text-gray-900 flex items-center">
+                      <UserPlus className="h-6 w-6 text-purple-600 mr-2" />
+                      Leads CRM Dashboard
+                    </h2>
+                    <p className="text-gray-600 mt-1">Manage leads, track conversions, and monitor the sales funnel</p>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <button 
+                      onClick={loadLeads}
+                      className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      Refresh Data
+                    </button>
+                    <span className="text-sm text-gray-500">
+                      Total: {leads.length} leads
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Leads Stats */}
+              <div className="p-6 bg-gray-50 border-b border-gray-200">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-gray-900">{leads.length}</div>
+                    <div className="text-sm text-gray-600">Total Leads</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-600">
+                      {leads.filter(l => l.status === 'new').length}
+                    </div>
+                    <div className="text-sm text-gray-600">New Leads</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-600">
+                      {leads.filter(l => l.status === 'verified').length}
+                    </div>
+                    <div className="text-sm text-gray-600">Verified</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-purple-600">
+                      {leads.filter(l => l.status === 'contacted').length}
+                    </div>
+                    <div className="text-sm text-gray-600">Contacted</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="divide-y divide-gray-200">
+                {leadsLoading ? (
+                  <div className="p-8 text-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-600 border-t-transparent mx-auto mb-4" />
+                    <p className="text-gray-600">Loading leads...</p>
+                  </div>
+                ) : leads.length === 0 ? (
+                  <div className="p-8 text-center">
+                    <UserPlus className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No leads yet</h3>
+                    <p className="text-gray-600">
+                      Leads will appear here once users submit the lead generation form.
+                    </p>
+                  </div>
+                ) : (
+                  leads.map((lead, index) => (
+                    <div key={lead.id || index} className="p-6 hover:bg-gray-50 transition-colors">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-3 mb-2">
+                            <h3 className="font-semibold text-gray-900">{lead.name}</h3>
+                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                              lead.status === 'new' ? 'bg-green-100 text-green-800' :
+                              lead.status === 'verified' ? 'bg-blue-100 text-blue-800' :
+                              lead.status === 'contacted' ? 'bg-purple-100 text-purple-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}>
+                              {lead.status?.charAt(0).toUpperCase() + lead.status?.slice(1) || 'Unknown'}
+                            </span>
+                            {lead.dateOfBirth && (
+                              <span className="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">
+                                Age: {Math.floor((Date.now() - new Date(lead.dateOfBirth).getTime()) / (365.25 * 24 * 60 * 60 * 1000))}
+                              </span>
+                            )}
+                          </div>
+                          
+                          <div className="flex items-center space-x-4 text-sm text-gray-600 mb-3">
+                            <div className="flex items-center">
+                              <Mail className="h-4 w-4 mr-1" />
+                              {lead.email}
+                            </div>
+                            <div className="flex items-center">
+                              <Phone className="h-4 w-4 mr-1" />
+                              {lead.countryCode || '+91'} {lead.phone}
+                            </div>
+                            <div className="flex items-center">
+                              <Clock className="h-4 w-4 mr-1" />
+                              {formatDate(lead.createdAt)}
+                            </div>
+                          </div>
+                          
+                          {/* Lead Questionnaire Data */}
+                          {lead.answers && (
+                            <div className="bg-gray-50 rounded-lg p-3 mb-3">
+                              <h4 className="text-sm font-medium text-gray-900 mb-2">Lead Information:</h4>
+                              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+                                {lead.genderIdentity && (
+                                  <div><span className="text-gray-600">Gender:</span> <span className="font-medium">{lead.genderIdentity}</span></div>
+                                )}
+                                {lead.openToMeeting && (
+                                  <div><span className="text-gray-600">Seeking:</span> <span className="font-medium">{lead.openToMeeting}</span></div>
+                                )}
+                                {lead.preferredAgeRange && (
+                                  <div><span className="text-gray-600">Age Pref:</span> <span className="font-medium">{lead.preferredAgeRange}</span></div>
+                                )}
+                                {lead.currentLocation && (
+                                  <div><span className="text-gray-600">Location:</span> <span className="font-medium">{lead.currentLocation}</span></div>
+                                )}
+                                {lead.matchmakingExperience && (
+                                  <div><span className="text-gray-600">Experience:</span> <span className="font-medium">{lead.matchmakingExperience}</span></div>
+                                )}
+                                {lead.hasBiodata && (
+                                  <div><span className="text-gray-600">Biodata:</span> <span className="font-medium text-green-600">Uploaded</span></div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="flex items-center space-x-2 ml-4">
+                          <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="View Details">
+                            <Eye className="h-4 w-4" />
+                          </button>
+                          <button className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors" title="Contact Lead">
+                            <PhoneCall className="h-4 w-4" />
+                          </button>
+                          <button className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors" title="Send Email">
+                            <Send className="h-4 w-4" />
+                          </button>
+                          <button className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete">
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <div className="mt-4 flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-xs text-gray-500">Source: {lead.source || 'Website'}</span>
+                          {lead.leadScore && (
+                            <span className="text-xs text-gray-500">Score: {lead.leadScore}/100</span>
+                          )}
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <button className="px-3 py-1 text-xs bg-green-100 text-green-800 rounded-full hover:bg-green-200 transition-colors">
+                            Mark as Contacted
+                          </button>
+                          <button className="px-3 py-1 text-xs bg-blue-100 text-blue-800 rounded-full hover:bg-blue-200 transition-colors">
+                            Verify Lead
+                          </button>
+                          <button className="px-3 py-1 text-xs bg-purple-100 text-purple-800 rounded-full hover:bg-purple-200 transition-colors">
+                            Convert to User
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+              
+              {leads.length > 0 && (
+                <div className="p-6 bg-gray-50 border-t border-gray-200">
+                  <div className="flex items-center justify-between text-sm text-gray-600">
+                    <span>Showing all {leads.length} leads</span>
+                    <div className="flex items-center space-x-2">
+                      <button className="text-blue-600 hover:text-blue-800 font-medium">
+                        Export to CSV
+                      </button>
+                      <span className="text-gray-300">|</span>
+                      <button className="text-green-600 hover:text-green-800 font-medium">
+                        Bulk Actions
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          
+          {/* Assessments Tab */}
+          {activeTab === 'assessments' && (
+            <div className="bg-white rounded-xl shadow-sm border">
+              <div className="p-6 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-xl font-semibold text-gray-900 flex items-center">
+                      <FileText className="h-6 w-6 text-blue-600 mr-2" />
+                      Assessment Responses Dashboard
+                    </h2>
+                    <p className="text-gray-600 mt-1">View and analyze completed questionnaire responses for matchmaking</p>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <button 
+                      onClick={loadAssessments}
+                      className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      Refresh Data
+                    </button>
+                    <span className="text-sm text-gray-500">
+                      Total: {assessments.length} assessments
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Assessment Stats */}
+              <div className="p-6 bg-gray-50 border-b border-gray-200">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-gray-900">{assessments.length}</div>
+                    <div className="text-sm text-gray-600">Total Assessments</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-600">
+                      {assessments.filter(a => a.isComplete).length}
+                    </div>
+                    <div className="text-sm text-gray-600">Complete</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-600">
+                      {assessments.filter(a => a.completionPercentage === 100).length}
+                    </div>
+                    <div className="text-sm text-gray-600">100% Complete</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-purple-600">
+                      {assessments.filter(a => a.source === 'lead_assessment').length}
+                    </div>
+                    <div className="text-sm text-gray-600">From Leads</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="divide-y divide-gray-200">
+                {assessmentsLoading ? (
+                  <div className="p-8 text-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-600 border-t-transparent mx-auto mb-4" />
+                    <p className="text-gray-600">Loading assessments...</p>
+                  </div>
+                ) : assessments.length === 0 ? (
+                  <div className="p-8 text-center">
+                    <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No assessments yet</h3>
+                    <p className="text-gray-600">
+                      Assessment responses will appear here once users complete the questionnaire.
+                    </p>
+                  </div>
+                ) : (
+                  assessments.map((assessment, index) => (
+                    <div key={assessment.id || index} className="p-6 hover:bg-gray-50 transition-colors">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-3 mb-2">
+                            <h3 className="font-semibold text-gray-900">{assessment.userName || 'Anonymous'}</h3>
+                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                              assessment.isComplete ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                            }`}>
+                              {assessment.isComplete ? 'Complete' : 'Incomplete'}
+                            </span>
+                            <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+                              {assessment.completionPercentage || 0}%
+                            </span>
+                            <span className="px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800">
+                              {assessment.source?.replace('_', ' ') || 'Direct'}
+                            </span>
+                          </div>
+                          
+                          <div className="flex items-center space-x-4 text-sm text-gray-600 mb-3">
+                            <div className="flex items-center">
+                              <Mail className="h-4 w-4 mr-1" />
+                              {assessment.userEmail}
+                            </div>
+                            <div className="flex items-center">
+                              <Phone className="h-4 w-4 mr-1" />
+                              {assessment.userPhone || 'N/A'}
+                            </div>
+                            <div className="flex items-center">
+                              <Clock className="h-4 w-4 mr-1" />
+                              {assessment.completedAt ? formatDate(assessment.completedAt) : formatDate(assessment.createdAt)}
+                            </div>
+                            {assessment.completionTime && (
+                              <div className="flex items-center">
+                                <Activity className="h-4 w-4 mr-1" />
+                                {assessment.completionTime}min
+                              </div>
+                            )}
+                          </div>
+                          
+                          {/* Sample Assessment Responses Preview */}
+                          {assessment.responses && (
+                            <div className="bg-gray-50 rounded-lg p-3 mb-3">
+                              <h4 className="text-sm font-medium text-gray-900 mb-2">Assessment Preview:</h4>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+                                {assessment.responses.spirituality_importance && (
+                                  <div><span className="text-gray-600">Spirituality:</span> <span className="font-medium">{assessment.responses.spirituality_importance}</span></div>
+                                )}
+                                {assessment.responses.children_perspective && (
+                                  <div><span className="text-gray-600">Children:</span> <span className="font-medium">{assessment.responses.children_perspective}</span></div>
+                                )}
+                                {assessment.responses.drinking_habits && (
+                                  <div><span className="text-gray-600">Drinking:</span> <span className="font-medium">{assessment.responses.drinking_habits}</span></div>
+                                )}
+                                {assessment.responses.smoking_habits && (
+                                  <div><span className="text-gray-600">Smoking:</span> <span className="font-medium">{assessment.responses.smoking_habits}</span></div>
+                                )}
+                                {assessment.responses.relocation_openness && (
+                                  <div><span className="text-gray-600">Relocation:</span> <span className="font-medium">{assessment.responses.relocation_openness}</span></div>
+                                )}
+                                {assessment.responses.weekend_preferences && Array.isArray(assessment.responses.weekend_preferences) && (
+                                  <div><span className="text-gray-600">Weekends:</span> <span className="font-medium">{assessment.responses.weekend_preferences.slice(0, 2).join(', ')}{assessment.responses.weekend_preferences.length > 2 ? '...' : ''}</span></div>
+                                )}
+                              </div>
+                              
+                              {/* Show total answered questions */}
+                              <div className="mt-2 text-xs text-blue-600">
+                                {Object.keys(assessment.responses).length} questions answered
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="flex items-center space-x-2 ml-4">
+                          <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="View Full Assessment">
+                            <Eye className="h-4 w-4" />
+                          </button>
+                          <button className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors" title="Find Matches">
+                            <Heart className="h-4 w-4" />
+                          </button>
+                          <button className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors" title="Contact User">
+                            <Send className="h-4 w-4" />
+                          </button>
+                          <button className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete">
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <div className="mt-4 flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-xs text-gray-500">User Type: {assessment.userType || 'Unknown'}</span>
+                          {assessment.leadId && (
+                            <span className="text-xs text-gray-500">Lead ID: {assessment.leadId}</span>
+                          )}
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <button className="px-3 py-1 text-xs bg-green-100 text-green-800 rounded-full hover:bg-green-200 transition-colors">
+                            Find Matches
+                          </button>
+                          <button className="px-3 py-1 text-xs bg-blue-100 text-blue-800 rounded-full hover:bg-blue-200 transition-colors">
+                            Export Data
+                          </button>
+                          <button className="px-3 py-1 text-xs bg-purple-100 text-purple-800 rounded-full hover:bg-purple-200 transition-colors">
+                            Compatibility Score
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+              
+              {assessments.length > 0 && (
+                <div className="p-6 bg-gray-50 border-t border-gray-200">
+                  <div className="flex items-center justify-between text-sm text-gray-600">
+                    <span>Showing all {assessments.length} assessments</span>
+                    <div className="flex items-center space-x-2">
+                      <button className="text-blue-600 hover:text-blue-800 font-medium">
+                        Export All to CSV
+                      </button>
+                      <span className="text-gray-300">|</span>
+                      <button className="text-green-600 hover:text-green-800 font-medium">
+                        Run Matching Algorithm
+                      </button>
+                      <span className="text-gray-300">|</span>
+                      <button className="text-purple-600 hover:text-purple-800 font-medium">
+                        Analytics Report
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          
           {/* Contact Forms Tab */}
           {activeTab === 'contacts' && (
             <div className="bg-white rounded-xl shadow-sm border">
@@ -958,7 +1398,7 @@ export default function EnhancedAdminDashboard() {
           )}
           
           {/* Other tabs placeholder */}
-          {activeTab !== 'overview' && activeTab !== 'users' && activeTab !== 'contacts' && (
+          {activeTab !== 'overview' && activeTab !== 'users' && activeTab !== 'leads' && activeTab !== 'assessments' && activeTab !== 'contacts' && (
             <div className="bg-white rounded-xl p-8 shadow-sm border text-center">
               <h2 className="text-xl font-semibold text-gray-900 mb-4">
                 {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Management

@@ -42,7 +42,7 @@ export interface Lead {
   needsSync?: boolean // Flag to indicate lead needs to be synced to backend
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4001/api'
 
 // Import Google Sheets service for automatic data export
 import { appendLeadToGoogleSheets } from './googleSheetsService'
@@ -176,72 +176,28 @@ export async function getLeads(params: {
 }
 
 export async function saveLead(leadInput: Omit<Lead, 'id' | 'createdAt' | 'updatedAt'> | Lead): Promise<Lead> {
-  console.log('💾 Saving lead with LOCAL-FIRST approach:', leadInput.email)
+  console.log('💾 Saving lead DIRECTLY to MongoDB:', leadInput.email)
   
-  // Step 1: Save to localStorage immediately for instant user feedback
-  const lead: Lead = {
-    id: ('id' in leadInput ? leadInput.id : undefined) || Date.now().toString(),
-    createdAt: ('createdAt' in leadInput ? leadInput.createdAt : undefined) || new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    name: leadInput.name,
-    email: leadInput.email,
-    phone: leadInput.phone,
-    password: leadInput.password,
-    dateOfBirth: leadInput.dateOfBirth,
-    countryCode: leadInput.countryCode,
-    answers: leadInput.answers,
-    status: leadInput.status || 'new',
-    source: leadInput.source || 'website',
-    isActive: true,
-    needsSync: true, // Mark for background sync
-    savedToCRM: false // Not yet saved to database
-  }
-  
-  // Save to localStorage first
-  const leads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
-  const existingIndex = leads.findIndex((l: Lead) => l.email === lead.email)
-  
-  if (existingIndex >= 0) {
-    leads[existingIndex] = { ...leads[existingIndex], ...lead }
-  } else {
-    leads.push(lead)
-  }
-  
-  localStorage.setItem('makemyknot_leads', JSON.stringify(leads))
-  console.log('✅ Lead saved to localStorage:', lead.email)
-  
-  // Step 2: Attempt to sync to MongoDB and Google Sheets in background (non-blocking)
-  setTimeout(async () => {
+  try {
+    // Save directly to MongoDB - no localStorage
+    const savedLead = await saveLeadToBackendWithRetry(leadInput)
+    console.log('✅ Lead successfully saved to MongoDB:', savedLead.email)
+    
+    // Also save to Google Sheets (non-blocking)
     try {
-      const savedLead = await saveLeadToBackendWithRetry(lead)
-      console.log('✅ Lead successfully synced to MongoDB:', savedLead.email)
-      
-      // Step 3: Also save to Google Sheets
-      try {
-        await appendLeadToGoogleSheets(savedLead)
-        console.log('📊 Lead successfully saved to Google Sheets:', savedLead.email)
-      } catch (sheetsError) {
-        console.warn('⚠️ Google Sheets sync failed (non-critical):', sheetsError)
-        // Don't fail the whole operation if Google Sheets fails
-      }
-      
-      // Update localStorage to mark as synced
-      const updatedLeads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
-      const syncIndex = updatedLeads.findIndex((l: Lead) => l.id === lead.id)
-      if (syncIndex >= 0) {
-        updatedLeads[syncIndex].savedToCRM = true
-        updatedLeads[syncIndex].needsSync = false
-        updatedLeads[syncIndex].syncedAt = new Date().toISOString()
-        localStorage.setItem('makemyknot_leads', JSON.stringify(updatedLeads))
-      }
-      
-    } catch (error) {
-      console.warn('⚠️ Background sync to MongoDB failed, will retry later:', error)
-      // Keep needsSync = true for retry later
+      await appendLeadToGoogleSheets(savedLead)
+      console.log('📊 Lead successfully saved to Google Sheets:', savedLead.email)
+    } catch (sheetsError) {
+      console.warn('⚠️ Google Sheets sync failed (non-critical):', sheetsError)
+      // Don't fail the whole operation if Google Sheets fails
     }
-  }, 100) // Small delay to ensure immediate user feedback first
-  
-  return lead
+    
+    return savedLead
+    
+  } catch (error) {
+    console.error('❌ Failed to save lead to MongoDB:', error)
+    throw new Error(`Failed to save lead: ${error}`)
+  }
 }
 
 // Helper function to save lead to backend with retry logic

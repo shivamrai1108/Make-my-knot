@@ -184,7 +184,7 @@ export const essentialQuestions: QuestionnaireQuestion[] = [
 ]
 
 // API Configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4001/api'
 
 // Local storage functions
 const QUESTIONNAIRE_STORAGE_KEY = 'questionnaire_responses'
@@ -202,16 +202,17 @@ export async function saveAssessmentResponse(response: QuestionnaireResponse): P
   }
 }
 
-// Save questionnaire response DIRECTLY to MongoDB only (legacy)
+// Save questionnaire response DIRECTLY to MongoDB only
 export async function saveQuestionnaireResponse(response: QuestionnaireResponse): Promise<void> {
   console.log('💾 Saving questionnaire DIRECTLY to MongoDB:', response.userEmail)
   
-  // For assessment flow, use the new Assessment API
-  if (response.source === 'lead_assessment' || response.source === 'direct_assessment') {
+  // Always use the Assessment API for questionnaire responses
+  if (response.source === 'lead_assessment' || response.source === 'direct_assessment' || response.source === 'user_questionnaire') {
     await saveAssessmentResponse(response)
     return
   }
   
+  // Fallback to questionnaire API for other sources
   try {
     await saveQuestionnaireResponseAPIWithRetry(response)
     console.log('✅ Questionnaire successfully saved to MongoDB:', response.userEmail)
