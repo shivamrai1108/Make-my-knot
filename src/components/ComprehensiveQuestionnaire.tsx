@@ -29,6 +29,7 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
   const [progress, setProgress] = useState(0)
   const [startTime] = useState(Date.now())
   const [isTransitioning, setIsTransitioning] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
     // Always start fresh - no automatic loading of previous incomplete responses
@@ -44,23 +45,22 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
   const currentQuestion = essentialQuestions[currentStep]
 
   const handleAnswer = (questionId: string, answer: any, questionType?: string) => {
+    if (isSubmitting) return
     // Update responses state
     setResponses(prev => ({ ...prev, [questionId]: answer }))
     
-    // Auto-advance for single choice and scale questions with smooth transition
+    // Auto-advance for single choice and scale questions with minimal delay
     if (questionType === 'single_choice' || questionType === 'scale') {
+      // If it's the last question, complete immediately to avoid multi-clicks
+      if (currentStep === essentialQuestions.length - 1) {
+        handleComplete(questionId, answer)
+        return
+      }
+      setIsTransitioning(true)
       setTimeout(() => {
-        setIsTransitioning(true)
-        setTimeout(() => {
-          // For the last question, pass the final answer directly to avoid race condition
-          if (currentStep === essentialQuestions.length - 1) {
-            handleComplete(questionId, answer)
-          } else {
-            handleNext()
-          }
-          setIsTransitioning(false)
-        }, 200)
-      }, 400)
+        handleNext()
+        setIsTransitioning(false)
+      }, 150)
     }
   }
 
@@ -68,7 +68,10 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
     if (currentStep < essentialQuestions.length - 1) {
       setCurrentStep(prev => prev + 1)
     } else {
-      handleComplete() // No parameters when called through normal flow
+      if (!isSubmitting) {
+        setIsSubmitting(true)
+        handleComplete() // No parameters when called through normal flow
+      }
     }
   }
 
@@ -79,6 +82,8 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
   }
 
   const handleComplete = async (finalQuestionId?: string, finalAnswer?: any) => {
+    if (isSubmitting) return
+    setIsSubmitting(true)
     const completionTime = Math.round((Date.now() - startTime) / (1000 * 60)) // in minutes
     
     // Ensure the final answer is included in responses if provided
