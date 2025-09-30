@@ -1,0 +1,19 @@
+# Ignore parent directory files
+../package.json
+../package-lock.json
+../next.config.js
+../node_modules
+../.next
+../src
+../public
+
+# Ignore local development files
+.env.local
+*.log
+.DS_Store
+
+# Ignore test files
+test/
+tests/
+**/*.test.js
+**/*.spec.js
