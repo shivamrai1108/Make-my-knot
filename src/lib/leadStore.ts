@@ -42,7 +42,7 @@ export interface Lead {
   needsSync?: boolean // Flag to indicate lead needs to be synced to backend
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4001/api'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://make-my-knot-production.up.railway.app/api'
 
 // Import Google Sheets service for automatic data export
 import { appendLeadToGoogleSheets } from './googleSheetsService'

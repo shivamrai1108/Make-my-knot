@@ -184,7 +184,7 @@ export const essentialQuestions: QuestionnaireQuestion[] = [
 ]
 
 // API Configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4001/api'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://make-my-knot-production.up.railway.app/api'
 
 // Local storage functions
 const QUESTIONNAIRE_STORAGE_KEY = 'questionnaire_responses'
