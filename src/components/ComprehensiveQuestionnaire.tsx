@@ -50,15 +50,79 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
     let userName = user?.name || ''
     let userPhone = user?.phone || ''
     
+    // Enhanced lead data lookup to handle multiple sources and ID formats
     if (leadId && typeof window !== 'undefined') {
+      console.log('🔍 Looking up lead data for ID:', leadId)
+      
       try {
-        const leads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
-        const lead = leads.find((l: any) => l.id === leadId)
-        if (lead) {
-          userEmail = lead.email || userEmail
-          userName = lead.name || userName
-          userPhone = lead.phone || userPhone
+        // Method 1: Check lead_signup_data (most reliable for recent leads)
+        const leadSignupData = localStorage.getItem('lead_signup_data')
+        if (leadSignupData) {
+          const parsedSignupData = JSON.parse(leadSignupData)
+          console.log('📋 Found lead_signup_data:', parsedSignupData)
+          
+          if (parsedSignupData.leadId === leadId || parsedSignupData.name || parsedSignupData.email) {
+            userEmail = parsedSignupData.email || userEmail
+            userName = parsedSignupData.name || userName
+            userPhone = parsedSignupData.phone || userPhone
+            console.log('✅ Pre-populated from lead_signup_data:', { email: userEmail, name: userName })
+          }
         }
+        
+        // Method 2: Check makemyknot_leads in localStorage (handles timestamp IDs)
+        if (!userEmail) {
+          const leads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
+          
+          // First try exact ID match
+          let lead = leads.find((l: any) => l.id === leadId)
+          
+          // If no exact match and leadId looks like ObjectId, try finding by other means
+          if (!lead && leadId.length === 24 && /^[a-f\d]{24}$/i.test(leadId)) {
+            // For ObjectId leadIds, try to find by recent timestamp or session
+            const sessionLeadId = sessionStorage.getItem('leadId')
+            if (sessionLeadId && sessionLeadId !== leadId) {
+              lead = leads.find((l: any) => l.id === sessionLeadId)
+              console.log('🔄 Found lead using sessionStorage fallback:', sessionLeadId)
+            }
+            
+            // Last resort: use the most recent lead if within last hour
+            if (!lead && leads.length > 0) {
+              const recentLead = leads
+                .filter((l: any) => l.createdAt && (Date.now() - new Date(l.createdAt).getTime()) < 3600000)
+                .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0]
+              if (recentLead) {
+                lead = recentLead
+                console.log('🔄 Using most recent lead as fallback:', recentLead.id)
+              }
+            }
+          }
+          
+          if (lead) {
+            userEmail = lead.email || userEmail
+            userName = lead.name || userName
+            userPhone = lead.phone || userPhone
+            console.log('✅ Pre-populated from makemyknot_leads:', { email: userEmail, name: userName, leadId: lead.id })
+          } else {
+            console.log('⚠️ No matching lead found in makemyknot_leads for ID:', leadId)
+          }
+        }
+        
+        // Method 3: Check sessionStorage for additional lead context
+        if (!userEmail) {
+          const sessionLeadId = sessionStorage.getItem('leadId')
+          if (sessionLeadId) {
+            console.log('📦 Checking sessionStorage leadId:', sessionLeadId)
+            const leads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
+            const lead = leads.find((l: any) => l.id === sessionLeadId)
+            if (lead) {
+              userEmail = lead.email || userEmail
+              userName = lead.name || userName
+              userPhone = lead.phone || userPhone
+              console.log('✅ Pre-populated from sessionStorage lead:', { email: userEmail, name: userName })
+            }
+          }
+        }
+        
       } catch (error) {
         console.warn('Could not retrieve lead information for pre-population:', error)
       }
@@ -69,7 +133,13 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
     setConfirmedName(userName)
     setConfirmedPhone(userPhone)
     
-    console.log('📧 Pre-populated email confirmation:', { email: userEmail, name: userName })
+    console.log('📧 Final pre-populated email confirmation:', { 
+      email: userEmail, 
+      name: userName, 
+      phone: userPhone,
+      leadId: leadId,
+      userId: userId
+    })
   }, [userId, leadId, user])
 
   useEffect(() => {
@@ -588,6 +658,13 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
             <p className="text-lg text-gray-600">
               Please confirm your details to ensure we save your assessment correctly.
             </p>
+            {(confirmedName || confirmedEmail || confirmedPhone) && (
+              <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-sm text-green-700">
+                  ✅ <strong>Good news!</strong> We found your information and pre-filled the form below.
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="space-y-6">
@@ -651,15 +728,39 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
 
             <button
               onClick={() => {
-                if (!confirmedName.trim() || !confirmedEmail.trim() || !confirmedPhone.trim()) {
-                  alert('Please fill in all required fields.');
+                // Enhanced validation with better error messages
+                if (!confirmedName.trim()) {
+                  alert('Please enter your full name.');
+                  return;
+                }
+                if (!confirmedEmail.trim()) {
+                  alert('Please enter your email address.');
+                  return;
+                }
+                if (!confirmedPhone.trim()) {
+                  alert('Please enter your phone number.');
                   return;
                 }
                 if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(confirmedEmail)) {
-                  alert('Please enter a valid email address.');
+                  alert('Please enter a valid email address (e.g., john@example.com).');
                   return;
                 }
-                console.log('✅ Email confirmation completed:', { name: confirmedName, email: confirmedEmail, phone: confirmedPhone });
+                
+                // Basic phone validation (at least 10 digits)
+                const phoneDigits = confirmedPhone.replace(/\D/g, '')
+                if (phoneDigits.length < 10) {
+                  alert('Please enter a valid phone number with at least 10 digits.');
+                  return;
+                }
+                
+                console.log('✅ Email confirmation completed successfully:', { 
+                  name: confirmedName.trim(), 
+                  email: confirmedEmail.trim(), 
+                  phone: confirmedPhone.trim(),
+                  leadId: leadId || 'none',
+                  userId: userId || 'none'
+                });
+                
                 setShowEmailConfirm(false);
               }}
               disabled={!confirmedName.trim() || !confirmedEmail.trim() || !confirmedPhone.trim()}
