@@ -1371,33 +1371,66 @@ function AssessmentsTab() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredAssessments.map((assessment) => (
+              {filteredAssessments.map((assessment) => {
+                const isPartial = assessment.answeredQuestions > 0 && !assessment.isComplete
+                const progressColor = assessment.completionPercentage >= 80 ? 'text-green-600' :
+                                      assessment.completionPercentage >= 50 ? 'text-yellow-600' :
+                                      assessment.completionPercentage >= 20 ? 'text-orange-600' : 'text-red-600'
+                
+                return (
                 <tr key={assessment.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="flex-shrink-0">
+                      <div className="flex-shrink-0 relative">
                         <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
                           <span className="text-sm font-medium text-primary-700">
                             {assessment.userInfo.name.charAt(0).toUpperCase()}
                           </span>
                         </div>
+                        {/* Progress ring for partial assessments */}
+                        {isPartial && (
+                          <div className="absolute -top-1 -right-1 w-5 h-5">
+                            <div className="w-5 h-5 rounded-full border-2 border-white bg-white flex items-center justify-center">
+                              <div className={`w-3 h-3 rounded-full ${progressColor.replace('text-', 'bg-')}`}></div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                       <div className="ml-4 flex-1">
                         <div className="text-sm font-medium text-gray-900">
                           {assessment.userInfo.name}
+                          {isPartial && (
+                            <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                              Partial
+                            </span>
+                          )}
                         </div>
-                        <div className="text-sm text-gray-500 capitalize">
+                        <div className="text-sm text-gray-500">
                           {assessment.userInfo.type} • ID: {assessment.id.slice(-6)}
+                          {isPartial && (
+                            <span className={`ml-2 font-medium ${progressColor}`}>
+                              • {assessment.answeredQuestions}/{assessment.totalQuestions || 14} answered
+                            </span>
+                          )}
                         </div>
                         {/* Mobile Status Indicator */}
                         <div className="mt-1 sm:hidden">
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            assessment.isComplete
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-yellow-100 text-yellow-800'
-                          }`}>
-                            {assessment.isComplete ? 'Complete' : 'In Progress'}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                              assessment.isComplete
+                                ? 'bg-green-100 text-green-800'
+                                : isPartial 
+                                  ? 'bg-orange-100 text-orange-800'
+                                  : 'bg-yellow-100 text-yellow-800'
+                            }`}>
+                              {assessment.isComplete ? 'Complete' : isPartial ? 'Partial' : 'Started'}
+                            </span>
+                            {isPartial && (
+                              <span className={`text-xs font-medium ${progressColor}`}>
+                                {assessment.completionPercentage || 0}%
+                              </span>
+                            )}
+                          </div>
                         </div>
                         {/* Mobile Action Buttons */}
                         <div className="flex items-center gap-2 mt-2 sm:hidden">
@@ -1434,25 +1467,40 @@ function AssessmentsTab() {
                     <div className="text-sm text-gray-500 break-all sm:break-normal">{assessment.userInfo.phone}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      assessment.isComplete
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-yellow-100 text-yellow-800'
-                    }`}>
-                      {assessment.isComplete ? 'Complete' : 'In Progress'}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        assessment.isComplete
+                          ? 'bg-green-100 text-green-800'
+                          : isPartial 
+                            ? 'bg-orange-100 text-orange-800'
+                            : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {assessment.isComplete ? 'Complete' : isPartial ? 'Partial' : 'Started'}
+                      </span>
+                      {isPartial && (
+                        <span className={`text-xs font-medium ${progressColor}`}>
+                          {assessment.completionPercentage || 0}%
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap hidden md:table-cell">
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div 
-                        className="bg-primary-600 h-2 rounded-full" 
+                        className={`h-2 rounded-full transition-all duration-300 ${
+                          assessment.completionPercentage >= 100 ? 'bg-green-500' :
+                          assessment.completionPercentage >= 80 ? 'bg-blue-500' :
+                          assessment.completionPercentage >= 50 ? 'bg-yellow-500' :
+                          assessment.completionPercentage >= 20 ? 'bg-orange-500' : 'bg-red-500'
+                        }`}
                         style={{ 
-                          width: `${(Object.keys(assessment.responses).length / essentialQuestions.length) * 100}%` 
+                          width: `${assessment.completionPercentage || 0}%` 
                         }}
                       />
                     </div>
-                    <div className="text-xs text-gray-500 mt-1">
-                      {Object.keys(assessment.responses).length}/{essentialQuestions.length} questions
+                    <div className="text-xs text-gray-500 mt-1 flex items-center justify-between">
+                      <span>{(assessment.answeredQuestions || 0)}/{assessment.totalQuestions || 14} questions</span>
+                      <span className={`font-medium ${progressColor}`}>{assessment.completionPercentage || 0}%</span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
@@ -1487,7 +1535,8 @@ function AssessmentsTab() {
                     </div>
                   </td>
                 </tr>
-              ))}
+                )
+              })}
             </tbody>
           </table>
         </div>

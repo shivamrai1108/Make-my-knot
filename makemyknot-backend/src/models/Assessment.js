@@ -112,7 +112,30 @@ const assessmentSchema = new mongoose.Schema({
   },
   isComplete: {
     type: Boolean,
-    default: true
+    default: false // Changed to false by default
+  },
+  
+  // Progress tracking
+  answeredQuestions: {
+    type: Number,
+    default: 0
+  },
+  totalQuestions: {
+    type: Number,
+    default: 14
+  },
+  startedAt: {
+    type: Date,
+    default: Date.now
+  },
+  lastUpdatedAt: {
+    type: Date,
+    default: Date.now
+  },
+  status: {
+    type: String,
+    enum: ['started', 'in_progress', 'completed', 'abandoned'],
+    default: 'started'
   },
   completedAt: {
     type: Date,
@@ -154,6 +177,8 @@ assessmentSchema.index({ createdAt: -1 });
 assessmentSchema.index({ isComplete: 1, completedAt: -1 });
 assessmentSchema.index({ leadId: 1 });
 assessmentSchema.index({ userId: 1 });
+assessmentSchema.index({ status: 1, lastUpdatedAt: -1 });
+assessmentSchema.index({ answeredQuestions: 1 });
 
 // Virtual for response completion percentage
 assessmentSchema.virtual('completionPercentage').get(function() {
@@ -181,6 +206,61 @@ assessmentSchema.virtual('completionPercentage').get(function() {
   
   return Math.round((answeredQuestions / totalQuestions) * 100);
 });
+
+// Virtual for partial completion status
+assessmentSchema.virtual('isPartiallyComplete').get(function() {
+  return this.answeredQuestions > 0 && !this.isComplete;
+});
+
+// Instance methods for progress tracking
+assessmentSchema.methods.updateProgress = function() {
+  // Count answered questions
+  let answered = 0;
+  if (this.responses) {
+    const r = this.responses;
+    if (r.spirituality_importance) answered++;
+    if (r.premarital_counseling) answered++;
+    if (r.shared_interests_importance) answered++;
+    if (r.relocation_openness) answered++;
+    if (r.children_perspective) answered++;
+    if (r.caste_importance) answered++;
+    if (r.weekend_preferences && r.weekend_preferences.length > 0) answered++;
+    if (r.family_independence_scenario) answered++;
+    if (r.hobbies_activities && r.hobbies_activities.length > 0) answered++;
+    if (r.drinking_habits) answered++;
+    if (r.smoking_habits) answered++;
+    if (r.relationship_reasons && r.relationship_reasons.length > 0) answered++;
+    if (r.career_opportunity_scenario) answered++;
+    if (r.family_gathering_scenario) answered++;
+  }
+  
+  this.answeredQuestions = answered;
+  this.lastUpdatedAt = new Date();
+  
+  // Update status
+  if (answered === 0) {
+    this.status = 'started';
+  } else if (answered < this.totalQuestions) {
+    this.status = 'in_progress';
+  } else {
+    this.status = 'completed';
+    this.isComplete = true;
+    if (!this.completedAt) {
+      this.completedAt = new Date();
+    }
+  }
+  
+  return this;
+};
+
+assessmentSchema.methods.addResponse = function(questionKey, value) {
+  if (!this.responses) {
+    this.responses = {};
+  }
+  this.responses[questionKey] = value;
+  this.updateProgress();
+  return this;
+};
 
 // Instance method to get compatibility score with another assessment
 assessmentSchema.methods.calculateCompatibilityWith = function(otherAssessment) {
@@ -263,6 +343,36 @@ assessmentSchema.methods.calculateCompatibilityWith = function(otherAssessment) 
   return totalComparisons > 0 ? Math.round((score / totalComparisons) * 100) : 0;
 };
 
+// Static methods for partial assessments
+assessmentSchema.statics.findByEmailOrId = function(email, leadId, userId) {
+  const query = {};
+  
+  if (email) query.email = email;
+  if (leadId) query.leadId = leadId;
+  if (userId) query.userId = userId;
+  
+  return this.findOne(query).sort({ lastUpdatedAt: -1 });
+};
+
+assessmentSchema.statics.getPartialAssessments = function() {
+  return this.find({
+    isComplete: false,
+    answeredQuestions: { $gt: 0 },
+    status: { $in: ['in_progress', 'started'] }
+  }).sort({ lastUpdatedAt: -1 });
+};
+
+assessmentSchema.statics.getAbandonedAssessments = function(daysAgo = 7) {
+  const cutoffDate = new Date();
+  cutoffDate.setDate(cutoffDate.getDate() - daysAgo);
+  
+  return this.find({
+    isComplete: false,
+    lastUpdatedAt: { $lt: cutoffDate },
+    status: { $ne: 'completed' }
+  }).sort({ lastUpdatedAt: -1 });
+};
+
 // Static method to find compatible assessments
 assessmentSchema.statics.findCompatibleAssessments = function(userEmail, minCompatibility = 70, limit = 10) {
   // This would be implemented to find compatible users based on their assessment responses
@@ -299,5 +409,16 @@ assessmentSchema.statics.getAnalytics = function(dateRange = 30) {
     }
   ]);
 };
+
+// Pre-save middleware to automatically update progress
+assessmentSchema.pre('save', function(next) {
+  this.updateProgress();
+  next();
+});
+
+// Pre-update middleware
+assessmentSchema.pre(['findOneAndUpdate', 'updateOne'], function() {
+  this.set({ lastUpdatedAt: new Date() });
+});
 
 module.exports = mongoose.model('Assessment', assessmentSchema);

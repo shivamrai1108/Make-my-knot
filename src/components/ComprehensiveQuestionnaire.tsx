@@ -31,6 +31,8 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submissionProgress, setSubmissionProgress] = useState(0)
+  const [lastSaveTime, setLastSaveTime] = useState<number>(0)
+  const [isSaving, setIsSaving] = useState(false)
 
   useEffect(() => {
     // Always start fresh - no automatic loading of previous incomplete responses
@@ -44,11 +46,98 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
   }, [currentStep])
 
   const currentQuestion = essentialQuestions[currentStep]
+  
+  // Auto-save function for partial progress
+  const savePartialProgress = async (currentResponses: Record<string, any>) => {
+    // Throttle saves to prevent too many API calls (max once every 2 seconds)
+    const now = Date.now()
+    if (now - lastSaveTime < 2000 || isSaving) {
+      return
+    }
+    
+    setIsSaving(true)
+    setLastSaveTime(now)
+    
+    try {
+      // Get user information
+      let userEmail = user?.email || ''
+      let userName = user?.name || ''
+      let userPhone = user?.phone || ''
+      
+      if (leadId && typeof window !== 'undefined') {
+        try {
+          const leads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
+          const lead = leads.find((l: any) => l.id === leadId)
+          if (lead) {
+            userEmail = lead.email || userEmail
+            userName = lead.name || userName
+            userPhone = lead.phone || userPhone
+          }
+        } catch (error) {
+          console.warn('Could not retrieve lead information:', error)
+        }
+      }
+      
+      // Only save if we have essential info
+      if (!userEmail) {
+        console.log('No email available, skipping auto-save')
+        setIsSaving(false)
+        return
+      }
+      
+      // Prepare partial assessment data
+      const partialData = {
+        name: userName,
+        email: userEmail,
+        phone: userPhone,
+        responses: currentResponses,
+        leadId: leadId || null,
+        userId: userId || null,
+        source: source || (leadId ? 'lead_assessment' : 'user_assessment'),
+        sessionId: `session_${Date.now()}`
+      }
+      
+      console.log('💾 Auto-saving assessment progress:', {
+        email: userEmail,
+        answeredQuestions: Object.keys(currentResponses).length,
+        totalQuestions: essentialQuestions.length
+      })
+      
+      // Save to backend API
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://make-my-knot-production.up.railway.app/api'
+      const response = await fetch(`${API_URL}/assessments/public/partial`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(partialData)
+      })
+      
+      if (response.ok) {
+        const result = await response.json()
+        console.log('✅ Auto-save successful:', {
+          progress: result.data.assessment.completionPercentage,
+          status: result.data.assessment.status
+        })
+      } else {
+        console.warn('⚠️ Auto-save failed:', response.status, response.statusText)
+      }
+      
+    } catch (error) {
+      console.error('❌ Auto-save error:', error)
+    } finally {
+      setIsSaving(false)
+    }
+  }
 
   const handleAnswer = (questionId: string, answer: any, questionType?: string) => {
     if (isSubmitting) return
     // Update responses state
-    setResponses(prev => ({ ...prev, [questionId]: answer }))
+    const newResponses = { ...responses, [questionId]: answer }
+    setResponses(newResponses)
+    
+    // Auto-save progress after each answer
+    savePartialProgress(newResponses)
     
     // Auto-advance for single choice and scale questions with minimal delay
     if (questionType === 'single_choice' || questionType === 'scale') {
@@ -637,9 +726,17 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
             <span className="text-sm font-medium text-gray-600">
               Question {currentStep + 1} of {essentialQuestions.length}
             </span>
-            <span className="text-sm font-medium text-gray-600">
-              {Math.round(progress)}% Complete
-            </span>
+            <div className="flex items-center gap-3">
+              {isSaving && (
+                <div className="flex items-center text-xs text-primary-600">
+                  <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-primary-600 mr-1"></div>
+                  Saving...
+                </div>
+              )}
+              <span className="text-sm font-medium text-gray-600">
+                {Math.round(progress)}% Complete
+              </span>
+            </div>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-3">
             <div 

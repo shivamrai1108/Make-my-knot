@@ -269,6 +269,111 @@ router.post('/public', catchAsync(async (req, res) => {
   }
 }));
 
+// PUT/PATCH /api/assessments/public/partial - Update assessment with partial progress (PUBLIC ACCESS)
+router.put('/public/partial', catchAsync(async (req, res) => {
+  try {
+    console.log('🔄 Partial assessment update started:', {
+      timestamp: new Date().toISOString(),
+      ip: req.ip,
+      bodyKeys: Object.keys(req.body),
+      hasResponses: !!req.body.responses
+    });
+    
+    const { 
+      name,
+      email,
+      phone,
+      responses = {}, 
+      leadId,
+      userId,
+      source = 'lead_assessment',
+      sessionId
+    } = req.body;
+    
+    // Basic validation
+    if (!email) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Email is required for partial assessment updates',
+        code: 'MISSING_EMAIL'
+      });
+    }
+    
+    // Find existing assessment or create new one
+    let assessment = await Assessment.findByEmailOrId(email, leadId, userId);
+    
+    if (!assessment) {
+      // Create new partial assessment
+      console.log('🆕 Creating new partial assessment for:', email);
+      assessment = new Assessment({
+        name: name || 'Unknown User',
+        email: email.toLowerCase().trim(),
+        phone: phone || '',
+        leadId: leadId || null,
+        userId: userId || null,
+        source,
+        responses: {},
+        sessionId,
+        status: 'started',
+        isComplete: false,
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent'),
+        submittedFrom: 'website'
+      });
+    }
+    
+    // Update responses (merge with existing)
+    Object.keys(responses).forEach(questionKey => {
+      if (responses[questionKey] !== undefined && responses[questionKey] !== null) {
+        assessment.addResponse(questionKey, responses[questionKey]);
+      }
+    });
+    
+    // Update other fields if provided
+    if (name) assessment.name = name;
+    if (phone) assessment.phone = phone;
+    if (sessionId) assessment.sessionId = sessionId;
+    
+    await assessment.save();
+    
+    console.log('✅ Partial assessment updated:', {
+      email,
+      progress: assessment.completionPercentage,
+      answeredQuestions: assessment.answeredQuestions,
+      status: assessment.status
+    });
+    
+    res.json({
+      status: 'success',
+      message: 'Assessment progress saved',
+      data: {
+        assessment: {
+          id: assessment._id,
+          name: assessment.name,
+          email: assessment.email,
+          isComplete: assessment.isComplete,
+          status: assessment.status,
+          completionPercentage: assessment.completionPercentage,
+          answeredQuestions: assessment.answeredQuestions,
+          totalQuestions: assessment.totalQuestions,
+          lastUpdatedAt: assessment.lastUpdatedAt,
+          responses: assessment.responses
+        }
+      }
+    });
+    
+  } catch (error) {
+    console.error('❌ Partial assessment update error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to save assessment progress',
+      code: 'PARTIAL_UPDATE_ERROR'
+    });
+  }
+}));
+
+router.patch('/public/partial', router.stack[router.stack.length - 1].route.stack[0].handle); // Alias PATCH to PUT
+
 // GET /api/assessments/public/:email - Get assessment by email (PUBLIC ACCESS)
 router.get('/public/:email', catchAsync(async (req, res) => {
   const assessment = await Assessment.findOne({ 
@@ -302,12 +407,19 @@ router.get('/public/:email', catchAsync(async (req, res) => {
 
 // GET /api/assessments/admin - Get all assessments for admin (PUBLIC for now)
 router.get('/admin', catchAsync(async (req, res) => {
-  const assessments = await Assessment.find({})
-    .sort({ createdAt: -1 })
-    .limit(100) // Limit to recent 100 assessments
+  const { includePartial = 'true', status, limit = 100 } = req.query;
+  
+  // Build filter
+  const filter = {};
+  if (status) filter.status = status;
+  if (includePartial === 'false') filter.isComplete = true;
+  
+  const assessments = await Assessment.find(filter)
+    .sort({ lastUpdatedAt: -1, createdAt: -1 }) // Show recent activity first
+    .limit(parseInt(limit))
     .select('-__v');
   
-  // Transform data for admin view
+  // Transform data for admin view with enhanced information
   const transformedAssessments = assessments.map(assessment => ({
     id: assessment._id,
     name: assessment.name,
@@ -316,11 +428,79 @@ router.get('/admin', catchAsync(async (req, res) => {
     isComplete: assessment.isComplete,
     completedAt: assessment.completedAt,
     completionPercentage: assessment.completionPercentage,
+    answeredQuestions: assessment.answeredQuestions || 0,
+    totalQuestions: assessment.totalQuestions || 14,
+    status: assessment.status || (assessment.isComplete ? 'completed' : 'started'),
     completionTime: assessment.completionTime,
     source: assessment.source,
     leadId: assessment.leadId,
     userId: assessment.userId,
     createdAt: assessment.createdAt,
+    lastUpdatedAt: assessment.lastUpdatedAt || assessment.createdAt,
+    startedAt: assessment.startedAt || assessment.createdAt,
+    isPartiallyComplete: assessment.answeredQuestions > 0 && !assessment.isComplete,
+    responses: assessment.responses
+  }));
+  
+  res.json({
+    status: 'success',
+    results: transformedAssessments.length,
+    data: {
+      assessments: transformedAssessments
+    }
+  });
+}));
+
+// GET /api/assessments/admin/partial - Get partial assessments (PUBLIC for now)
+router.get('/admin/partial', catchAsync(async (req, res) => {
+  const partialAssessments = await Assessment.getPartialAssessments();
+  
+  const transformedAssessments = partialAssessments.map(assessment => ({
+    id: assessment._id,
+    name: assessment.name,
+    email: assessment.email,
+    phone: assessment.phone,
+    completionPercentage: assessment.completionPercentage,
+    answeredQuestions: assessment.answeredQuestions,
+    totalQuestions: assessment.totalQuestions,
+    status: assessment.status,
+    source: assessment.source,
+    leadId: assessment.leadId,
+    userId: assessment.userId,
+    createdAt: assessment.createdAt,
+    lastUpdatedAt: assessment.lastUpdatedAt,
+    responses: assessment.responses
+  }));
+  
+  res.json({
+    status: 'success',
+    results: transformedAssessments.length,
+    data: {
+      assessments: transformedAssessments
+    }
+  });
+}));
+
+// GET /api/assessments/admin/abandoned - Get abandoned assessments (PUBLIC for now)
+router.get('/admin/abandoned', catchAsync(async (req, res) => {
+  const { daysAgo = 7 } = req.query;
+  const abandonedAssessments = await Assessment.getAbandonedAssessments(parseInt(daysAgo));
+  
+  const transformedAssessments = abandonedAssessments.map(assessment => ({
+    id: assessment._id,
+    name: assessment.name,
+    email: assessment.email,
+    phone: assessment.phone,
+    completionPercentage: assessment.completionPercentage,
+    answeredQuestions: assessment.answeredQuestions,
+    totalQuestions: assessment.totalQuestions,
+    status: assessment.status,
+    source: assessment.source,
+    leadId: assessment.leadId,
+    userId: assessment.userId,
+    createdAt: assessment.createdAt,
+    lastUpdatedAt: assessment.lastUpdatedAt,
+    daysSinceLastUpdate: Math.floor((Date.now() - new Date(assessment.lastUpdatedAt).getTime()) / (1000 * 60 * 60 * 24)),
     responses: assessment.responses
   }));
   

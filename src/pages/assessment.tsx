@@ -10,13 +10,29 @@ export default function AssessmentPage() {
   const { leadId, userId, source } = router.query
   const [isReady, setIsReady] = useState(false)
   const [shouldSkipAssessment, setShouldSkipAssessment] = useState(false)
+  const [loadingError, setLoadingError] = useState<string | null>(null)
 
   useEffect(() => {
+    console.log('🔍 Assessment page useEffect:', {
+      routerIsReady: router.isReady,
+      leadId,
+      userId,
+      source,
+      query: router.query
+    })
+    
     // Ensure router is ready before proceeding
     if (router.isReady) {
       // Check if assessment was already completed to prevent double loading
       const sessionLeadId = sessionStorage.getItem('leadId')
       const effectiveLeadId = (Array.isArray(leadId) ? leadId[0] : leadId) || sessionLeadId
+      
+      console.log('📋 Lead ID resolution:', {
+        urlLeadId: leadId,
+        sessionLeadId,
+        effectiveLeadId,
+        source
+      })
       
       // Check if assessment is already completed for this lead
       if (effectiveLeadId) {
@@ -80,8 +96,24 @@ export default function AssessmentPage() {
       }
       
       setIsReady(true)
+      console.log('✅ Assessment ready to load')
+    } else {
+      console.log('⏳ Waiting for router to be ready...')
     }
   }, [router.isReady, leadId])
+  
+  // Add timeout mechanism to prevent infinite loading
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (!isReady && !shouldSkipAssessment) {
+        console.log('⚠️ Assessment loading timeout - forcing ready state')
+        setIsReady(true)
+        setLoadingError('Loading took longer than expected, but continuing...')
+      }
+    }, 5000) // 5 second timeout
+    
+    return () => clearTimeout(timeout)
+  }, [])
 
   const handleQuestionnaireComplete = (response: QuestionnaireResponse) => {
     console.log('Assessment completed! Debug info:', {
@@ -161,12 +193,40 @@ export default function AssessmentPage() {
 
   if (!isReady || shouldSkipAssessment) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary-50 to-purple-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">
-            {shouldSkipAssessment ? 'Assessment completed! Redirecting...' : 'Loading your assessment...'}
-          </p>
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 to-purple-50 flex items-center justify-center p-4">
+        <div className="text-center max-w-md">
+          {!shouldSkipAssessment && (
+            <>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+              <p className="text-gray-600 mb-4">
+                Loading your assessment...
+              </p>
+              {loadingError && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+                  <p className="text-yellow-800 text-sm">{loadingError}</p>
+                  <button
+                    onClick={() => setIsReady(true)}
+                    className="mt-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm"
+                  >
+                    Continue Anyway
+                  </button>
+                </div>
+              )}
+              <div className="text-xs text-gray-500 mt-2">
+                Router Ready: {router.isReady ? '✅' : '⏳'} | Lead ID: {leadId || 'None'}
+              </div>
+            </>
+          )}
+          {shouldSkipAssessment && (
+            <>
+              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <p className="text-gray-600">Assessment completed! Redirecting...</p>
+            </>
+          )}
         </div>
       </div>
     )
