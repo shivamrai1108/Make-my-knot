@@ -102,16 +102,23 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
         return
       }
       
+      // Only include leadId if it looks like a valid MongoDB ObjectId
+      const isValidLeadId = leadId && /^[a-f\d]{24}$/i.test(leadId)
+      
       // Prepare partial assessment data
-      const partialData = {
+      const partialData: any = {
         name: userName,
         email: userEmail,
         phone: userPhone,
         responses: currentResponses,
-        leadId: leadId || null,
         userId: userId || null,
         source: source || (leadId ? 'lead_assessment' : 'user_assessment'),
         sessionId: `session_${Date.now()}`
+      }
+      
+      // Only add leadId if it's valid
+      if (isValidLeadId) {
+        partialData.leadId = leadId
       }
       
       console.log('💾 Auto-saving assessment progress:', {
@@ -230,21 +237,30 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
     try {
       // Save directly to Assessment API
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://make-my-knot-production.up.railway.app/api'
-      const assessmentData = {
+      // Only include leadId if it looks like a valid MongoDB ObjectId (24 hex chars)
+      const isValidLeadId = leadId && /^[a-f\d]{24}$/i.test(leadId)
+      
+      const assessmentData: any = {
         name: userName,
         email: userEmail,
         phone: userPhone,
         responses: finalResponses,
-        leadId: leadId,
         userId: userId,
         completionTime,
         source: source || (leadId ? 'lead_assessment' : 'user_assessment')
       }
       
+      // Only add leadId if it's valid to prevent 500 errors
+      if (isValidLeadId) {
+        assessmentData.leadId = leadId
+      }
+      
       console.log('🔄 Submitting assessment to backend API:', {
         email: userEmail,
         answeredQuestions: Object.keys(finalResponses).length,
-        source: assessmentData.source
+        source: assessmentData.source,
+        includesLeadId: isValidLeadId,
+        leadId: isValidLeadId ? leadId : 'excluded (invalid format)'
       })
       
       const response_api = await fetch(`${API_URL}/assessments/public`, {
