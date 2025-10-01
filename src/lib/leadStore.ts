@@ -176,12 +176,45 @@ export async function getLeads(params: {
 }
 
 export async function saveLead(leadInput: Omit<Lead, 'id' | 'createdAt' | 'updatedAt'> | Lead): Promise<Lead> {
-  console.log('💾 Saving lead DIRECTLY to MongoDB:', leadInput.email)
+  console.log('💾 Saving lead to MongoDB and localStorage:', leadInput.email)
   
   try {
-    // Save directly to MongoDB - no localStorage
+    // Save directly to MongoDB
     const savedLead = await saveLeadToBackendWithRetry(leadInput)
     console.log('✅ Lead successfully saved to MongoDB:', savedLead.email)
+    
+    // IMPORTANT: Also save to localStorage with BOTH the original timestamp ID and MongoDB ObjectId
+    // This ensures assessment can find the lead data using either ID format
+    if (typeof window !== 'undefined') {
+      try {
+        const leads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
+        
+        // Create lead entry with original timestamp ID (for assessment lookup)
+        const leadForStorage = {
+          ...savedLead,
+          id: leadInput.id || savedLead.id, // Keep original timestamp ID if provided
+          mongoId: savedLead.id, // Store MongoDB ObjectId as backup
+          savedToCRM: true,
+          syncedAt: new Date().toISOString()
+        }
+        
+        // Remove any existing lead with same email or ID to prevent duplicates
+        const filteredLeads = leads.filter((l: any) => 
+          l.email !== savedLead.email && 
+          l.id !== leadForStorage.id && 
+          l.id !== savedLead.id
+        )
+        
+        // Add the new lead
+        filteredLeads.push(leadForStorage)
+        localStorage.setItem('makemyknot_leads', JSON.stringify(filteredLeads))
+        
+        console.log('✅ Lead also saved to localStorage with ID:', leadForStorage.id)
+        
+      } catch (localStorageError) {
+        console.warn('⚠️ Failed to save lead to localStorage (non-critical):', localStorageError)
+      }
+    }
     
     // Also save to Google Sheets (non-blocking)
     try {
