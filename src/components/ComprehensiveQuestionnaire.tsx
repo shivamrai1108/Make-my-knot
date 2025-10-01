@@ -112,7 +112,7 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
         phone: userPhone,
         responses: currentResponses,
         userId: userId || null,
-        source: source || (leadId ? 'lead_assessment' : 'user_assessment'),
+        source: source === 'lead' ? 'lead_assessment' : (source || (leadId ? 'lead_assessment' : 'user_assessment')),
         sessionId: `session_${Date.now()}`
       }
       
@@ -247,7 +247,7 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
         responses: finalResponses,
         userId: userId,
         completionTime,
-        source: source || (leadId ? 'lead_assessment' : 'user_assessment')
+        source: source === 'lead' ? 'lead_assessment' : (source || (leadId ? 'lead_assessment' : 'user_assessment'))
       }
       
       // Only add leadId if it's valid to prevent 500 errors
