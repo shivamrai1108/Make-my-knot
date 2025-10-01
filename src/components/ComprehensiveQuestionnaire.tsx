@@ -33,112 +33,32 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
   const [lastSaveTime, setLastSaveTime] = useState<number>(0)
   const [isSaving, setIsSaving] = useState(false)
   
-  // Email confirmation state - REMOVED
-  const [showEmailConfirm, setShowEmailConfirm] = useState(false)
+  // Email confirmation state
+  const [showEmailConfirm, setShowEmailConfirm] = useState(true)
   const [confirmedEmail, setConfirmedEmail] = useState('')
   const [confirmedName, setConfirmedName] = useState('')
   const [confirmedPhone, setConfirmedPhone] = useState('')
 
   useEffect(() => {
     // Always start fresh - no automatic loading of previous incomplete responses
-    // Users who want to continue can be handled through a separate "Continue Previous" button
-    // This ensures users get a clean experience every time they start the questionnaire
     console.log('Questionnaire initialized - starting fresh')
     
-    // Pre-populate email confirmation with user/lead data
-    let userEmail = user?.email || ''
-    let userName = user?.name || ''
-    let userPhone = user?.phone || ''
+    // Only pre-populate from authenticated user data (no localStorage lookup)
+    const userEmail = user?.email || ''
+    const userName = user?.name || ''
+    const userPhone = user?.phone || ''
     
-    // Enhanced lead data lookup to handle multiple sources and ID formats
-    if (leadId && typeof window !== 'undefined') {
-      console.log('🔍 Looking up lead data for ID:', leadId)
-      
-      try {
-        // Method 1: Check lead_signup_data (most reliable for recent leads)
-        const leadSignupData = localStorage.getItem('lead_signup_data')
-        if (leadSignupData) {
-          const parsedSignupData = JSON.parse(leadSignupData)
-          console.log('📋 Found lead_signup_data:', parsedSignupData)
-          
-          if (parsedSignupData.leadId === leadId || parsedSignupData.name || parsedSignupData.email) {
-            userEmail = parsedSignupData.email || userEmail
-            userName = parsedSignupData.name || userName
-            userPhone = parsedSignupData.phone || userPhone
-            console.log('✅ Pre-populated from lead_signup_data:', { email: userEmail, name: userName })
-          }
-        }
-        
-        // Method 2: Check makemyknot_leads in localStorage (handles timestamp IDs)
-        if (!userEmail) {
-          const leads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
-          
-          // First try exact ID match
-          let lead = leads.find((l: any) => l.id === leadId)
-          
-          // If no exact match and leadId looks like ObjectId, try finding by other means
-          if (!lead && leadId.length === 24 && /^[a-f\d]{24}$/i.test(leadId)) {
-            // For ObjectId leadIds, try to find by recent timestamp or session
-            const sessionLeadId = sessionStorage.getItem('leadId')
-            if (sessionLeadId && sessionLeadId !== leadId) {
-              lead = leads.find((l: any) => l.id === sessionLeadId)
-              console.log('🔄 Found lead using sessionStorage fallback:', sessionLeadId)
-            }
-            
-            // Last resort: use the most recent lead if within last hour
-            if (!lead && leads.length > 0) {
-              const recentLead = leads
-                .filter((l: any) => l.createdAt && (Date.now() - new Date(l.createdAt).getTime()) < 3600000)
-                .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0]
-              if (recentLead) {
-                lead = recentLead
-                console.log('🔄 Using most recent lead as fallback:', recentLead.id)
-              }
-            }
-          }
-          
-          if (lead) {
-            userEmail = lead.email || userEmail
-            userName = lead.name || userName
-            userPhone = lead.phone || userPhone
-            console.log('✅ Pre-populated from makemyknot_leads:', { email: userEmail, name: userName, leadId: lead.id })
-          } else {
-            console.log('⚠️ No matching lead found in makemyknot_leads for ID:', leadId)
-          }
-        }
-        
-        // Method 3: Check sessionStorage for additional lead context
-        if (!userEmail) {
-          const sessionLeadId = sessionStorage.getItem('leadId')
-          if (sessionLeadId) {
-            console.log('📦 Checking sessionStorage leadId:', sessionLeadId)
-            const leads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
-            const lead = leads.find((l: any) => l.id === sessionLeadId)
-            if (lead) {
-              userEmail = lead.email || userEmail
-              userName = lead.name || userName
-              userPhone = lead.phone || userPhone
-              console.log('✅ Pre-populated from sessionStorage lead:', { email: userEmail, name: userName })
-            }
-          }
-        }
-        
-      } catch (error) {
-        console.warn('Could not retrieve lead information for pre-population:', error)
-      }
-    }
-    
-    // Pre-populate the confirmed fields for backend submission (no confirmation screen shown)
+    // Pre-populate the confirmed fields for backend submission
     setConfirmedEmail(userEmail)
     setConfirmedName(userName)
     setConfirmedPhone(userPhone)
     
-    console.log('📧 Pre-populated user data for assessment submission:', { 
+    console.log('📧 Pre-populated from user context:', { 
       email: userEmail, 
       name: userName, 
       phone: userPhone,
-      leadId: leadId,
-      userId: userId
+      leadId: leadId || 'none',
+      userId: userId || 'none'
     })
   }, [userId, leadId, user])
 
@@ -643,7 +563,121 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
     )
   }
 
-  // Email confirmation screen - REMOVED (assessments and leads are saving correctly without it)
+  // Email confirmation screen
+  if (showEmailConfirm) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 to-purple-50 flex items-center justify-center p-4">
+        <div className="max-w-2xl w-full bg-white rounded-3xl shadow-2xl p-8">
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-2xl">📧</span>
+            </div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Confirm Your Information
+            </h2>
+            <p className="text-lg text-gray-600">
+              Please provide your details to ensure we save your assessment correctly.
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Your Name *
+              </label>
+              <input
+                type="text"
+                value={confirmedName}
+                onChange={(e) => setConfirmedName(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                placeholder="Enter your full name"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email Address *
+              </label>
+              <input
+                type="email"
+                value={confirmedEmail}
+                onChange={(e) => setConfirmedEmail(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                placeholder="Enter your email address"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Phone Number *
+              </label>
+              <input
+                type="tel"
+                value={confirmedPhone}
+                onChange={(e) => setConfirmedPhone(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                placeholder="Enter your phone number"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="bg-primary-50 rounded-lg p-4 mt-6">
+            <p className="text-sm text-primary-800">
+              <strong>Privacy Note:</strong> This information is used to save your assessment and notify you of matches. We never share your data with third parties.
+            </p>
+          </div>
+
+          <div className="flex justify-between items-center mt-8">
+            <button
+              onClick={() => setShowWelcome(true)}
+              className="flex items-center px-6 py-3 text-gray-600 hover:text-gray-900"
+            >
+              <ChevronLeft className="w-5 h-5 mr-2" />
+              Back
+            </button>
+
+            <button
+              onClick={() => {
+                // Simple validation
+                if (!confirmedName.trim()) {
+                  alert('Please enter your full name.');
+                  return;
+                }
+                if (!confirmedEmail.trim()) {
+                  alert('Please enter your email address.');
+                  return;
+                }
+                if (!confirmedPhone.trim()) {
+                  alert('Please enter your phone number.');
+                  return;
+                }
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(confirmedEmail)) {
+                  alert('Please enter a valid email address.');
+                  return;
+                }
+                
+                console.log('✅ Email confirmation completed:', { 
+                  name: confirmedName.trim(), 
+                  email: confirmedEmail.trim(), 
+                  phone: confirmedPhone.trim()
+                });
+                
+                setShowEmailConfirm(false);
+              }}
+              disabled={!confirmedName.trim() || !confirmedEmail.trim() || !confirmedPhone.trim()}
+              className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Continue to Assessment
+              <ChevronRight className="w-5 h-5 ml-2" />
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   // Animated congratulations screen
   if (showCongrats) {
