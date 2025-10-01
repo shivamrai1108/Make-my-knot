@@ -1,0 +1,12 @@
+[variables]
+NIXPACKS_NODEJS_VERSION = "18"
+
+[phases.build]
+cmd = "npm ci --only=production"
+
+[phases.start]
+cmd = "node src/index.js"
+
+[providers.node]
+packageManager = "npm"
+packageFilePath = "./package.json"
