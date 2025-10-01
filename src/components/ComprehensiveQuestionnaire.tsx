@@ -32,13 +32,45 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
   const [submissionProgress, setSubmissionProgress] = useState(0)
   const [lastSaveTime, setLastSaveTime] = useState<number>(0)
   const [isSaving, setIsSaving] = useState(false)
+  
+  // Email confirmation state
+  const [showEmailConfirm, setShowEmailConfirm] = useState(true)
+  const [confirmedEmail, setConfirmedEmail] = useState('')
+  const [confirmedName, setConfirmedName] = useState('')
+  const [confirmedPhone, setConfirmedPhone] = useState('')
 
   useEffect(() => {
     // Always start fresh - no automatic loading of previous incomplete responses
     // Users who want to continue can be handled through a separate "Continue Previous" button
     // This ensures users get a clean experience every time they start the questionnaire
     console.log('Questionnaire initialized - starting fresh')
-  }, [userId, leadId])
+    
+    // Pre-populate email confirmation with user/lead data
+    let userEmail = user?.email || ''
+    let userName = user?.name || ''
+    let userPhone = user?.phone || ''
+    
+    if (leadId && typeof window !== 'undefined') {
+      try {
+        const leads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
+        const lead = leads.find((l: any) => l.id === leadId)
+        if (lead) {
+          userEmail = lead.email || userEmail
+          userName = lead.name || userName
+          userPhone = lead.phone || userPhone
+        }
+      } catch (error) {
+        console.warn('Could not retrieve lead information for pre-population:', error)
+      }
+    }
+    
+    // Pre-populate the confirmation fields
+    setConfirmedEmail(userEmail)
+    setConfirmedName(userName)
+    setConfirmedPhone(userPhone)
+    
+    console.log('📧 Pre-populated email confirmation:', { email: userEmail, name: userName })
+  }, [userId, leadId, user])
 
   useEffect(() => {
     setProgress((currentStep / essentialQuestions.length) * 100)
@@ -58,24 +90,10 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
     setLastSaveTime(now)
     
     try {
-      // Get user information
-      let userEmail = user?.email || ''
-      let userName = user?.name || ''
-      let userPhone = user?.phone || ''
-      
-      if (leadId && typeof window !== 'undefined') {
-        try {
-          const leads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
-          const lead = leads.find((l: any) => l.id === leadId)
-          if (lead) {
-            userEmail = lead.email || userEmail
-            userName = lead.name || userName
-            userPhone = lead.phone || userPhone
-          }
-        } catch (error) {
-          console.warn('Could not retrieve lead information:', error)
-        }
-      }
+      // Use confirmed email from confirmation step
+      const userEmail = confirmedEmail || user?.email || ''
+      const userName = confirmedName || user?.name || ''
+      const userPhone = confirmedPhone || user?.phone || ''
       
       // Only save if we have essential info
       if (!userEmail) {
@@ -185,24 +203,10 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
     console.log('📊 Total questions answered:', Object.keys(finalResponses).length, 'out of', essentialQuestions.length)
     setSubmissionProgress(25) // Processing responses
     
-    // Get user information from lead if available
-    let userEmail = user?.email || ''
-    let userName = user?.name || ''
-    let userPhone = user?.phone || ''
-    
-    if (leadId && typeof window !== 'undefined') {
-      try {
-        const leads = JSON.parse(localStorage.getItem('makemyknot_leads') || '[]')
-        const lead = leads.find((l: any) => l.id === leadId)
-        if (lead) {
-          userEmail = lead.email || userEmail
-          userName = lead.name || userName
-          userPhone = lead.phone || userPhone
-        }
-      } catch (error) {
-        console.warn('Could not retrieve lead information for assessment:', error)
-      }
-    }
+    // Use confirmed email from the confirmation step
+    const userEmail = confirmedEmail || user?.email || ''
+    const userName = confirmedName || user?.name || ''
+    const userPhone = confirmedPhone || user?.phone || ''
     
     const response: QuestionnaireResponse = {
       id: userId || leadId || `questionnaire_${Date.now()}`,
@@ -548,6 +552,107 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
             Let&apos;s Get Started
             <ChevronRight className="w-5 h-5 ml-2" />
           </button>
+        </div>
+      </div>
+    )
+  }
+
+  // Email confirmation screen
+  if (showEmailConfirm) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 to-purple-50 flex items-center justify-center p-4">
+        <div className="max-w-2xl w-full bg-white rounded-3xl shadow-2xl p-8">
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-2xl">📧</span>
+            </div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Confirm Your Information
+            </h2>
+            <p className="text-lg text-gray-600">
+              Please confirm your details to ensure we save your assessment correctly.
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Your Name *
+              </label>
+              <input
+                type="text"
+                value={confirmedName}
+                onChange={(e) => setConfirmedName(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                placeholder="Enter your full name"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email Address *
+              </label>
+              <input
+                type="email"
+                value={confirmedEmail}
+                onChange={(e) => setConfirmedEmail(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                placeholder="Enter your email address"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Phone Number *
+              </label>
+              <input
+                type="tel"
+                value={confirmedPhone}
+                onChange={(e) => setConfirmedPhone(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                placeholder="Enter your phone number"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="bg-primary-50 rounded-lg p-4 mt-6">
+            <p className="text-sm text-primary-800">
+              <strong>Privacy Note:</strong> This information is used to save your assessment and notify you of matches. We never share your data with third parties.
+            </p>
+          </div>
+
+          <div className="flex justify-between items-center mt-8">
+            <button
+              onClick={() => setShowWelcome(true)}
+              className="flex items-center px-6 py-3 text-gray-600 hover:text-gray-900"
+            >
+              <ChevronLeft className="w-5 h-5 mr-2" />
+              Back
+            </button>
+
+            <button
+              onClick={() => {
+                if (!confirmedName.trim() || !confirmedEmail.trim() || !confirmedPhone.trim()) {
+                  alert('Please fill in all required fields.');
+                  return;
+                }
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(confirmedEmail)) {
+                  alert('Please enter a valid email address.');
+                  return;
+                }
+                console.log('✅ Email confirmation completed:', { name: confirmedName, email: confirmedEmail, phone: confirmedPhone });
+                setShowEmailConfirm(false);
+              }}
+              disabled={!confirmedName.trim() || !confirmedEmail.trim() || !confirmedPhone.trim()}
+              className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Continue to Assessment
+              <ChevronRight className="w-5 h-5 ml-2" />
+            </button>
+          </div>
         </div>
       </div>
     )
