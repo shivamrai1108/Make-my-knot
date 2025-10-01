@@ -3,10 +3,135 @@ const Lead = require('../models/Lead');
 const { protect } = require('../middleware/auth');
 const catchAsync = require('../middleware/catchAsync');
 const AppError = require('../utils/AppError');
+const { uploadBiodata, handleUploadErrors } = require('../middleware/upload');
+const path = require('path');
+const fs = require('fs');
 
 const router = express.Router();
 
 // Public routes (no auth required) - Allow anyone to submit leads
+
+// POST /api/leads/biodata - Upload biodata file for lead (PUBLIC ACCESS)
+router.post('/biodata', uploadBiodata, handleUploadErrors, catchAsync(async (req, res) => {
+  // Add CORS headers for public access
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'POST');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  
+  const { email } = req.body;
+  
+  if (!email) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'Email is required for biodata upload'
+    });
+  }
+  
+  if (!req.file) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'No biodata file uploaded'
+    });
+  }
+  
+  // Find or create lead with email
+  let lead = await Lead.findOne({ email: email.toLowerCase() });
+  
+  if (!lead) {
+    // Create minimal lead entry for biodata storage
+    lead = await Lead.create({
+      name: 'Biodata Upload User',
+      email: email.toLowerCase(),
+      phone: '0000000000', // Placeholder
+      hasBiodata: true,
+      biodataFileName: req.file.originalname,
+      biodataFilePath: req.file.path,
+      biodataFileSize: req.file.size,
+      biodataFileType: req.file.mimetype,
+      biodataUploadedAt: new Date(),
+      status: 'new',
+      source: 'biodata_upload'
+    });
+  } else {
+    // Update existing lead with biodata info
+    lead.hasBiodata = true;
+    lead.biodataFileName = req.file.originalname;
+    lead.biodataFilePath = req.file.path;
+    lead.biodataFileSize = req.file.size;
+    lead.biodataFileType = req.file.mimetype;
+    lead.biodataUploadedAt = new Date();
+    await lead.save();
+  }
+  
+  res.status(201).json({
+    status: 'success',
+    message: 'Biodata uploaded successfully',
+    data: {
+      leadId: lead._id,
+      fileName: req.file.originalname,
+      fileSize: req.file.size,
+      uploadedAt: lead.biodataUploadedAt
+    }
+  });
+}));
+
+// GET /api/leads/:id/biodata/download - Download biodata file (PROTECTED)
+router.get('/:id/biodata/download', protect, catchAsync(async (req, res, next) => {
+  const lead = await Lead.findById(req.params.id);
+  
+  if (!lead) {
+    return next(new AppError('Lead not found', 404));
+  }
+  
+  if (!lead.hasBiodata || !lead.biodataFilePath) {
+    return next(new AppError('No biodata file found for this lead', 404));
+  }
+  
+  const filePath = lead.biodataFilePath;
+  
+  // Check if file exists
+  if (!fs.existsSync(filePath)) {
+    return next(new AppError('Biodata file not found on server', 404));
+  }
+  
+  // Set appropriate headers for file download
+  const fileName = lead.biodataFileName || `biodata_${lead.name}.pdf`;
+  res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+  res.setHeader('Content-Type', lead.biodataFileType || 'application/octet-stream');
+  
+  // Stream the file
+  const fileStream = fs.createReadStream(filePath);
+  fileStream.pipe(res);
+}));
+
+// GET /api/leads/:id/biodata/view - View biodata file in browser (PROTECTED)
+router.get('/:id/biodata/view', protect, catchAsync(async (req, res, next) => {
+  const lead = await Lead.findById(req.params.id);
+  
+  if (!lead) {
+    return next(new AppError('Lead not found', 404));
+  }
+  
+  if (!lead.hasBiodata || !lead.biodataFilePath) {
+    return next(new AppError('No biodata file found for this lead', 404));
+  }
+  
+  const filePath = lead.biodataFilePath;
+  
+  // Check if file exists
+  if (!fs.existsSync(filePath)) {
+    return next(new AppError('Biodata file not found on server', 404));
+  }
+  
+  // Set appropriate headers for inline viewing
+  res.setHeader('Content-Type', lead.biodataFileType || 'application/octet-stream');
+  res.setHeader('Content-Disposition', 'inline');
+  
+  // Stream the file
+  const fileStream = fs.createReadStream(filePath);
+  fileStream.pipe(res);
+}));
+
 // POST /api/leads - Create a new lead (PUBLIC ACCESS)
 router.post('/', catchAsync(async (req, res) => {
   // Add CORS headers for public access

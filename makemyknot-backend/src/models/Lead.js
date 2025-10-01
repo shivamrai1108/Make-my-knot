@@ -93,6 +93,20 @@ const leadSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
+  biodataFilePath: {
+    type: String,
+    trim: true
+  },
+  biodataFileSize: {
+    type: Number
+  },
+  biodataFileType: {
+    type: String,
+    trim: true
+  },
+  biodataUploadedAt: {
+    type: Date
+  },
   
   // Legacy answers field for backward compatibility
   answers: {

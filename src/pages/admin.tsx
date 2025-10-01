@@ -3425,52 +3425,101 @@ function CRMLeadsTab() {
               )}
               
               {/* Biodata Section */}
-              {selectedLead.answers?.hasBiodata && (
+              {(selectedLead.hasBiodata || selectedLead.answers?.hasBiodata) && (
                 <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-                  <h4 className="font-semibold text-blue-900 mb-3">Biodata Document</h4>
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <FileText className="h-5 w-5 text-blue-600" />
-                      <span className="text-sm font-medium text-blue-900">
-                        {selectedLead.answers?.biodataFileName || 'biodata.pdf'}
-                      </span>
+                  <h4 className="font-semibold text-blue-900 mb-3 flex items-center gap-2">
+                    <FileText className="h-5 w-5 text-blue-600" />
+                    Biodata Document
+                  </h4>
+                  <div className="space-y-3">
+                    <div className="bg-white p-3 rounded border">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-blue-900">
+                            {selectedLead.biodataFileName || selectedLead.answers?.biodataFileName || 'biodata.pdf'}
+                          </p>
+                          {selectedLead.biodataFileSize && (
+                            <p className="text-xs text-blue-700">
+                              Size: {(selectedLead.biodataFileSize / 1024 / 1024).toFixed(2)} MB
+                            </p>
+                          )}
+                          {selectedLead.biodataUploadedAt && (
+                            <p className="text-xs text-blue-600">
+                              Uploaded: {new Date(selectedLead.biodataUploadedAt).toLocaleDateString()}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={async () => {
+                              try {
+                                const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://make-my-knot-production.up.railway.app/api'
+                                const token = localStorage.getItem('makemyknot_token')
+                                
+                                if (!token) {
+                                  alert('Authentication required. Please log in again.')
+                                  return
+                                }
+                                
+                                const response = await fetch(`${API_URL}/leads/${selectedLead.id}/biodata/download`, {
+                                  headers: {
+                                    'Authorization': `Bearer ${token}`
+                                  }
+                                })
+                                
+                                if (response.ok) {
+                                  const blob = await response.blob()
+                                  const url = URL.createObjectURL(blob)
+                                  const a = document.createElement('a')
+                                  a.href = url
+                                  a.download = selectedLead.biodataFileName || `biodata_${selectedLead.name}.pdf`
+                                  document.body.appendChild(a)
+                                  a.click()
+                                  document.body.removeChild(a)
+                                  URL.revokeObjectURL(url)
+                                } else {
+                                  alert('Failed to download biodata file')
+                                }
+                              } catch (error) {
+                                console.error('Download error:', error)
+                                alert('Error downloading biodata file')
+                              }
+                            }}
+                            className="text-blue-600 hover:text-blue-900 flex items-center gap-1 px-3 py-1.5 rounded border border-blue-200 hover:bg-blue-100 transition-colors"
+                          >
+                            <Download className="h-4 w-4" />
+                            Download
+                          </button>
+                          <button
+                            onClick={async () => {
+                              try {
+                                const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://make-my-knot-production.up.railway.app/api'
+                                const token = localStorage.getItem('makemyknot_token')
+                                
+                                if (!token) {
+                                  alert('Authentication required. Please log in again.')
+                                  return
+                                }
+                                
+                                const viewUrl = `${API_URL}/leads/${selectedLead.id}/biodata/view?token=${token}`
+                                window.open(viewUrl, '_blank')
+                              } catch (error) {
+                                console.error('View error:', error)
+                                alert('Error viewing biodata file')
+                              }
+                            }}
+                            className="text-green-600 hover:text-green-900 flex items-center gap-1 px-3 py-1.5 rounded border border-green-200 hover:bg-green-100 transition-colors"
+                          >
+                            <Eye className="h-4 w-4" />
+                            View
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                    <button
-                      onClick={() => {
-                        if (selectedLead.biodataFile) {
-                          const url = URL.createObjectURL(selectedLead.biodataFile)
-                          const a = document.createElement('a')
-                          a.href = url
-                          a.download = selectedLead.answers?.biodataFileName || `biodata_${selectedLead.name}.pdf`
-                          document.body.appendChild(a)
-                          a.click()
-                          document.body.removeChild(a)
-                          URL.revokeObjectURL(url)
-                        } else {
-                          alert('Biodata file not available for download')
-                        }
-                      }}
-                      className="text-blue-600 hover:text-blue-900 flex items-center gap-1 px-3 py-1 rounded border border-blue-200 hover:bg-blue-100"
-                    >
-                      <Download className="h-4 w-4" />
-                      Download
-                    </button>
-                    {selectedLead.biodataFile && selectedLead.biodataFile.type === 'application/pdf' && (
-                      <button
-                        onClick={() => {
-                          const url = URL.createObjectURL(selectedLead.biodataFile)
-                          window.open(url, '_blank')
-                        }}
-                        className="text-green-600 hover:text-green-900 flex items-center gap-1 px-3 py-1 rounded border border-green-200 hover:bg-green-100"
-                      >
-                        <Eye className="h-4 w-4" />
-                        View
-                      </button>
-                    )}
+                    <p className="text-blue-700 text-xs">
+                      ℹ️ Biodata files are securely stored on the server and can be downloaded or viewed for verification purposes.
+                    </p>
                   </div>
-                  <p className="text-blue-700 text-xs mt-2">
-                    Uploaded biodata document - Admin can view and download for verification purposes
-                  </p>
                 </div>
               )}
 

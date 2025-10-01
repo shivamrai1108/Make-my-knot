@@ -333,37 +333,62 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
     const leadId = Date.now().toString()
     console.log('🔍 FORM DEBUG: Generated leadId:', leadId);
     
-    // Include additional profile data in answers
-    const enhancedAnswers = {
-      ...answers,
-      dateOfBirth: contact.dateOfBirth,
-      countryCode: contact.countryCode,
-      fullPhoneNumber: contact.countryCode + contact.phone,
-      biodataFileName: biodataFile?.name || null,
-      hasBiodata: !!biodataFile,
-      hasPassword: true // Password will be saved separately for security
-    }
-    
-    const lead: Lead = {
-      id: leadId,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      name: contact.name,
-      email: contact.email,
-      phone: contact.phone, // Store just the phone number
-      password: contact.password, // Store password for account creation
-      dateOfBirth: contact.dateOfBirth, // Set as direct field
-      countryCode: contact.countryCode, // Set as direct field
-      answers: enhancedAnswers,
-      status: 'new',
-      biodataFile: biodataFile // Store file for admin access
-    }
-    
-    console.log('🔍 FORM DEBUG: Lead object created:', lead);
-    
     try {
+      // Step 1: Upload biodata file if present
+      let biodataUploadResult = null;
+      if (biodataFile) {
+        console.log('📎 Uploading biodata file:', biodataFile.name);
+        
+        const formData = new FormData();
+        formData.append('biodataFile', biodataFile);
+        formData.append('email', contact.email);
+        
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://make-my-knot-production.up.railway.app/api';
+        
+        const biodataResponse = await fetch(`${API_URL}/leads/biodata`, {
+          method: 'POST',
+          body: formData
+        });
+        
+        if (biodataResponse.ok) {
+          biodataUploadResult = await biodataResponse.json();
+          console.log('✅ Biodata uploaded successfully:', biodataUploadResult.data);
+        } else {
+          console.warn('⚠️ Biodata upload failed:', biodataResponse.status);
+          // Continue with lead creation even if biodata upload fails
+        }
+      }
+      
+      // Step 2: Create/update lead with questionnaire data
+      const enhancedAnswers = {
+        ...answers,
+        dateOfBirth: contact.dateOfBirth,
+        countryCode: contact.countryCode,
+        fullPhoneNumber: contact.countryCode + contact.phone,
+        biodataFileName: biodataFile?.name || null,
+        hasBiodata: !!biodataFile && !!biodataUploadResult,
+        hasPassword: true // Password will be saved separately for security
+      }
+      
+      const lead: Lead = {
+        id: leadId,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        name: contact.name,
+        email: contact.email,
+        phone: contact.phone, // Store just the phone number
+        password: contact.password, // Store password for account creation
+        dateOfBirth: contact.dateOfBirth, // Set as direct field
+        countryCode: contact.countryCode, // Set as direct field
+        answers: enhancedAnswers,
+        status: 'new',
+        biodataFile: biodataFile // Store file for admin access
+      }
+      
+      console.log('🔍 FORM DEBUG: Lead object created:', lead);
       console.log('📦 FORM DEBUG: About to call saveLead with:', lead);
-      // Use local-first saving approach - this will save to localStorage immediately
+      
+      // Save lead to MongoDB
       const savedLead = await saveLead(lead)
       console.log('✅ FORM DEBUG: Lead saved successfully:', savedLead);
       
@@ -375,15 +400,9 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
       onSubmitted?.()
       
     } catch (error) {
-      console.error('Error saving lead locally:', error)
-      // Even if there's an error, we'll still proceed since local saving should work
-      // The background sync will handle database saving
-      sessionStorage.setItem('leadSubmitted', 'true')
-      sessionStorage.setItem('leadId', leadId)
-      
-      setSubmitted(true)
-      setLeadId(leadId)
-      onSubmitted?.()
+      console.error('Error saving lead:', error)
+      setIsProcessing(false)
+      alert('There was an error submitting your information. Please try again.')
     }
   }
 
@@ -610,14 +629,14 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
             )}
           </div>
 
-          {/* Optional Biodata Upload */}
-          <div className="mb-3 sm:mb-4">
-            <label className="block text-xs sm:text-sm font-medium text-white/90 mb-1 sm:mb-2">
-              <Upload className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
+          {/* Optional Biodata Upload - Compact */}
+          <div className="mb-2 sm:mb-3">
+            <label className="block text-xs font-medium text-white/90 mb-1">
+              <Upload className="w-3 h-3 inline mr-1" />
               Upload Biodata (Optional)
             </label>
-            <p className="text-xs text-white/70 mb-2 sm:mb-3">
-              Upload your biodata in PDF or JPEG format (max 5MB) to help us serve you better
+            <p className="text-xs text-white/70 mb-1.5">
+              PDF or JPEG (max 5MB)
             </p>
             
             {!biodataFile ? (
@@ -629,18 +648,17 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                   id="biodata-upload"
                 />
-                <div className="border-2 border-dashed border-white/30 rounded-lg p-2 sm:p-3 text-center hover:border-white/50 hover:bg-white/10 transition-colors">
-                  <Upload className="h-4 w-4 sm:h-5 sm:w-5 text-white/70 mx-auto mb-1" />
-                  <p className="text-xs text-white/80 mb-0.5">Click to upload biodata</p>
-                  <p className="text-xs text-white/60">PDF or JPEG files only</p>
+                <div className="border border-dashed border-white/30 rounded-md p-2 text-center hover:border-white/50 hover:bg-white/10 transition-colors">
+                  <Upload className="h-3 w-3 text-white/70 mx-auto mb-0.5" />
+                  <p className="text-xs text-white/80">Click to upload</p>
                 </div>
               </div>
             ) : (
-              <div className="border border-white/30 bg-white/10 rounded-lg p-3 flex items-center justify-between min-w-0">
+              <div className="border border-white/30 bg-white/10 rounded-md p-2 flex items-center justify-between min-w-0">
                 <div className="flex items-center min-w-0 flex-1">
-                  <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 mr-2 flex-shrink-0" />
+                  <CheckCircle className="h-3 w-3 text-green-400 mr-1.5 flex-shrink-0" />
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs sm:text-sm font-medium text-white truncate">{biodataFile.name}</p>
+                    <p className="text-xs font-medium text-white truncate">{biodataFile.name}</p>
                     <p className="text-xs text-white/70">{(biodataFile.size / 1024 / 1024).toFixed(1)} MB</p>
                   </div>
                 </div>
@@ -649,13 +667,13 @@ export default function LeadQuestionnaire({ onSubmitted }: Props) {
                   onClick={removeBiodataFile}
                   className="text-white/60 hover:text-white/90 transition-colors flex-shrink-0 ml-2"
                 >
-                  <X className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <X className="h-3 w-3" />
                 </button>
               </div>
             )}
             
             {uploadError && (
-              <p className="text-red-400 text-xs mt-1 sm:mt-2">{uploadError}</p>
+              <p className="text-red-400 text-xs mt-1">{uploadError}</p>
             )}
           </div>
 
