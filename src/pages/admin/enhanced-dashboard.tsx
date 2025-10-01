@@ -1013,25 +1013,31 @@ export default function EnhancedAdminDashboard() {
                           {/* Lead Questionnaire Data */}
                           {lead.answers && (
                             <div className="bg-gray-50 rounded-lg p-3 mb-3">
-                              <h4 className="text-sm font-medium text-gray-900 mb-2">Lead Information:</h4>
-                              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
-                                {lead.genderIdentity && (
-                                  <div><span className="text-gray-600">Gender:</span> <span className="font-medium">{lead.genderIdentity}</span></div>
+                              <h4 className="text-sm font-medium text-gray-900 mb-2">Lead Questionnaire Answers:</h4>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+                                {lead.answers.matchmaking_experience && (
+                                  <div><span className="text-gray-600">Matchmaking Experience:</span> <span className="font-medium">{lead.answers.matchmaking_experience}</span></div>
                                 )}
-                                {lead.openToMeeting && (
-                                  <div><span className="text-gray-600">Seeking:</span> <span className="font-medium">{lead.openToMeeting}</span></div>
+                                {lead.answers.gender_identity && (
+                                  <div><span className="text-gray-600">Gender Identity:</span> <span className="font-medium">{lead.answers.gender_identity}</span></div>
                                 )}
-                                {lead.preferredAgeRange && (
-                                  <div><span className="text-gray-600">Age Pref:</span> <span className="font-medium">{lead.preferredAgeRange}</span></div>
+                                {lead.answers.open_to_meeting && (
+                                  <div><span className="text-gray-600">Open to Meeting:</span> <span className="font-medium">{lead.answers.open_to_meeting}</span></div>
                                 )}
-                                {lead.currentLocation && (
-                                  <div><span className="text-gray-600">Location:</span> <span className="font-medium">{lead.currentLocation}</span></div>
+                                {lead.answers.preferred_age_range && (
+                                  <div><span className="text-gray-600">Preferred Age Range:</span> <span className="font-medium">{lead.answers.preferred_age_range}</span></div>
                                 )}
-                                {lead.matchmakingExperience && (
-                                  <div><span className="text-gray-600">Experience:</span> <span className="font-medium">{lead.matchmakingExperience}</span></div>
+                                {lead.answers.current_location && (
+                                  <div><span className="text-gray-600">Current Location:</span> <span className="font-medium">{lead.answers.current_location}</span></div>
                                 )}
-                                {lead.hasBiodata && (
-                                  <div><span className="text-gray-600">Biodata:</span> <span className="font-medium text-green-600">Uploaded</span></div>
+                                {lead.answers.dateOfBirth && (
+                                  <div><span className="text-gray-600">Date of Birth:</span> <span className="font-medium">{lead.answers.dateOfBirth}</span></div>
+                                )}
+                                {lead.answers.hasBiodata !== undefined && (
+                                  <div><span className="text-gray-600">Has Biodata:</span> <span className={`font-medium ${lead.answers.hasBiodata ? 'text-green-600' : 'text-red-600'}`}>{lead.answers.hasBiodata ? 'Yes' : 'No'}</span></div>
+                                )}
+                                {lead.answers.biodataFileName && (
+                                  <div><span className="text-gray-600">Biodata File:</span> <span className="font-medium text-blue-600">{lead.answers.biodataFileName}</span></div>
                                 )}
                               </div>
                             </div>
