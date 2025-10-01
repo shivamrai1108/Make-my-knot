@@ -3319,6 +3319,62 @@ function CRMLeadsTab() {
                 </div>
               </div>
 
+              {/* Lead Questionnaire Answers */}
+              {selectedLead.answers && (
+                <div className="mb-6 p-4 bg-indigo-50 rounded-lg">
+                  <h4 className="font-semibold text-indigo-900 mb-3">Lead Questionnaire Answers</h4>
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {/* Matchmaking Experience */}
+                    {selectedLead.answers.matchmaking_experience && (
+                      <div className="p-3 border border-indigo-200 rounded-lg bg-white hover:bg-indigo-50 transition-colors">
+                        <div className="text-xs font-semibold text-indigo-700 uppercase mb-1">Matchmaking Experience</div>
+                        <div className="text-sm text-gray-900">{selectedLead.answers.matchmaking_experience}</div>
+                      </div>
+                    )}
+                    
+                    {/* Gender Identity */}
+                    {selectedLead.answers.gender_identity && (
+                      <div className="p-3 border border-indigo-200 rounded-lg bg-white hover:bg-indigo-50 transition-colors">
+                        <div className="text-xs font-semibold text-indigo-700 uppercase mb-1">Gender Identity</div>
+                        <div className="text-sm text-gray-900">{selectedLead.answers.gender_identity}</div>
+                      </div>
+                    )}
+                    
+                    {/* Open to Meeting */}
+                    {selectedLead.answers.open_to_meeting && (
+                      <div className="p-3 border border-indigo-200 rounded-lg bg-white hover:bg-indigo-50 transition-colors">
+                        <div className="text-xs font-semibold text-indigo-700 uppercase mb-1">Open to Meeting</div>
+                        <div className="text-sm text-gray-900">{selectedLead.answers.open_to_meeting}</div>
+                      </div>
+                    )}
+                    
+                    {/* Preferred Age Range */}
+                    {selectedLead.answers.preferred_age_range && (
+                      <div className="p-3 border border-indigo-200 rounded-lg bg-white hover:bg-indigo-50 transition-colors">
+                        <div className="text-xs font-semibold text-indigo-700 uppercase mb-1">Preferred Age Range</div>
+                        <div className="text-sm text-gray-900">{selectedLead.answers.preferred_age_range}</div>
+                      </div>
+                    )}
+                    
+                    {/* Current Location */}
+                    {selectedLead.answers.current_location && (
+                      <div className="p-3 border border-indigo-200 rounded-lg bg-white hover:bg-indigo-50 transition-colors">
+                        <div className="text-xs font-semibold text-indigo-700 uppercase mb-1">Current Location</div>
+                        <div className="text-sm text-gray-900">{selectedLead.answers.current_location}</div>
+                      </div>
+                    )}
+                    
+                    {/* Date of Birth */}
+                    {selectedLead.answers.dateOfBirth && (
+                      <div className="p-3 border border-indigo-200 rounded-lg bg-white hover:bg-indigo-50 transition-colors">
+                        <div className="text-xs font-semibold text-indigo-700 uppercase mb-1">Date of Birth</div>
+                        <div className="text-sm text-gray-900">{selectedLead.answers.dateOfBirth}</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+              
               {/* Biodata Section */}
               {selectedLead.answers?.hasBiodata && (
                 <div className="mb-6 p-4 bg-blue-50 rounded-lg">
