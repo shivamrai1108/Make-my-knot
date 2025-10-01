@@ -276,8 +276,25 @@ async function saveAssessmentResponseAPIWithRetry(response: QuestionnaireRespons
       clearTimeout(timeoutId)
 
       if (!response_api.ok) {
-        const errorData = await response_api.text()
-        throw new Error(`API Error: ${response_api.status} - ${errorData}`)
+        let errorMessage = 'Failed to save assessment. Please try again.'
+        let errorDetails = {}
+        
+        try {
+          const errorData = await response_api.json()
+          if (errorData.message) {
+            errorMessage = errorData.message
+          }
+          if (errorData.code) {
+            errorDetails = { code: errorData.code, details: errorData.details || {} }
+          }
+        } catch (parseError) {
+          // Fallback to text if JSON parsing fails
+          const errorText = await response_api.text()
+          errorMessage = errorText || errorMessage
+        }
+        
+        console.error(`❌ Assessment API Error (${response_api.status}):`, { errorMessage, errorDetails })
+        throw new Error(errorMessage)
       }
 
       const result = await response_api.json()
@@ -439,7 +456,7 @@ export async function getAssessmentResponses(): Promise<QuestionnaireResponse[]>
     console.log(`✅ Processed ${assessments.length} assessment responses`)
     
     // Debug Samsung bhai specifically
-    const samsungData = assessments.find(a => a.userName?.toLowerCase().includes('samsung'))
+    const samsungData = assessments.find((a: any) => a.userName?.toLowerCase().includes('samsung'))
     if (samsungData) {
       console.log('👑 Samsung bhai found in API response:', {
         id: samsungData.id,
@@ -449,7 +466,7 @@ export async function getAssessmentResponses(): Promise<QuestionnaireResponse[]>
       })
     } else {
       console.log('⚠️ Samsung bhai NOT found in processed assessments')
-      console.log('🔎 Available names:', assessments.map(a => a.userName))
+      console.log('🔎 Available names:', assessments.map((a: any) => a.userName))
     }
     
     return assessments
