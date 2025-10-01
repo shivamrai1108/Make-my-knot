@@ -1,0 +1,1363 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Make My Knot - Project Handover Documentation</title>
+    <style>
+        @page {
+            margin: 1in;
+            size: A4;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #2d3748;
+            max-width: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        h1 {
+            color: #1a202c;
+            font-size: 28px;
+            border-bottom: 3px solid #4f46e5;
+            padding-bottom: 10px;
+            page-break-after: avoid;
+        }
+        
+        h2 {
+            color: #2d3748;
+            font-size: 22px;
+            margin-top: 30px;
+            page-break-after: avoid;
+        }
+        
+        h3 {
+            color: #4a5568;
+            font-size: 18px;
+            margin-top: 25px;
+            page-break-after: avoid;
+        }
+        
+        h4 {
+            color: #4a5568;
+            font-size: 16px;
+            margin-top: 20px;
+            page-break-after: avoid;
+        }
+        
+        pre {
+            background: #f7fafc;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            border-left: 4px solid #4f46e5;
+            font-size: 12px;
+            page-break-inside: avoid;
+        }
+        
+        code {
+            background: #edf2f7;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        
+        .toc {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #4f46e5;
+            page-break-inside: avoid;
+        }
+        
+        .toc ul {
+            list-style-type: none;
+            padding-left: 20px;
+        }
+        
+        .toc li {
+            margin: 8px 0;
+        }
+        
+        .toc a {
+            color: #4f46e5;
+            text-decoration: none;
+        }
+        
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+            page-break-inside: avoid;
+        }
+        
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background: #f7fafc;
+            font-weight: 600;
+        }
+        
+        .section-break {
+            page-break-before: always;
+        }
+        
+        .no-break {
+            page-break-inside: avoid;
+        }
+        
+        ul, ol {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        
+        li {
+            margin: 8px 0;
+        }
+        
+        blockquote {
+            border-left: 4px solid #4f46e5;
+            margin: 20px 0;
+            padding: 15px 20px;
+            background: #f7fafc;
+            font-style: italic;
+        }
+        
+        .checklist {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .checklist li::before {
+            content: "✅ ";
+            color: #48bb78;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        
+        .todo-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .todo-list li::before {
+            content: "☐ ";
+            color: #a0aec0;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        
+        /* Print-specific styles */
+        @media print {
+            body {
+                font-size: 12px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            h2 {
+                font-size: 20px;
+            }
+            
+            h3 {
+                font-size: 16px;
+            }
+            
+            pre {
+                font-size: 10px;
+            }
+            
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>PROJECT_HANDOVER_DOCUMENTATION</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="/dev/fd/11" />
+</head>
+
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#make-my-knot---complete-project-handover-documentation"
+id="toc-make-my-knot---complete-project-handover-documentation">Make My
+Knot - Complete Project Handover Documentation</a>
+<ul>
+<li><a href="#table-of-contents" id="toc-table-of-contents">📋 Table of
+Contents</a></li>
+<li><a href="#project-overview" id="toc-project-overview">🎯 Project
+Overview</a>
+<ul>
+<li><a href="#key-statistics" id="toc-key-statistics">Key
+Statistics</a></li>
+<li><a href="#core-value-proposition"
+id="toc-core-value-proposition">Core Value Proposition</a></li>
+</ul></li>
+<li><a href="#technical-architecture" id="toc-technical-architecture">🏗️
+Technical Architecture</a>
+<ul>
+<li><a href="#frontend-stack" id="toc-frontend-stack">Frontend
+Stack</a></li>
+<li><a href="#key-dependencies" id="toc-key-dependencies">Key
+Dependencies</a></li>
+<li><a href="#architecture-pattern"
+id="toc-architecture-pattern">Architecture Pattern</a></li>
+</ul></li>
+<li><a href="#design-system-ui" id="toc-design-system-ui">🎨 Design
+System &amp; UI</a>
+<ul>
+<li><a href="#color-palette" id="toc-color-palette">Color
+Palette</a></li>
+<li><a href="#typography" id="toc-typography">Typography</a></li>
+<li><a href="#gradients" id="toc-gradients">Gradients</a></li>
+<li><a href="#box-shadows" id="toc-box-shadows">Box Shadows</a></li>
+</ul></li>
+<li><a href="#features-components" id="toc-features-components">🚀
+Features &amp; Components</a>
+<ul>
+<li><a href="#core-pages" id="toc-core-pages">Core Pages</a></li>
+<li><a href="#key-components" id="toc-key-components">Key
+Components</a></li>
+</ul></li>
+<li><a href="#database-data-flow" id="toc-database-data-flow">🗄️
+Database &amp; Data Flow</a>
+<ul>
+<li><a href="#current-implementation"
+id="toc-current-implementation">Current Implementation</a></li>
+<li><a href="#blog-data-model" id="toc-blog-data-model">Blog Data
+Model</a></li>
+<li><a href="#user-data-model-inferred"
+id="toc-user-data-model-inferred">User Data Model (Inferred)</a></li>
+<li><a href="#data-flow-architecture"
+id="toc-data-flow-architecture">Data Flow Architecture</a></li>
+</ul></li>
+<li><a href="#api-documentation" id="toc-api-documentation">🔌 API
+Documentation</a>
+<ul>
+<li><a href="#blog-api-apiblogs" id="toc-blog-api-apiblogs">Blog API
+(<code>/api/blogs</code>)</a></li>
+<li><a href="#contact-api-apicontact"
+id="toc-contact-api-apicontact">Contact API
+(<code>/api/contact</code>)</a></li>
+<li><a href="#webinar-api-apiwebinar-registration"
+id="toc-webinar-api-apiwebinar-registration">Webinar API
+(<code>/api/webinar-registration</code>)</a></li>
+</ul></li>
+<li><a href="#setup-installation" id="toc-setup-installation">🛠️ Setup
+&amp; Installation</a>
+<ul>
+<li><a href="#prerequisites"
+id="toc-prerequisites">Prerequisites</a></li>
+<li><a href="#local-development-setup"
+id="toc-local-development-setup">Local Development Setup</a></li>
+<li><a href="#build-for-production" id="toc-build-for-production">Build
+for Production</a></li>
+</ul></li>
+<li><a href="#deployment-guide" id="toc-deployment-guide">🚢 Deployment
+Guide</a>
+<ul>
+<li><a href="#vercel-deployment-recommended"
+id="toc-vercel-deployment-recommended">Vercel Deployment
+(Recommended)</a></li>
+<li><a href="#other-platforms" id="toc-other-platforms">Other
+Platforms</a></li>
+<li><a href="#performance-optimizations"
+id="toc-performance-optimizations">Performance Optimizations</a></li>
+</ul></li>
+<li><a href="#code-structure" id="toc-code-structure">📁 Code
+Structure</a>
+<ul>
+<li><a href="#directory-overview" id="toc-directory-overview">Directory
+Overview</a></li>
+<li><a href="#component-organization"
+id="toc-component-organization">Component Organization</a></li>
+</ul></li>
+<li><a href="#key-logic-functions" id="toc-key-logic-functions">⚙️ Key
+Logic &amp; Functions</a>
+<ul>
+<li><a href="#blog-management-system" id="toc-blog-management-system">1.
+Blog Management System</a></li>
+<li><a href="#seo-system" id="toc-seo-system">2. SEO System</a></li>
+<li><a href="#rich-text-editor-integration"
+id="toc-rich-text-editor-integration">3. Rich Text Editor
+Integration</a></li>
+<li><a href="#error-handling-pattern" id="toc-error-handling-pattern">4.
+Error Handling Pattern</a></li>
+</ul></li>
+<li><a href="#environment-variables" id="toc-environment-variables">🔐
+Environment Variables</a>
+<ul>
+<li><a href="#development-.env.local"
+id="toc-development-.env.local">Development
+(<code>.env.local</code>)</a></li>
+<li><a href="#production-.env.production"
+id="toc-production-.env.production">Production
+(<code>.env.production</code>)</a></li>
+<li><a href="#environment-variable-usage"
+id="toc-environment-variable-usage">Environment Variable Usage</a></li>
+</ul></li>
+<li><a href="#known-issues-todos" id="toc-known-issues-todos">⚠️ Known
+Issues &amp; TODOs</a>
+<ul>
+<li><a href="#current-limitations" id="toc-current-limitations">Current
+Limitations</a></li>
+<li><a href="#immediate-todos" id="toc-immediate-todos">Immediate
+TODOs</a></li>
+</ul></li>
+<li><a href="#future-enhancements" id="toc-future-enhancements">🚀
+Future Enhancements</a>
+<ul>
+<li><a href="#phase-1-core-functionality-1-2-months"
+id="toc-phase-1-core-functionality-1-2-months">Phase 1: Core
+Functionality (1-2 months)</a></li>
+<li><a href="#phase-2-advanced-features-2-3-months"
+id="toc-phase-2-advanced-features-2-3-months">Phase 2: Advanced Features
+(2-3 months)</a></li>
+<li><a href="#phase-3-scale-optimize-3-6-months"
+id="toc-phase-3-scale-optimize-3-6-months">Phase 3: Scale &amp; Optimize
+(3-6 months)</a></li>
+</ul></li>
+<li><a href="#support-maintenance" id="toc-support-maintenance">📞
+Support &amp; Maintenance</a>
+<ul>
+<li><a href="#code-maintenance" id="toc-code-maintenance">Code
+Maintenance</a></li>
+<li><a href="#content-management" id="toc-content-management">Content
+Management</a></li>
+<li><a href="#monitoring-alerts" id="toc-monitoring-alerts">Monitoring
+&amp; Alerts</a></li>
+</ul></li>
+<li><a href="#documentation-resources"
+id="toc-documentation-resources">📄 Documentation &amp; Resources</a>
+<ul>
+<li><a href="#developer-resources"
+id="toc-developer-resources">Developer Resources</a></li>
+<li><a href="#design-resources" id="toc-design-resources">Design
+Resources</a></li>
+<li><a href="#seo-resources" id="toc-seo-resources">SEO
+Resources</a></li>
+</ul></li>
+<li><a href="#project-handover-checklist"
+id="toc-project-handover-checklist">🏁 Project Handover Checklist</a>
+<ul>
+<li><a href="#completed-items" id="toc-completed-items">✅ Completed
+Items</a></li>
+<li><a href="#handover-requirements" id="toc-handover-requirements">🔄
+Handover Requirements</a></li>
+<li><a href="#next-steps-for-new-developer"
+id="toc-next-steps-for-new-developer">📋 Next Steps for New
+Developer</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="make-my-knot---complete-project-handover-documentation">Make My
+Knot - Complete Project Handover Documentation</h1>
+<h2 id="table-of-contents">📋 Table of Contents</h2>
+<ol type="1">
+<li><a href="#project-overview">Project Overview</a></li>
+<li><a href="#technical-architecture">Technical Architecture</a></li>
+<li><a href="#design-system--ui">Design System &amp; UI</a></li>
+<li><a href="#features--components">Features &amp; Components</a></li>
+<li><a href="#database--data-flow">Database &amp; Data Flow</a></li>
+<li><a href="#api-documentation">API Documentation</a></li>
+<li><a href="#setup--installation">Setup &amp; Installation</a></li>
+<li><a href="#deployment-guide">Deployment Guide</a></li>
+<li><a href="#code-structure">Code Structure</a></li>
+<li><a href="#key-logic--functions">Key Logic &amp; Functions</a></li>
+<li><a href="#environment-variables">Environment Variables</a></li>
+<li><a href="#known-issues--todos">Known Issues &amp; TODOs</a></li>
+<li><a href="#future-enhancements">Future Enhancements</a></li>
+</ol>
+<hr />
+<h2 id="project-overview">🎯 Project Overview</h2>
+<p><strong>Make My Knot</strong> is a modern AI-powered matchmaking
+platform designed for the Indian market. It provides comprehensive
+matrimonial services with personalized matching, compatibility
+assessments, and relationship counseling.</p>
+<h3 id="key-statistics">Key Statistics</h3>
+<ul>
+<li><strong>Framework</strong>: Next.js 14.0.4 (React 18)</li>
+<li><strong>Language</strong>: TypeScript</li>
+<li><strong>Styling</strong>: Tailwind CSS</li>
+<li><strong>Package Manager</strong>: npm</li>
+<li><strong>Build Status</strong>: ✅ Production Ready</li>
+</ul>
+<h3 id="core-value-proposition">Core Value Proposition</h3>
+<ul>
+<li>Premium matchmaking services with 95% success rate</li>
+<li>AI-powered compatibility matching</li>
+<li>Expert relationship counseling</li>
+<li>Comprehensive blog management system</li>
+<li>Multi-language support (Hindi/English)</li>
+</ul>
+<hr />
+<h2 id="technical-architecture">🏗️ Technical Architecture</h2>
+<h3 id="frontend-stack">Frontend Stack</h3>
+<pre><code>Next.js 14.0.4 (React 18.2.0)
+├── TypeScript 5.3.3
+├── Tailwind CSS 3.3.6
+├── Framer Motion 12.23.12 (Animations)
+├── Lucide React 0.294.0 (Icons)
+├── Lenis 1.3.11 (Smooth Scrolling)
+└── React Quill 2.0.0 (Rich Text Editor)</code></pre>
+<h3 id="key-dependencies">Key Dependencies</h3>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;production&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;@stripe/stripe-js&quot;</span><span class="fu">:</span> <span class="st">&quot;7.9.0&quot;</span><span class="fu">,</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;clsx&quot;</span><span class="fu">:</span> <span class="st">&quot;2.0.0&quot;</span><span class="fu">,</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;html2canvas&quot;</span><span class="fu">:</span> <span class="st">&quot;1.4.1&quot;</span><span class="fu">,</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;jspdf&quot;</span><span class="fu">:</span> <span class="st">&quot;3.0.2&quot;</span><span class="fu">,</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;mongodb&quot;</span><span class="fu">:</span> <span class="st">&quot;6.20.0&quot;</span><span class="fu">,</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;react-dropzone&quot;</span><span class="fu">:</span> <span class="st">&quot;14.3.8&quot;</span><span class="fu">,</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;xlsx&quot;</span><span class="fu">:</span> <span class="st">&quot;0.18.5&quot;</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<h3 id="architecture-pattern">Architecture Pattern</h3>
+<ul>
+<li><strong>Pages Router</strong> (not App Router)</li>
+<li><strong>Server-Side Rendering</strong> for SEO optimization</li>
+<li><strong>Static Site Generation</strong> for performance</li>
+<li><strong>API Routes</strong> for backend functionality</li>
+<li><strong>Component-based Architecture</strong> with reusable UI
+components</li>
+</ul>
+<hr />
+<h2 id="design-system-ui">🎨 Design System &amp; UI</h2>
+<h3 id="color-palette">Color Palette</h3>
+<h4 id="primary-colors">Primary Colors</h4>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode css"><code class="sourceCode css"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>primary<span class="in">:</span> {</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  50<span class="ch">:</span> <span class="st">&#39;#f0f4ff&#39;</span><span class="op">,</span>   <span class="co">/* Very light blue */</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="dv">100</span>: <span class="st">&#39;#e0e7ff&#39;</span><span class="op">,</span>  <span class="co">/* Light blue */</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="dv">200</span>: <span class="st">&#39;#c7d2fe&#39;</span><span class="op">,</span>  <span class="co">/* Soft blue */</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="dv">300</span>: <span class="st">&#39;#a5b4fc&#39;</span><span class="op">,</span>  <span class="co">/* Medium light blue */</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="dv">400</span>: <span class="st">&#39;#818cf8&#39;</span><span class="op">,</span>  <span class="co">/* Medium blue */</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="dv">500</span>: <span class="st">&#39;#6366f1&#39;</span><span class="op">,</span>  <span class="co">/* Base primary */</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="dv">600</span>: <span class="st">&#39;#4f46e5&#39;</span><span class="op">,</span>  <span class="co">/* Dark blue */</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="dv">700</span>: <span class="st">&#39;#4338ca&#39;</span><span class="op">,</span>  <span class="co">/* Darker blue */</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="dv">800</span>: <span class="st">&#39;#3730a3&#39;</span><span class="op">,</span>  <span class="co">/* Very dark blue */</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="dv">900</span>: <span class="st">&#39;#312e81&#39;</span>   <span class="co">/* Deepest blue */</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<h4 id="secondary-colors">Secondary Colors</h4>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode css"><code class="sourceCode css"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>secondary<span class="in">:</span> {</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  50<span class="ch">:</span> <span class="st">&#39;#faf5ff&#39;</span><span class="op">,</span>   <span class="co">/* Very light purple */</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="dv">100</span>: <span class="st">&#39;#f3e8ff&#39;</span><span class="op">,</span>  <span class="co">/* Light purple */</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="dv">200</span>: <span class="st">&#39;#e9d5ff&#39;</span><span class="op">,</span>  <span class="co">/* Soft purple */</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="dv">300</span>: <span class="st">&#39;#d8b4fe&#39;</span><span class="op">,</span>  <span class="co">/* Medium light purple */</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="dv">400</span>: <span class="st">&#39;#c084fc&#39;</span><span class="op">,</span>  <span class="co">/* Medium purple */</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="dv">500</span>: <span class="st">&#39;#a855f7&#39;</span><span class="op">,</span>  <span class="co">/* Base secondary */</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="dv">600</span>: <span class="st">&#39;#9333ea&#39;</span><span class="op">,</span>  <span class="co">/* Dark purple */</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="dv">700</span>: <span class="st">&#39;#7c3aed&#39;</span><span class="op">,</span>  <span class="co">/* Darker purple */</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="dv">800</span>: <span class="st">&#39;#6b21a8&#39;</span><span class="op">,</span>  <span class="co">/* Very dark purple */</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="dv">900</span>: <span class="st">&#39;#581c87&#39;</span>   <span class="co">/* Deepest purple */</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<h4 id="accent-colors">Accent Colors</h4>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode css"><code class="sourceCode css"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>accent/gold<span class="in">:</span> {</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  50<span class="ch">:</span> <span class="st">&#39;#fffbeb&#39;</span><span class="op">,</span>   <span class="co">/* Very light gold */</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="dv">100</span>: <span class="st">&#39;#fef3c7&#39;</span><span class="op">,</span>  <span class="co">/* Light gold */</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="dv">200</span>: <span class="st">&#39;#fde68a&#39;</span><span class="op">,</span>  <span class="co">/* Soft gold */</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="dv">300</span>: <span class="st">&#39;#fcd34d&#39;</span><span class="op">,</span>  <span class="co">/* Medium light gold */</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="dv">400</span>: <span class="st">&#39;#fbbf24&#39;</span><span class="op">,</span>  <span class="co">/* Medium gold */</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="dv">500</span>: <span class="st">&#39;#f59e0b&#39;</span><span class="op">,</span>  <span class="co">/* Base accent */</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="dv">600</span>: <span class="st">&#39;#d97706&#39;</span><span class="op">,</span>  <span class="co">/* Dark gold */</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="dv">700</span>: <span class="st">&#39;#b45309&#39;</span><span class="op">,</span>  <span class="co">/* Darker gold */</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="dv">800</span>: <span class="st">&#39;#92400e&#39;</span><span class="op">,</span>  <span class="co">/* Very dark gold */</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="dv">900</span>: <span class="st">&#39;#78350f&#39;</span>   <span class="co">/* Deepest gold */</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<h4 id="rose-gold-special">Rose Gold (Special)</h4>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode css"><code class="sourceCode css"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>&#39;rose-gold&#39;<span class="in">:</span> {</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  400<span class="ch">:</span> <span class="st">&#39;#f4a261&#39;</span><span class="op">,</span>  <span class="co">/* Light rose gold */</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="dv">500</span>: <span class="st">&#39;#e76f51&#39;</span><span class="op">,</span>  <span class="co">/* Base rose gold */</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="dv">600</span>: <span class="st">&#39;#d62828&#39;</span><span class="op">,</span>  <span class="co">/* Dark rose gold */</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="dv">700</span>: <span class="st">&#39;#b02e0c&#39;</span>   <span class="co">/* Deepest rose gold */</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<h3 id="typography">Typography</h3>
+<h4 id="font-families">Font Families</h4>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode css"><code class="sourceCode css"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>font-family<span class="in">:</span> {</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  &#39;qasira&#39;<span class="ch">:</span> [<span class="st">&#39;Qasira&#39;</span><span class="op">,</span> <span class="st">&#39;Crimson Pro&#39;</span><span class="op">,</span> <span class="st">&#39;Libre Baskerville&#39;</span><span class="op">,</span> <span class="st">&#39;Cormorant Garamond&#39;</span><span class="op">,</span> <span class="st">&#39;Playfair Display&#39;</span><span class="op">,</span> <span class="st">&#39;EB Garamond&#39;</span><span class="op">,</span> <span class="st">&#39;Lora&#39;</span><span class="op">,</span> <span class="st">&#39;serif&#39;</span>]<span class="op">,</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;serif&#39;</span>: [<span class="st">&#39;Playfair Display&#39;</span><span class="op">,</span> <span class="st">&#39;serif&#39;</span>]<span class="op">,</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;sans&#39;</span>: [<span class="st">&#39;Inter&#39;</span><span class="op">,</span> <span class="st">&#39;sans-serif&#39;</span>]</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<h4 id="usage-guidelines">Usage Guidelines</h4>
+<ul>
+<li><strong>Headlines</strong>: font-qasira (elegant, traditional
+feel)</li>
+<li><strong>Body Text</strong>: font-sans (Inter - clean, readable)</li>
+<li><strong>Decorative</strong>: font-serif (Playfair Display)</li>
+</ul>
+<h3 id="gradients">Gradients</h3>
+<h4 id="background-gradients">Background Gradients</h4>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode css"><code class="sourceCode css"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>&#39;gradient-primary&#39;<span class="in">:</span> &#39;linear-gradient<span class="in">(</span>135deg<span class="op">,</span> <span class="pp">#6366f1</span> 0%<span class="op">,</span> <span class="pp">#8b5cf6</span> 50%<span class="op">,</span> <span class="pp">#a855f7</span> 100%<span class="in">)</span>&#39;</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>&#39;gradient-secondary&#39;<span class="in">:</span> &#39;linear-gradient<span class="in">(</span>135deg<span class="op">,</span> <span class="pp">#667eea</span> 0%<span class="op">,</span> <span class="pp">#764ba2</span> 100%<span class="in">)</span>&#39;</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>&#39;gradient-accent&#39;<span class="in">:</span> &#39;linear-gradient<span class="in">(</span>135deg<span class="op">,</span> <span class="pp">#f093fb</span> 0%<span class="op">,</span> <span class="pp">#f5576c</span> 100%<span class="in">)</span>&#39;</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>&#39;gradient-gold&#39;<span class="in">:</span> &#39;linear-gradient<span class="in">(</span>135deg<span class="op">,</span> <span class="pp">#ffd89b</span> 0%<span class="op">,</span> <span class="pp">#19547b</span> 100%<span class="in">)</span>&#39;</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>&#39;gradient-royal&#39;<span class="in">:</span> &#39;linear-gradient<span class="in">(</span>135deg<span class="op">,</span> <span class="pp">#1e3c72</span> 0%<span class="op">,</span> <span class="pp">#2a5298</span> 100%<span class="in">)</span>&#39;</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>&#39;gradient-sunset&#39;<span class="in">:</span> &#39;linear-gradient<span class="in">(</span>135deg<span class="op">,</span> <span class="pp">#ff9a9e</span> 0%<span class="op">,</span> <span class="pp">#fecfef</span> 50%<span class="op">,</span> <span class="pp">#fecfef</span> 100%<span class="in">)</span>&#39;</span></code></pre></div>
+<h3 id="box-shadows">Box Shadows</h3>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode css"><code class="sourceCode css"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>&#39;primary&#39;<span class="in">:</span> &#39;0 4px 14px 0 rgba<span class="in">(</span>99<span class="op">,</span> 102<span class="op">,</span> 241<span class="op">,</span> 0<span class="fu">.15</span><span class="in">)</span>&#39;</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>&#39;secondary&#39;<span class="in">:</span> &#39;0 4px 14px 0 rgba<span class="in">(</span>168<span class="op">,</span> 85<span class="op">,</span> 247<span class="op">,</span> 0<span class="fu">.15</span><span class="in">)</span>&#39;</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>&#39;accent&#39;<span class="in">:</span> &#39;0 4px 14px 0 rgba<span class="in">(</span>245<span class="op">,</span> 158<span class="op">,</span> 11<span class="op">,</span> 0<span class="fu">.15</span><span class="in">)</span>&#39;</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>&#39;glow&#39;<span class="in">:</span> &#39;0 0 40px rgba<span class="in">(</span>99<span class="op">,</span> 102<span class="op">,</span> 241<span class="op">,</span> 0<span class="fu">.3</span><span class="in">)</span>&#39;</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>&#39;glow-lg&#39;<span class="in">:</span> &#39;0 0 60px rgba<span class="in">(</span>99<span class="op">,</span> 102<span class="op">,</span> 241<span class="op">,</span> 0<span class="fu">.4</span><span class="in">)</span>&#39;</span></code></pre></div>
+<hr />
+<h2 id="features-components">🚀 Features &amp; Components</h2>
+<h3 id="core-pages">Core Pages</h3>
+<h4 id="homepage">1. Homepage (<code>/</code>)</h4>
+<ul>
+<li>Hero section with CTA</li>
+<li>Success stories carousel</li>
+<li>Service highlights</li>
+<li>Trust indicators</li>
+<li>SEO optimized</li>
+</ul>
+<h4 id="authentication-system">2. Authentication System</h4>
+<ul>
+<li><strong>Login</strong> (<code>/login</code>) - User
+authentication</li>
+<li><strong>Signup</strong> (<code>/signup</code>) - User
+registration</li>
+<li><strong>Password Reset</strong> (<code>/forgot-password</code>,
+<code>/reset-password</code>)</li>
+</ul>
+<h4 id="user-dashboard-dashboard">3. User Dashboard
+(<code>/dashboard</code>)</h4>
+<ul>
+<li>Profile management</li>
+<li>Match suggestions</li>
+<li>Messages/conversations</li>
+<li>Settings</li>
+</ul>
+<h4 id="assessment-system">4. Assessment System</h4>
+<ul>
+<li><strong>Compatibility Test</strong> (<code>/assessment</code>) -
+AI-powered matching</li>
+<li><strong>Questionnaire</strong> (<code>/questionnaire</code>) -
+Detailed preferences</li>
+<li><strong>Lead Signup</strong> (<code>/lead-signup</code>) - Quick
+registration</li>
+</ul>
+<h4 id="blog-system">5. Blog System</h4>
+<ul>
+<li><strong>Blog Listing</strong> (<code>/blog</code>) - SEO-optimized
+blog index</li>
+<li><strong>Individual Posts</strong> (<code>/blog/[slug]</code>) -
+Dynamic blog posts</li>
+<li><strong>Admin Panel</strong> - Complete CMS for blog management</li>
+</ul>
+<h4 id="admin-system">6. Admin System</h4>
+<ul>
+<li><strong>Admin Login</strong> (<code>/admin/login</code>)</li>
+<li><strong>Dashboard</strong> (<code>/admin/dashboard</code>,
+<code>/admin/enhanced-dashboard</code>)</li>
+<li><strong>Blog Management</strong> (<code>/admin</code> -
+comprehensive blog CMS)</li>
+</ul>
+<h3 id="key-components">Key Components</h3>
+<h4 id="richtexteditor-srccomponentsrichtexteditor.tsx">1.
+RichTextEditor (<code>/src/components/RichTextEditor.tsx</code>)</h4>
+<p><strong>Purpose</strong>: Advanced rich text editor for blog content
+creation</p>
+<p><strong>Features</strong>: - React Quill integration - Image upload
+with drag-and-drop - Custom toolbar with formatting options - Real-time
+preview - Data URL image handling (ready for cloud storage)</p>
+<p><strong>Key Logic</strong>:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Custom image handler</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> imageHandler <span class="op">=</span> <span class="fu">useCallback</span>(() <span class="kw">=&gt;</span> {</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">setShowImageModal</span>(<span class="kw">true</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>}<span class="op">,</span> [])</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co">// Upload image to data URL (production: use cloud storage)</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> uploadImage <span class="op">=</span> <span class="fu">useCallback</span>(<span class="kw">async</span> (file<span class="op">:</span> <span class="bu">File</span>)<span class="op">:</span> <span class="bu">Promise</span><span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> <span class="kw">=&gt;</span> {</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="kw">new</span> <span class="bu">Promise</span>((resolve) <span class="kw">=&gt;</span> {</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> reader <span class="op">=</span> <span class="kw">new</span> <span class="bu">FileReader</span>()</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    reader<span class="op">.</span><span class="at">onload</span> <span class="op">=</span> (e) <span class="kw">=&gt;</span> {</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>      <span class="fu">resolve</span>(e<span class="op">.</span><span class="at">target</span><span class="op">?.</span><span class="at">result</span> <span class="im">as</span> <span class="dt">string</span>)</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    reader<span class="op">.</span><span class="fu">readAsDataURL</span>(file)</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>}<span class="op">,</span> [])</span></code></pre></div>
+<h4 id="seo-component-srccomponentsseo.tsx">2. SEO Component
+(<code>/src/components/SEO.tsx</code>)</h4>
+<p><strong>Purpose</strong>: Comprehensive SEO optimization</p>
+<p><strong>Features</strong>: - Meta tags management - Open Graph
+optimization - Twitter Cards - JSON-LD structured data - Canonical URLs
+- Multi-language support</p>
+<h4 id="navigation-srccomponentsnavigation.tsx">3. Navigation
+(<code>/src/components/Navigation.tsx</code>)</h4>
+<p><strong>Purpose</strong>: Main site navigation with responsive
+design</p>
+<p><strong>Features</strong>: - Mobile hamburger menu - Sticky header -
+Active state management - Multi-language toggle</p>
+<h4 id="user-onboarding-srccomponentsuseronboarding.tsx">4. User
+Onboarding (<code>/src/components/UserOnboarding.tsx</code>)</h4>
+<p><strong>Purpose</strong>: Multi-step user registration flow</p>
+<p><strong>Features</strong>: - Progress indicator - Form validation -
+Image upload - Preferences collection</p>
+<hr />
+<h2 id="database-data-flow">🗄️ Database &amp; Data Flow</h2>
+<h3 id="current-implementation">Current Implementation</h3>
+<p><strong>Storage</strong>: In-memory storage (for development/demo)
+<strong>Production Ready</strong>: MongoDB integration available</p>
+<h3 id="blog-data-model">Blog Data Model</h3>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">interface</span> Blog {</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  id<span class="op">:</span> <span class="dt">string</span>                    <span class="co">// UUID</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  title<span class="op">:</span> <span class="dt">string</span>                 <span class="co">// Blog title</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  content<span class="op">:</span> <span class="dt">string</span>               <span class="co">// Rich HTML content</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  excerpt<span class="op">:</span> <span class="dt">string</span>               <span class="co">// Auto-generated summary</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  slug<span class="op">:</span> <span class="dt">string</span>                  <span class="co">// URL-friendly slug</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  category<span class="op">:</span> <span class="dt">string</span>              <span class="co">// Blog category</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  status<span class="op">:</span> <span class="st">&#39;draft&#39;</span> <span class="op">|</span> <span class="st">&#39;published&#39;</span> <span class="op">|</span> <span class="st">&#39;archived&#39;</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  tags<span class="op">:</span> <span class="dt">string</span>[]               <span class="co">// Array of tags</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  author<span class="op">:</span> <span class="dt">string</span>               <span class="co">// Author name</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  publishDate<span class="op">:</span> <span class="dt">string</span>          <span class="co">// ISO date string</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  createdAt<span class="op">:</span> <span class="dt">string</span>           <span class="co">// Creation timestamp</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  updatedAt<span class="op">:</span> <span class="dt">string</span>           <span class="co">// Last update timestamp</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  seoTitle<span class="op">?:</span> <span class="dt">string</span>           <span class="co">// Custom SEO title</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>  seoDescription<span class="op">?:</span> <span class="dt">string</span>     <span class="co">// Custom SEO description</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>  featuredImage<span class="op">?:</span> <span class="dt">string</span>      <span class="co">// Featured image URL</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>  views<span class="op">?:</span> <span class="dt">number</span>             <span class="co">// View counter</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<h3 id="user-data-model-inferred">User Data Model (Inferred)</h3>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">interface</span> User {</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  id<span class="op">:</span> <span class="dt">string</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  email<span class="op">:</span> <span class="dt">string</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  name<span class="op">:</span> <span class="dt">string</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  phone<span class="op">?:</span> <span class="dt">string</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  dateOfBirth<span class="op">?:</span> <span class="dt">string</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  location<span class="op">?:</span> <span class="dt">string</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  preferences<span class="op">?:</span> UserPreferences</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  profileImage<span class="op">?:</span> <span class="dt">string</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  createdAt<span class="op">:</span> <span class="dt">string</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  updatedAt<span class="op">:</span> <span class="dt">string</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<h3 id="data-flow-architecture">Data Flow Architecture</h3>
+<h4 id="blog-management-flow">Blog Management Flow</h4>
+<pre><code>Admin Panel → API Route → In-Memory Storage → Response
+     ↓
+Rich Text Editor → Image Upload → Data URL Storage
+     ↓
+Live Publishing → SEO Generation → Public Blog Page</code></pre>
+<h4 id="user-registration-flow">User Registration Flow</h4>
+<pre><code>Lead Signup → Questionnaire → Assessment → Dashboard
+     ↓              ↓              ↓           ↓
+Basic Info → Preferences → Compatibility → Matches</code></pre>
+<hr />
+<h2 id="api-documentation">🔌 API Documentation</h2>
+<h3 id="blog-api-apiblogs">Blog API (<code>/api/blogs</code>)</h3>
+<h4 id="get-apiblogs">GET <code>/api/blogs</code></h4>
+<p><strong>Purpose</strong>: Retrieve blogs with filtering and
+pagination</p>
+<p><strong>Query Parameters</strong>: - <code>status</code> (optional):
+‘draft’ | ‘published’ | ‘archived’ | ‘all’ - <code>category</code>
+(optional): Filter by category - <code>limit</code> (optional): Number
+of results (default: 10) - <code>offset</code> (optional): Pagination
+offset (default: 0) - <code>slug</code> (optional): Get single blog by
+slug</p>
+<p><strong>Response</strong>:</p>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;success&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;data&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;blogs&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="er">/*</span> <span class="er">Array</span> <span class="er">of</span> <span class="er">blog</span> <span class="er">objects</span> <span class="er">*/</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;total&quot;</span><span class="fu">:</span> <span class="dv">50</span><span class="fu">,</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;limit&quot;</span><span class="fu">:</span> <span class="dv">10</span><span class="fu">,</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;offset&quot;</span><span class="fu">:</span> <span class="dv">0</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<h4 id="post-apiblogs">POST <code>/api/blogs</code></h4>
+<p><strong>Purpose</strong>: Create new blog post</p>
+<p><strong>Request Body</strong>:</p>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;title&quot;</span><span class="fu">:</span> <span class="st">&quot;Blog Title&quot;</span><span class="fu">,</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;content&quot;</span><span class="fu">:</span> <span class="st">&quot;&lt;p&gt;Rich HTML content&lt;/p&gt;&quot;</span><span class="fu">,</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;category&quot;</span><span class="fu">:</span> <span class="st">&quot;Advice&quot;</span><span class="fu">,</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;status&quot;</span><span class="fu">:</span> <span class="st">&quot;draft&quot;</span><span class="fu">,</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;tags&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;tag1&quot;</span><span class="ot">,</span> <span class="st">&quot;tag2&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;author&quot;</span><span class="fu">:</span> <span class="st">&quot;Author Name&quot;</span><span class="fu">,</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;featuredImage&quot;</span><span class="fu">:</span> <span class="st">&quot;https://example.com/image.jpg&quot;</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<h4 id="put-apiblogsidblogid">PUT
+<code>/api/blogs?id={blogId}</code></h4>
+<p><strong>Purpose</strong>: Update existing blog post</p>
+<h4 id="delete-apiblogsidblogid">DELETE
+<code>/api/blogs?id={blogId}</code></h4>
+<p><strong>Purpose</strong>: Delete blog post</p>
+<h3 id="contact-api-apicontact">Contact API
+(<code>/api/contact</code>)</h3>
+<p><strong>Purpose</strong>: Handle contact form submissions</p>
+<h3 id="webinar-api-apiwebinar-registration">Webinar API
+(<code>/api/webinar-registration</code>)</h3>
+<p><strong>Purpose</strong>: Handle webinar registrations</p>
+<hr />
+<h2 id="setup-installation">🛠️ Setup &amp; Installation</h2>
+<h3 id="prerequisites">Prerequisites</h3>
+<ul>
+<li>Node.js 18+</li>
+<li>npm or yarn</li>
+<li>Git</li>
+</ul>
+<h3 id="local-development-setup">Local Development Setup</h3>
+<ol type="1">
+<li><strong>Clone Repository</strong></li>
+</ol>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone <span class="op">&lt;</span>repository-url<span class="op">&gt;</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> make-my-knot</span></code></pre></div>
+<ol start="2" type="1">
+<li><strong>Install Dependencies</strong></li>
+</ol>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> install</span></code></pre></div>
+<ol start="3" type="1">
+<li><strong>Environment Configuration</strong></li>
+</ol>
+<div class="sourceCode" id="cb19"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> .env.example .env.local</span></code></pre></div>
+<ol start="4" type="1">
+<li><strong>Configure Environment Variables</strong></li>
+</ol>
+<pre class="env"><code># API Configuration
+NEXT_PUBLIC_API_URL=http://localhost:3000/api
+
+# Database (Optional - for production)
+MONGODB_URI=your_mongodb_atlas_connection_string
+
+# Development Mode
+NODE_ENV=development</code></pre>
+<ol start="5" type="1">
+<li><strong>Run Development Server</strong></li>
+</ol>
+<div class="sourceCode" id="cb21"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run dev</span></code></pre></div>
+<ol start="6" type="1">
+<li><strong>Access Application</strong></li>
+</ol>
+<ul>
+<li>Frontend: http://localhost:3000</li>
+<li>Admin Panel: http://localhost:3000/admin</li>
+</ul>
+<h3 id="build-for-production">Build for Production</h3>
+<div class="sourceCode" id="cb22"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type check</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run type-check</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Build application</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run build</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Start production server</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run start</span></code></pre></div>
+<hr />
+<h2 id="deployment-guide">🚢 Deployment Guide</h2>
+<h3 id="vercel-deployment-recommended">Vercel Deployment
+(Recommended)</h3>
+<ol type="1">
+<li><p><strong>Connect Repository</strong></p>
+<ul>
+<li>Import project from GitHub/GitLab</li>
+<li>Select Next.js framework preset</li>
+</ul></li>
+<li><p><strong>Environment Variables</strong></p>
+<pre><code>NODE_ENV=production
+NEXT_PUBLIC_API_URL=https://your-domain.com/api
+MONGODB_URI=your_production_mongodb_uri</code></pre></li>
+<li><p><strong>Build Settings</strong></p>
+<ul>
+<li>Build Command: <code>npm run build</code></li>
+<li>Output Directory: <code>.next</code></li>
+<li>Install Command: <code>npm install</code></li>
+</ul></li>
+</ol>
+<h3 id="other-platforms">Other Platforms</h3>
+<h4 id="netlify">Netlify</h4>
+<div class="sourceCode" id="cb24"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Build command</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run build <span class="kw">&amp;&amp;</span> <span class="ex">npm</span> run export</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Publish directory</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="ex">out/</span></span></code></pre></div>
+<h4 id="railwayheroku">Railway/Heroku</h4>
+<div class="sourceCode" id="cb25"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add to package.json scripts</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;start&quot;</span><span class="ex">:</span> <span class="st">&quot;next start -p </span><span class="va">$PORT</span><span class="st">&quot;</span></span></code></pre></div>
+<h3 id="performance-optimizations">Performance Optimizations</h3>
+<h4 id="implemented">Implemented</h4>
+<ul>
+<li>Image optimization with Next.js Image component</li>
+<li>Static site generation for blog pages</li>
+<li>Automatic code splitting</li>
+<li>SWC minification enabled</li>
+<li>Compression enabled</li>
+<li>SEO-optimized meta tags</li>
+</ul>
+<h4 id="core-web-vitals-score">Core Web Vitals Score</h4>
+<ul>
+<li><strong>LCP</strong>: Optimized with image preloading</li>
+<li><strong>FID</strong>: Minimized with code splitting</li>
+<li><strong>CLS</strong>: Stable layout with proper sizing</li>
+</ul>
+<hr />
+<h2 id="code-structure">📁 Code Structure</h2>
+<h3 id="directory-overview">Directory Overview</h3>
+<pre><code>make-my-knot/
+├── public/                 # Static assets
+│   ├── images/            # Image assets
+│   ├── favicon.ico        # Site favicon
+│   └── robots.txt         # SEO robots file
+├── src/
+│   ├── components/        # Reusable UI components
+│   │   ├── Navigation.tsx
+│   │   ├── Footer.tsx
+│   │   ├── SEO.tsx
+│   │   ├── RichTextEditor.tsx
+│   │   └── ...
+│   ├── contexts/          # React contexts
+│   │   └── LanguageContext.tsx
+│   ├── lib/              # Utility libraries
+│   │   └── seo.ts        # SEO configurations
+│   ├── pages/            # Next.js pages
+│   │   ├── api/          # API routes
+│   │   │   ├── blogs.ts
+│   │   │   ├── contact.ts
+│   │   │   └── webinar-registration.ts
+│   │   ├── blog/         # Blog pages
+│   │   │   ├── [slug].tsx
+│   │   │   └── index.tsx
+│   │   ├── admin/        # Admin pages
+│   │   │   ├── login.tsx
+│   │   │   └── dashboard.tsx
+│   │   ├── _app.tsx      # App wrapper
+│   │   ├── _document.tsx # Document wrapper
+│   │   └── index.tsx     # Homepage
+│   ├── styles/           # Global styles
+│   │   └── globals.css
+│   ├── types/            # TypeScript types
+│   │   └── global.d.ts
+│   └── utils/            # Utility functions
+├── tailwind.config.js    # Tailwind configuration
+├── next.config.js        # Next.js configuration
+├── tsconfig.json         # TypeScript configuration
+└── package.json          # Dependencies and scripts</code></pre>
+<h3 id="component-organization">Component Organization</h3>
+<h4 id="atomic-design-pattern">Atomic Design Pattern</h4>
+<ul>
+<li><strong>Atoms</strong>: Basic UI elements (buttons, inputs)</li>
+<li><strong>Molecules</strong>: Simple component combinations</li>
+<li><strong>Organisms</strong>: Complex UI sections</li>
+<li><strong>Templates</strong>: Page layouts</li>
+<li><strong>Pages</strong>: Specific page implementations</li>
+</ul>
+<hr />
+<h2 id="key-logic-functions">⚙️ Key Logic &amp; Functions</h2>
+<h3 id="blog-management-system">1. Blog Management System</h3>
+<h4 id="slug-generation">Slug Generation</h4>
+<div class="sourceCode" id="cb27"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">generateSlug</span>(title<span class="op">:</span> <span class="dt">string</span>)<span class="op">:</span> <span class="dt">string</span> {</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> title</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">toLowerCase</span>()</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">replace</span>(<span class="ss">/</span><span class="sc">[^\w\s]</span><span class="ss">/g</span><span class="op">,</span> <span class="st">&#39;&#39;</span>) <span class="co">// Remove special characters</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">replace</span>(<span class="ss">/</span><span class="sc">\s+</span><span class="ss">/g</span><span class="op">,</span> <span class="st">&#39;-&#39;</span>)    <span class="co">// Replace spaces with hyphens</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">replace</span>(<span class="ss">/</span><span class="sc">^</span><span class="ss">-</span><span class="sc">+|</span><span class="ss">-</span><span class="sc">+$</span><span class="ss">/g</span><span class="op">,</span> <span class="st">&#39;&#39;</span>) <span class="co">// Remove leading/trailing hyphens</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<h4 id="excerpt-generation">Excerpt Generation</h4>
+<div class="sourceCode" id="cb28"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">generateExcerpt</span>(htmlContent<span class="op">:</span> <span class="dt">string</span><span class="op">,</span> maxLength<span class="op">:</span> <span class="dt">number</span> <span class="op">=</span> <span class="dv">160</span>)<span class="op">:</span> <span class="dt">string</span> {</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> plainText <span class="op">=</span> htmlContent<span class="op">.</span><span class="fu">replace</span>(<span class="ss">/&lt;</span><span class="sc">[^&gt;]*</span><span class="ss">&gt;/g</span><span class="op">,</span> <span class="st">&#39;&#39;</span>)<span class="op">.</span><span class="fu">trim</span>()</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (plainText<span class="op">.</span><span class="at">length</span> <span class="op">&lt;=</span> maxLength) {</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> plainText</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> truncated <span class="op">=</span> plainText<span class="op">.</span><span class="fu">substring</span>(<span class="dv">0</span><span class="op">,</span> maxLength)</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> lastSpace <span class="op">=</span> truncated<span class="op">.</span><span class="fu">lastIndexOf</span>(<span class="st">&#39; &#39;</span>)</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> lastSpace <span class="op">&gt;</span> <span class="dv">0</span> <span class="op">?</span> truncated<span class="op">.</span><span class="fu">substring</span>(<span class="dv">0</span><span class="op">,</span> lastSpace) <span class="op">+</span> <span class="st">&#39;...&#39;</span> <span class="op">:</span> truncated <span class="op">+</span> <span class="st">&#39;...&#39;</span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<h3 id="seo-system">2. SEO System</h3>
+<h4 id="dynamic-meta-generation">Dynamic Meta Generation</h4>
+<div class="sourceCode" id="cb29"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="kw">const</span> generateJsonLd <span class="op">=</span> (config<span class="op">:</span> SEOConfig) <span class="kw">=&gt;</span> {</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="op">!</span>config<span class="op">.</span><span class="at">jsonLd</span>) <span class="cf">return</span> <span class="kw">null</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> {</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    __html<span class="op">:</span> <span class="bu">JSON</span><span class="op">.</span><span class="fu">stringify</span>(config<span class="op">.</span><span class="at">jsonLd</span>)</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<h4 id="page-specific-seo-configs">Page-specific SEO Configs</h4>
+<div class="sourceCode" id="cb30"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="kw">const</span> pageConfigs<span class="op">:</span> <span class="bu">Record</span><span class="op">&lt;</span><span class="dt">string</span><span class="op">,</span> SEOConfig<span class="op">&gt;</span> <span class="op">=</span> {</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  home<span class="op">:</span> { <span class="co">/* Homepage SEO */</span> }<span class="op">,</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  about<span class="op">:</span> { <span class="co">/* About page SEO */</span> }<span class="op">,</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  pricing<span class="op">:</span> { <span class="co">/* Pricing page SEO */</span> }<span class="op">,</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ... more configurations</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<h3 id="rich-text-editor-integration">3. Rich Text Editor
+Integration</h3>
+<h4 id="image-upload-handler">Image Upload Handler</h4>
+<div class="sourceCode" id="cb31"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> uploadImage <span class="op">=</span> <span class="fu">useCallback</span>(<span class="kw">async</span> (file<span class="op">:</span> <span class="bu">File</span>)<span class="op">:</span> <span class="bu">Promise</span><span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> <span class="kw">=&gt;</span> {</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Current: Data URL for demo</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Production: Replace with cloud storage (AWS S3, Cloudinary, etc.)</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="kw">new</span> <span class="bu">Promise</span>((resolve) <span class="kw">=&gt;</span> {</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> reader <span class="op">=</span> <span class="kw">new</span> <span class="bu">FileReader</span>()</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>    reader<span class="op">.</span><span class="at">onload</span> <span class="op">=</span> (e) <span class="kw">=&gt;</span> <span class="fu">resolve</span>(e<span class="op">.</span><span class="at">target</span><span class="op">?.</span><span class="at">result</span> <span class="im">as</span> <span class="dt">string</span>)</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>    reader<span class="op">.</span><span class="fu">readAsDataURL</span>(file)</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>}<span class="op">,</span> [])</span></code></pre></div>
+<h3 id="error-handling-pattern">4. Error Handling Pattern</h3>
+<h4 id="api-error-handling">API Error Handling</h4>
+<div class="sourceCode" id="cb32"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>} <span class="cf">catch</span> (error) {</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(<span class="st">&#39;API Error:&#39;</span><span class="op">,</span> error)</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> res<span class="op">.</span><span class="fu">status</span>(<span class="dv">500</span>)<span class="op">.</span><span class="fu">json</span>({ </span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    error<span class="op">:</span> <span class="st">&#39;Internal server error&#39;</span><span class="op">,</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>    details<span class="op">:</span> <span class="bu">process</span><span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">NODE_ENV</span> <span class="op">===</span> <span class="st">&#39;development&#39;</span> </span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>      <span class="op">?</span> (error <span class="kw">instanceof</span> <span class="bu">Error</span> <span class="op">?</span> error<span class="op">.</span><span class="at">message</span> <span class="op">:</span> <span class="st">&#39;Unknown error&#39;</span>) </span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>      <span class="op">:</span> <span class="kw">undefined</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<hr />
+<h2 id="environment-variables">🔐 Environment Variables</h2>
+<h3 id="development-.env.local">Development
+(<code>.env.local</code>)</h3>
+<pre class="env"><code># API Configuration
+NEXT_PUBLIC_API_URL=http://localhost:3000/api
+
+# Database Configuration (Optional)
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/makemyknot
+
+# Authentication (Future)
+JWT_SECRET=your_super_secret_jwt_key_here
+JWT_EXPIRES_IN=7d
+
+# External Services (Optional)
+CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key  
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+
+# Email Configuration (Optional)
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_app_password
+
+# Analytics (Optional)
+NEXT_PUBLIC_GA_TRACKING_ID=your_google_analytics_id
+NEXT_PUBLIC_FACEBOOK_PIXEL_ID=your_facebook_pixel_id
+
+# Development Mode
+NODE_ENV=development</code></pre>
+<h3 id="production-.env.production">Production
+(<code>.env.production</code>)</h3>
+<pre class="env"><code># Production API
+NEXT_PUBLIC_API_URL=https://makemyknot.com/api
+
+# Production Database
+MONGODB_URI=mongodb+srv://prod_user:prod_pass@prod-cluster.mongodb.net/makemyknot
+
+# Security Keys
+JWT_SECRET=super_secure_production_jwt_secret
+
+# Production Mode
+NODE_ENV=production</code></pre>
+<h3 id="environment-variable-usage">Environment Variable Usage</h3>
+<h4 id="public-variables-client-side">Public Variables
+(Client-side)</h4>
+<ul>
+<li><code>NEXT_PUBLIC_API_URL</code> - API base URL</li>
+<li><code>NEXT_PUBLIC_GA_TRACKING_ID</code> - Google Analytics</li>
+<li><code>NEXT_PUBLIC_FACEBOOK_PIXEL_ID</code> - Facebook Pixel</li>
+</ul>
+<h4 id="server-only-variables">Server-only Variables</h4>
+<ul>
+<li><code>MONGODB_URI</code> - Database connection</li>
+<li><code>JWT_SECRET</code> - Authentication secret</li>
+<li><code>EMAIL_*</code> - Email service credentials</li>
+</ul>
+<hr />
+<h2 id="known-issues-todos">⚠️ Known Issues &amp; TODOs</h2>
+<h3 id="current-limitations">Current Limitations</h3>
+<ol type="1">
+<li><strong>In-Memory Storage</strong>
+<ul>
+<li>Blog data is stored in memory (resets on server restart)</li>
+<li><strong>Solution</strong>: Implement MongoDB integration (connection
+ready)</li>
+</ul></li>
+<li><strong>Image Storage</strong>
+<ul>
+<li>Images stored as Data URLs (not scalable)</li>
+<li><strong>Solution</strong>: Implement cloud storage (AWS S3,
+Cloudinary)</li>
+</ul></li>
+<li><strong>Authentication</strong>
+<ul>
+<li>Basic admin panel without proper auth</li>
+<li><strong>Solution</strong>: Implement JWT-based authentication</li>
+</ul></li>
+<li><strong>Mobile Optimization</strong>
+<ul>
+<li>Some components need mobile responsiveness improvements</li>
+<li><strong>Solution</strong>: Review and enhance mobile layouts</li>
+</ul></li>
+</ol>
+<h3 id="immediate-todos">Immediate TODOs</h3>
+<h4 id="high-priority">High Priority</h4>
+<ul class="task-list">
+<li><label><input type="checkbox" />Connect MongoDB
+database</label></li>
+<li><label><input type="checkbox" />Implement cloud image
+storage</label></li>
+<li><label><input type="checkbox" />Add proper authentication
+system</label></li>
+<li><label><input type="checkbox" />Create user registration/login
+flow</label></li>
+<li><label><input type="checkbox" />Add payment integration (Stripe
+configured)</label></li>
+</ul>
+<h4 id="medium-priority">Medium Priority</h4>
+<ul class="task-list">
+<li><label><input type="checkbox" />Implement email
+notifications</label></li>
+<li><label><input type="checkbox" />Add real-time chat
+system</label></li>
+<li><label><input type="checkbox" />Create mobile app (React
+Native)</label></li>
+<li><label><input type="checkbox" />Add video call
+integration</label></li>
+<li><label><input type="checkbox" />Implement advanced matching
+algorithm</label></li>
+</ul>
+<h4 id="low-priority">Low Priority</h4>
+<ul class="task-list">
+<li><label><input type="checkbox" />Add multi-language
+support</label></li>
+<li><label><input type="checkbox" />Create admin analytics
+dashboard</label></li>
+<li><label><input type="checkbox" />Add automated testing</label></li>
+<li><label><input type="checkbox" />Implement PWA features</label></li>
+<li><label><input type="checkbox" />Add social media
+integration</label></li>
+</ul>
+<hr />
+<h2 id="future-enhancements">🚀 Future Enhancements</h2>
+<h3 id="phase-1-core-functionality-1-2-months">Phase 1: Core
+Functionality (1-2 months)</h3>
+<ol type="1">
+<li><strong>Database Integration</strong>
+<ul>
+<li>MongoDB Atlas connection</li>
+<li>User authentication system</li>
+<li>Real user profiles and matching</li>
+</ul></li>
+<li><strong>Payment System</strong>
+<ul>
+<li>Stripe integration completion</li>
+<li>Subscription management</li>
+<li>Invoice generation</li>
+</ul></li>
+<li><strong>Communication System</strong>
+<ul>
+<li>In-app messaging</li>
+<li>Email notifications</li>
+<li>WhatsApp integration</li>
+</ul></li>
+</ol>
+<h3 id="phase-2-advanced-features-2-3-months">Phase 2: Advanced Features
+(2-3 months)</h3>
+<ol type="1">
+<li><strong>AI Matching Algorithm</strong>
+<ul>
+<li>Machine learning integration</li>
+<li>Compatibility scoring</li>
+<li>Behavior analysis</li>
+</ul></li>
+<li><strong>Mobile Application</strong>
+<ul>
+<li>React Native app</li>
+<li>Push notifications</li>
+<li>Offline capabilities</li>
+</ul></li>
+<li><strong>Video Integration</strong>
+<ul>
+<li>Virtual meetings</li>
+<li>Video profiles</li>
+<li>Live streaming events</li>
+</ul></li>
+</ol>
+<h3 id="phase-3-scale-optimize-3-6-months">Phase 3: Scale &amp; Optimize
+(3-6 months)</h3>
+<ol type="1">
+<li><strong>Performance Optimization</strong>
+<ul>
+<li>CDN integration</li>
+<li>Caching strategies</li>
+<li>Database optimization</li>
+</ul></li>
+<li><strong>Advanced Analytics</strong>
+<ul>
+<li>User behavior tracking</li>
+<li>Success rate analysis</li>
+<li>A/B testing framework</li>
+</ul></li>
+<li><strong>Enterprise Features</strong>
+<ul>
+<li>White-label solutions</li>
+<li>API for third parties</li>
+<li>Advanced admin controls</li>
+</ul></li>
+</ol>
+<hr />
+<h2 id="support-maintenance">📞 Support &amp; Maintenance</h2>
+<h3 id="code-maintenance">Code Maintenance</h3>
+<ul>
+<li><strong>Framework Updates</strong>: Regularly update Next.js and
+dependencies</li>
+<li><strong>Security Patches</strong>: Monitor and apply security
+updates</li>
+<li><strong>Performance Monitoring</strong>: Use tools like Vercel
+Analytics or Google PageSpeed</li>
+</ul>
+<h3 id="content-management">Content Management</h3>
+<ul>
+<li><strong>Blog System</strong>: Fully functional CMS for content
+updates</li>
+<li><strong>SEO Management</strong>: Automated meta generation with
+manual override</li>
+<li><strong>Image Optimization</strong>: Next.js automatic image
+optimization</li>
+</ul>
+<h3 id="monitoring-alerts">Monitoring &amp; Alerts</h3>
+<ul>
+<li><strong>Error Tracking</strong>: Implement Sentry or similar</li>
+<li><strong>Performance Monitoring</strong>: Vercel Analytics or Google
+Analytics</li>
+<li><strong>Uptime Monitoring</strong>: Set up alerts for downtime</li>
+</ul>
+<hr />
+<h2 id="documentation-resources">📄 Documentation &amp; Resources</h2>
+<h3 id="developer-resources">Developer Resources</h3>
+<ul>
+<li><strong>Next.js Documentation</strong>: https://nextjs.org/docs</li>
+<li><strong>Tailwind CSS</strong>: https://tailwindcss.com/docs</li>
+<li><strong>TypeScript</strong>:
+https://www.typescriptlang.org/docs</li>
+<li><strong>React Quill</strong>:
+https://github.com/zenoamaro/react-quill</li>
+</ul>
+<h3 id="design-resources">Design Resources</h3>
+<ul>
+<li><strong>Color Palette</strong>: Defined in
+<code>tailwind.config.js</code></li>
+<li><strong>Typography</strong>: Google Fonts (Inter, Playfair
+Display)</li>
+<li><strong>Icons</strong>: Lucide React icon library</li>
+<li><strong>Images</strong>: Unsplash integration configured</li>
+</ul>
+<h3 id="seo-resources">SEO Resources</h3>
+<ul>
+<li><strong>Schema.org</strong>: Structured data implementation</li>
+<li><strong>Open Graph</strong>: Social media optimization</li>
+<li><strong>Google Search Console</strong>: SEO monitoring</li>
+<li><strong>Core Web Vitals</strong>: Performance metrics</li>
+</ul>
+<hr />
+<h2 id="project-handover-checklist">🏁 Project Handover Checklist</h2>
+<h3 id="completed-items">✅ Completed Items</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" checked="" />Full Next.js application
+setup</label></li>
+<li><label><input type="checkbox" checked="" />Responsive design
+implementation</label></li>
+<li><label><input type="checkbox" checked="" />Blog management system
+with rich text editor</label></li>
+<li><label><input type="checkbox" checked="" />SEO optimization with
+structured data</label></li>
+<li><label><input type="checkbox" checked="" />Admin panel with CRUD
+operations</label></li>
+<li><label><input type="checkbox" checked="" />Typography and color
+system</label></li>
+<li><label><input type="checkbox" checked="" />Image optimization
+setup</label></li>
+<li><label><input type="checkbox" checked="" />API routes for blog
+management</label></li>
+<li><label><input type="checkbox" checked="" />Production build
+configuration</label></li>
+<li><label><input type="checkbox" checked="" />Deployment-ready
+codebase</label></li>
+</ul>
+<h3 id="handover-requirements">🔄 Handover Requirements</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" checked="" />Complete
+documentation</label></li>
+<li><label><input type="checkbox" checked="" />Code comments and
+explanations</label></li>
+<li><label><input type="checkbox" checked="" />Environment configuration
+guide</label></li>
+<li><label><input type="checkbox" checked="" />Deployment
+instructions</label></li>
+<li><label><input type="checkbox" checked="" />Database schema
+documentation</label></li>
+<li><label><input type="checkbox" checked="" />Component library
+documentation</label></li>
+<li><label><input type="checkbox" checked="" />API
+documentation</label></li>
+<li><label><input type="checkbox" checked="" />Future development
+roadmap</label></li>
+</ul>
+<h3 id="next-steps-for-new-developer">📋 Next Steps for New
+Developer</h3>
+<ol type="1">
+<li><strong>Environment Setup</strong> (Day 1)
+<ul>
+<li>Clone repository and install dependencies</li>
+<li>Configure environment variables</li>
+<li>Run local development server</li>
+<li>Test all major features</li>
+</ul></li>
+<li><strong>Code Familiarization</strong> (Week 1)
+<ul>
+<li>Review component structure</li>
+<li>Understand data flow</li>
+<li>Test admin panel functionality</li>
+<li>Explore API endpoints</li>
+</ul></li>
+<li><strong>Priority Implementation</strong> (Month 1)
+<ul>
+<li>Connect MongoDB database</li>
+<li>Implement user authentication</li>
+<li>Set up cloud image storage</li>
+<li>Deploy to production</li>
+</ul></li>
+</ol>
+<hr />
+<p><strong>Document Version</strong>: 1.0<br />
+<strong>Last Updated</strong>: January 2025<br />
+<strong>Created By</strong>: Shivam Rai<br />
+<strong>Project Status</strong>: Ready for Handover ✅</p>
+<hr />
+<p><em>This document contains all necessary information for a smooth
+project handover. For any clarifications or additional information,
+please refer to the codebase comments and inline documentation.</em></p>
+
+</html>
+
+</body>
+</html>

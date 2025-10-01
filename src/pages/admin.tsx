@@ -1,9 +1,16 @@
 import Head from 'next/head'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
+import dynamic from 'next/dynamic'
 import { 
-  Shield, Trash2, CheckCircle2, Mail, Phone, User, Lock, LogOut, Users, BarChart3, MessageSquare, CreditCard, Eye, EyeOff, Settings, Zap, AlertTriangle, DollarSign, TrendingUp, Activity, UserPlus, Video, Calendar, Gift, Edit, XCircle, MapPin, Briefcase, GraduationCap, Search, Wifi, MessageCircle, FileText, Brain, Download, Target, Filter, Clock, Heart, Star, X
+  Shield, Trash2, CheckCircle2, Mail, Phone, User, Lock, LogOut, Users, BarChart3, MessageSquare, CreditCard, Eye, EyeOff, Settings, Zap, AlertTriangle, DollarSign, TrendingUp, Activity, UserPlus, Video, Calendar, Gift, Edit, XCircle, MapPin, Briefcase, GraduationCap, Search, Wifi, MessageCircle, FileText, Brain, Download, Target, Filter, Clock, Heart, Star, X, Globe, ExternalLink
 } from 'lucide-react'
+
+// Dynamically import RichTextEditor to avoid SSR issues
+const RichTextEditor = dynamic(() => import('@/components/RichTextEditor'), {
+  ssr: false,
+  loading: () => <div className="h-64 bg-gray-100 animate-pulse rounded-lg"></div>
+})
 import { useOnlineStatus } from '@/lib/OnlineStatusContext'
 import { OnlineUsersList, OnlineStatusBadge, OnlineStatusIndicator } from '@/components/OnlineStatusIndicator'
 import { getQuestionnaireResponses, getAssessmentResponses, essentialQuestions, calculateCompatibilityScore, QuestionnaireResponse, deleteQuestionnaireResponse } from '@/lib/questionnaireStore'
@@ -5997,6 +6004,8 @@ function BlogsTab() {
   const [selectedTemplate, setSelectedTemplate] = useState<any>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterStatus, setFilterStatus] = useState<'all' | 'draft' | 'published' | 'archived'>('all')
+  const [isPublishing, setIsPublishing] = useState(false)
+  const [featuredImageUrl, setFeaturedImageUrl] = useState('')
 
   // Blog templates for different types of content
   const blogTemplates = [
@@ -6354,29 +6363,93 @@ The value of professional support in building healthy relationships.
     publishDate: new Date().toISOString().split('T')[0]
   })
 
-  // Load blogs from localStorage (in production, this would be from a database)
+  // Load blogs from API
+  const loadBlogs = async () => {
+    try {
+      const response = await fetch('/api/blogs')
+      if (response.ok) {
+        const data = await response.json()
+        setBlogs(data.data?.blogs || [])
+      }
+    } catch (error) {
+      console.error('Error loading blogs:', error)
+    }
+  }
+
   useEffect(() => {
-    const savedBlogs = JSON.parse(localStorage.getItem('makemyknot_blogs') || '[]')
-    setBlogs(savedBlogs)
+    loadBlogs()
   }, [])
 
-  // Save blog
-  const saveBlog = (blog: any) => {
-    const updatedBlogs = blog.id 
-      ? blogs.map(b => b.id === blog.id ? blog : b)
-      : [...blogs, { ...blog, id: crypto.randomUUID(), createdAt: new Date().toISOString() }]
-    
-    setBlogs(updatedBlogs)
-    localStorage.setItem('makemyknot_blogs', JSON.stringify(updatedBlogs))
+  // Save blog (create or update)
+  const saveBlog = async (blog: any) => {
+    try {
+      const method = blog.id ? 'PUT' : 'POST'
+      const url = blog.id ? `/api/blogs?id=${blog.id}` : '/api/blogs'
+      
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          ...blog,
+          tags: typeof blog.tags === 'string' ? blog.tags.split(',').map((t: string) => t.trim()) : blog.tags,
+          featuredImage: featuredImageUrl || blog.featuredImage
+        })
+      })
+      
+      if (response.ok) {
+        await loadBlogs() // Refresh blogs list
+        return true
+      } else {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to save blog')
+      }
+    } catch (error) {
+      console.error('Error saving blog:', error)
+      alert(`Failed to save blog: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      return false
+    }
   }
 
   // Delete blog
-  const deleteBlog = (id: string) => {
+  const deleteBlog = async (id: string) => {
     if (!confirm('Are you sure you want to delete this blog?')) return
     
-    const updatedBlogs = blogs.filter(b => b.id !== id)
-    setBlogs(updatedBlogs)
-    localStorage.setItem('makemyknot_blogs', JSON.stringify(updatedBlogs))
+    try {
+      const response = await fetch(`/api/blogs?id=${id}`, {
+        method: 'DELETE'
+      })
+      
+      if (response.ok) {
+        await loadBlogs() // Refresh blogs list
+      } else {
+        throw new Error('Failed to delete blog')
+      }
+    } catch (error) {
+      console.error('Error deleting blog:', error)
+      alert('Failed to delete blog. Please try again.')
+    }
+  }
+
+  // Publish blog live
+  const publishBlog = async (blog: any) => {
+    setIsPublishing(true)
+    try {
+      const success = await saveBlog({
+        ...blog,
+        status: 'published',
+        publishDate: new Date().toISOString()
+      })
+      
+      if (success) {
+        alert(`Blog "${blog.title}" has been published successfully! It's now live at: https://makemyknot.com/blog/${blog.slug}`)
+        setShowCreateModal(false)
+        setSelectedBlog(null)
+      }
+    } finally {
+      setIsPublishing(false)
+    }
   }
 
   // Create blog from template
@@ -6575,6 +6648,18 @@ The value of professional support in building healthy relationships.
                         <Edit className="h-4 w-4" />
                         Edit
                       </button>
+                      
+                      {blog.status === 'published' && blog.slug && (
+                        <button
+                          onClick={() => window.open(`https://makemyknot.com/blog/${blog.slug}`, '_blank')}
+                          className="text-green-600 hover:text-green-900 flex items-center gap-1 px-3 py-1 rounded border border-green-200 hover:bg-green-50"
+                          title="View Live Blog"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                          Live
+                        </button>
+                      )}
+                      
                       <button
                         onClick={() => exportBlog(blog)}
                         className="text-blue-600 hover:text-blue-900 flex items-center gap-1 px-3 py-1 rounded border border-blue-200 hover:bg-blue-50"
@@ -6583,6 +6668,7 @@ The value of professional support in building healthy relationships.
                         <Download className="h-4 w-4" />
                         Export
                       </button>
+                      
                       <button
                         onClick={() => deleteBlog(blog.id)}
                         className="text-red-600 hover:text-red-900 flex items-center gap-1 px-3 py-1 rounded border border-red-200 hover:bg-red-50"
@@ -6711,19 +6797,53 @@ The value of professional support in building healthy relationships.
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Content</label>
-                <textarea
-                  value={selectedBlog ? selectedBlog.content : newBlog.content}
+                <label className="block text-sm font-medium text-gray-700 mb-2">Featured Image URL (Optional)</label>
+                <input
+                  type="url"
+                  value={selectedBlog ? selectedBlog.featuredImage || '' : featuredImageUrl}
                   onChange={(e) => {
                     if (selectedBlog) {
-                      setSelectedBlog({...selectedBlog, content: e.target.value})
+                      setSelectedBlog({...selectedBlog, featuredImage: e.target.value})
                     } else {
-                      setNewBlog({...newBlog, content: e.target.value})
+                      setFeaturedImageUrl(e.target.value)
                     }
                   }}
-                  rows={20}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent font-mono text-sm"
-                  placeholder="Write your blog content here... (Supports Markdown)"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="https://example.com/image.jpg"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Content</label>
+                <RichTextEditor
+                  value={selectedBlog ? selectedBlog.content : newBlog.content}
+                  onChange={(content) => {
+                    if (selectedBlog) {
+                      setSelectedBlog({...selectedBlog, content})
+                    } else {
+                      setNewBlog({...newBlog, content})
+                    }
+                  }}
+                  placeholder="Write your blog content here..."
+                  height="500px"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Tags (comma-separated)</label>
+                <input
+                  type="text"
+                  value={selectedBlog ? (Array.isArray(selectedBlog.tags) ? selectedBlog.tags.join(', ') : selectedBlog.tags || '') : (Array.isArray(newBlog.tags) ? newBlog.tags.join(', ') : newBlog.tags || '')}
+                  onChange={(e) => {
+                    const tags = e.target.value.split(',').map((t: string) => t.trim())
+                    if (selectedBlog) {
+                      setSelectedBlog({...selectedBlog, tags})
+                    } else {
+                      setNewBlog({...newBlog, tags})
+                    }
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="relationship, marriage, tips, advice"
                 />
               </div>
               
@@ -6785,23 +6905,64 @@ The value of professional support in building healthy relationships.
                 onClick={() => {
                   setShowCreateModal(false)
                   setSelectedBlog(null)
+                  setFeaturedImageUrl('')
                 }}
                 className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                disabled={isPublishing}
               >
                 Cancel
               </button>
+              
               <button
-                onClick={() => {
-                  if (selectedBlog) {
-                    saveBlog({...selectedBlog, updatedAt: new Date().toISOString()})
+                onClick={async () => {
+                  const blogData = selectedBlog || newBlog
+                  if (!blogData.title.trim()) {
+                    alert('Please enter a blog title')
+                    return
+                  }
+                  
+                  const success = await saveBlog({
+                    ...blogData,
+                    status: 'draft',
+                    updatedAt: new Date().toISOString()
+                  })
+                  
+                  if (success) {
+                    setShowCreateModal(false)
                     setSelectedBlog(null)
-                  } else {
-                    handleCreateBlog()
+                    setFeaturedImageUrl('')
                   }
                 }}
-                className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                className="flex-1 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                disabled={isPublishing}
               >
-                {selectedBlog ? 'Update Blog' : 'Create Blog'}
+                Save as Draft
+              </button>
+              
+              <button
+                onClick={() => {
+                  const blogData = selectedBlog || newBlog
+                  if (!blogData.title.trim()) {
+                    alert('Please enter a blog title')
+                    return
+                  }
+                  
+                  publishBlog(blogData)
+                }}
+                className="flex items-center gap-2 flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                disabled={isPublishing}
+              >
+                {isPublishing ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    Publishing...
+                  </>
+                ) : (
+                  <>
+                    <Globe className="h-4 w-4" />
+                    Publish Live
+                  </>
+                )}
               </button>
             </div>
           </div>
