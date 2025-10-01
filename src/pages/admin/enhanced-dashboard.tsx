@@ -195,9 +195,19 @@ export default function EnhancedAdminDashboard() {
   const loadAssessments = async () => {
     setAssessmentsLoading(true)
     try {
+      console.log('🔄 Force refreshing assessments from API...')
       const assessmentsData = await getAssessmentResponses()
       setAssessments(assessmentsData || [])
       console.log('✅ Loaded assessments data for admin:', assessmentsData?.length || 0)
+      console.log('📊 Assessment data preview:', assessmentsData?.slice(0, 2))
+      
+      // Check for Samsung bhai specifically
+      const samsungAssessment = assessmentsData?.find(a => a.userName?.toLowerCase().includes('samsung'))
+      if (samsungAssessment) {
+        console.log('✅ Samsung bhai assessment found:', samsungAssessment.id, samsungAssessment.isComplete)
+      } else {
+        console.log('⚠️ Samsung bhai assessment not found in current data')
+      }
     } catch (error) {
       console.error('❌ Error loading assessments:', error)
       setAssessments([])

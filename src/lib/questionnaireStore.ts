@@ -400,13 +400,15 @@ export async function saveQuestionnaireResponseAPI(response: QuestionnaireRespon
 // Get assessments from new Assessment collection
 export async function getAssessmentResponses(): Promise<QuestionnaireResponse[]> {
   try {
-    console.log('🔍 Fetching assessment responses from Assessment collection...')
+    const apiUrl = `${API_BASE_URL}/assessments/admin`
+    console.log('🔍 Fetching assessment responses from:', apiUrl)
     
-    const response = await fetch(`${API_BASE_URL}/assessments/admin`, {
+    const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
+      cache: 'no-cache', // Force fresh data
     })
     
     if (!response.ok) {
@@ -414,6 +416,8 @@ export async function getAssessmentResponses(): Promise<QuestionnaireResponse[]>
     }
     
     const result = await response.json()
+    console.log('📊 Raw API response:', result.status, 'Total results:', result.results)
+    
     const assessments = result.data.assessments.map((assessment: any) => ({
       id: assessment.id,
       userId: assessment.userId,
@@ -432,7 +436,22 @@ export async function getAssessmentResponses(): Promise<QuestionnaireResponse[]>
       completionPercentage: assessment.completionPercentage
     }))
     
-    console.log(`✅ Fetched ${assessments.length} assessment responses from Assessment collection`)
+    console.log(`✅ Processed ${assessments.length} assessment responses`)
+    
+    // Debug Samsung bhai specifically
+    const samsungData = assessments.find(a => a.userName?.toLowerCase().includes('samsung'))
+    if (samsungData) {
+      console.log('👑 Samsung bhai found in API response:', {
+        id: samsungData.id,
+        name: samsungData.userName,
+        complete: samsungData.isComplete,
+        completion: samsungData.completionPercentage
+      })
+    } else {
+      console.log('⚠️ Samsung bhai NOT found in processed assessments')
+      console.log('🔎 Available names:', assessments.map(a => a.userName))
+    }
+    
     return assessments
     
   } catch (error) {
