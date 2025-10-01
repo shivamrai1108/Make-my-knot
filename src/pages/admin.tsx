@@ -678,7 +678,7 @@ function exportLeadsToCSV(leads: EnhancedLead[]) {
 // Import LogIn icon
 import { LogIn } from 'lucide-react'
 
-type AdminTab = 'dashboard' | 'users' | 'leads' | 'nominations' | 'questionnaires' | 'assessments' | 'webinars' | 'blogs' | 'matchmaking' | 'moderation' | 'payments' | 'analytics' | 'communication' | 'offers' | 'online-status'
+type AdminTab = 'dashboard' | 'users' | 'leads' | 'nominations' | 'questionnaires' | 'assessments' | 'webinars' | 'blogs' | 'matchmaking' | 'moderation' | 'payments' | 'analytics' | 'communication' | 'offers' | 'online-status' | 'file-management'
 
 // Enhanced webinar interface
 interface Webinar {
@@ -806,6 +806,7 @@ export default function Admin() {
     { id: 'nominations', label: 'Nominations', icon: UserPlus },
     { id: 'questionnaires', label: 'AI Questionnaires', icon: Brain },
     { id: 'assessments', label: 'Assessments', icon: FileText },
+    { id: 'file-management', label: 'File Management', icon: Download },
     { id: 'webinars', label: 'Webinars', icon: Video },
     { id: 'blogs', label: 'Blog Management', icon: Edit },
     { id: 'offers', label: 'Offers', icon: Gift },
@@ -1037,6 +1038,7 @@ export default function Admin() {
           {activeTab === 'nominations' && <NominationsTab />}
           {activeTab === 'questionnaires' && <QuestionnairesTab />}
           {activeTab === 'assessments' && <AssessmentsTab />}
+          {activeTab === 'file-management' && <FileManagementTab />}
           {activeTab === 'webinars' && <WebinarsTab />}
           {activeTab === 'blogs' && <BlogsTab />}
           {activeTab === 'offers' && <OffersTab />}
@@ -1050,6 +1052,392 @@ export default function Admin() {
         </div>
       </div>
     </>
+  )
+}
+
+// File Management Tab
+function FileManagementTab() {
+  const [leads, setLeads] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [selectedLead, setSelectedLead] = useState<any>(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filterType, setFilterType] = useState<'all' | 'with-biodata' | 'without-biodata'>('with-biodata')
+
+  useEffect(() => {
+    const loadLeadsWithBiodata = async () => {
+      setLoading(true)
+      try {
+        console.log('🗂️ Loading leads with biodata files...')
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://make-my-knot-production.up.railway.app/api'
+        
+        const response = await fetch(`${API_URL}/leads/admin`)
+        if (response.ok) {
+          const data = await response.json()
+          const allLeads = data.data?.leads || []
+          
+          console.log(`📊 Found ${allLeads.length} total leads, ${allLeads.filter((l: any) => l.hasBiodata).length} with biodata`)
+          setLeads(allLeads)
+        } else {
+          console.warn('Failed to load leads from API')
+          setLeads([])
+        }
+      } catch (error) {
+        console.error('Error loading leads:', error)
+        setLeads([])
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadLeadsWithBiodata()
+  }, [])
+
+  const filteredLeads = leads.filter(lead => {
+    const matchesSearch = !searchTerm || 
+      lead.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead.email?.toLowerCase().includes(searchTerm.toLowerCase())
+    
+    const matchesFilter = filterType === 'all' || 
+      (filterType === 'with-biodata' && lead.hasBiodata) ||
+      (filterType === 'without-biodata' && !lead.hasBiodata)
+    
+    return matchesSearch && matchesFilter
+  })
+
+  const downloadBiodataFile = async (lead: any) => {
+    try {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://make-my-knot-production.up.railway.app/api'
+      const token = localStorage.getItem('makemyknot_token')
+      
+      if (!token) {
+        alert('Authentication required. Please log in again.')
+        return
+      }
+      
+      const response = await fetch(`${API_URL}/leads/${lead._id}/biodata/download`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      
+      if (response.ok) {
+        const blob = await response.blob()
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = lead.biodataFileName || `biodata_${lead.name}.pdf`
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+        
+        console.log('✅ File downloaded successfully')
+      } else {
+        alert('Failed to download biodata file')
+      }
+    } catch (error) {
+      console.error('Download error:', error)
+      alert('Error downloading biodata file')
+    }
+  }
+
+  const viewBiodataFile = async (lead: any) => {
+    try {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://make-my-knot-production.up.railway.app/api'
+      const token = localStorage.getItem('makemyknot_token')
+      
+      if (!token) {
+        alert('Authentication required. Please log in again.')
+        return
+      }
+      
+      const viewUrl = `${API_URL}/leads/${lead._id}/biodata/view?token=${token}`
+      window.open(viewUrl, '_blank')
+    } catch (error) {
+      console.error('View error:', error)
+      alert('Error viewing biodata file')
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <span className="ml-3 text-gray-600">Loading biodata files...</span>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">File Management</h2>
+          <p className="text-gray-600 mt-1">Manage and download uploaded biodata files</p>
+        </div>
+        <div className="flex items-center space-x-3">
+          <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+            📁 {filteredLeads.filter(l => l.hasBiodata).length} Files
+          </span>
+        </div>
+      </div>
+
+      {/* Filters and Search */}
+      <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex-1">
+            <div className="relative">
+              <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search by name or email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <select
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value as any)}
+              className="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+            >
+              <option value="all">All Leads</option>
+              <option value="with-biodata">With Biodata</option>
+              <option value="without-biodata">Without Biodata</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Files Table */}
+      <div className="bg-white rounded-lg border border-gray-200">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900">Biodata Files ({filteredLeads.filter(l => l.hasBiodata).length})</h3>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-gray-200 bg-gray-50">
+                <th className="text-left py-3 px-4 font-medium text-gray-700">Lead Info</th>
+                <th className="text-left py-3 px-4 font-medium text-gray-700">File Details</th>
+                <th className="text-left py-3 px-4 font-medium text-gray-700">Upload Date</th>
+                <th className="text-left py-3 px-4 font-medium text-gray-700">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredLeads.filter(lead => lead.hasBiodata).map((lead) => (
+                <tr key={lead._id} className="border-b border-gray-100 hover:bg-gray-50">
+                  <td className="py-4 px-4">
+                    <div>
+                      <div className="font-medium text-gray-900">{lead.name}</div>
+                      <div className="text-sm text-gray-500">{lead.email}</div>
+                      <div className="text-xs text-gray-400">{lead.phone}</div>
+                    </div>
+                  </td>
+                  <td className="py-4 px-4">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <FileText className="h-4 w-4 text-blue-600" />
+                        <span className="font-medium text-gray-900">
+                          {lead.biodataFileName || 'biodata.pdf'}
+                        </span>
+                      </div>
+                      {lead.biodataFileSize && (
+                        <div className="text-sm text-gray-500">
+                          Size: {(lead.biodataFileSize / 1024 / 1024).toFixed(2)} MB
+                        </div>
+                      )}
+                      {lead.biodataFileType && (
+                        <div className="text-xs text-gray-400">
+                          Type: {lead.biodataFileType}
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                  <td className="py-4 px-4">
+                    <div className="text-sm text-gray-900">
+                      {lead.biodataUploadedAt ? 
+                        new Date(lead.biodataUploadedAt).toLocaleDateString() : 
+                        new Date(lead.createdAt).toLocaleDateString()
+                      }
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {lead.biodataUploadedAt ? 
+                        new Date(lead.biodataUploadedAt).toLocaleTimeString() : 
+                        new Date(lead.createdAt).toLocaleTimeString()
+                      }
+                    </div>
+                  </td>
+                  <td className="py-4 px-4">
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => downloadBiodataFile(lead)}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors"
+                      >
+                        <Download className="h-4 w-4" />
+                        Download
+                      </button>
+                      <button
+                        onClick={() => viewBiodataFile(lead)}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-green-700 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors"
+                      >
+                        <Eye className="h-4 w-4" />
+                        View
+                      </button>
+                      <button
+                        onClick={() => setSelectedLead(lead)}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors"
+                      >
+                        <User className="h-4 w-4" />
+                        Details
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {filteredLeads.filter(lead => lead.hasBiodata).length === 0 && (
+                <tr>
+                  <td colSpan={4} className="py-12 text-center">
+                    <div className="text-gray-500">
+                      <FileText className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+                      <p className="text-lg font-medium">No biodata files found</p>
+                      <p className="text-sm">Files will appear here when leads upload their biodata</p>
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Statistics */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <div className="flex items-center">
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <FileText className="h-5 w-5 text-blue-600" />
+            </div>
+            <div className="ml-3">
+              <p className="text-sm font-medium text-gray-600">Total Files</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {leads.filter(l => l.hasBiodata).length}
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <div className="flex items-center">
+            <div className="p-2 bg-green-100 rounded-lg">
+              <Users className="h-5 w-5 text-green-600" />
+            </div>
+            <div className="ml-3">
+              <p className="text-sm font-medium text-gray-600">Total Leads</p>
+              <p className="text-2xl font-bold text-gray-900">{leads.length}</p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <div className="flex items-center">
+            <div className="p-2 bg-yellow-100 rounded-lg">
+              <TrendingUp className="h-5 w-5 text-yellow-600" />
+            </div>
+            <div className="ml-3">
+              <p className="text-sm font-medium text-gray-600">Upload Rate</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {leads.length > 0 ? Math.round((leads.filter(l => l.hasBiodata).length / leads.length) * 100) : 0}%
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Selected Lead Details Modal */}
+      {selectedLead && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-semibold text-gray-900">Lead Details</h3>
+                <button
+                  onClick={() => setSelectedLead(null)}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <X className="h-5 w-5 text-gray-500" />
+                </button>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Name</label>
+                    <p className="text-gray-900">{selectedLead.name}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Email</label>
+                    <p className="text-gray-900">{selectedLead.email}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Phone</label>
+                    <p className="text-gray-900">{selectedLead.phone}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Status</label>
+                    <p className="text-gray-900 capitalize">{selectedLead.status}</p>
+                  </div>
+                </div>
+                
+                {selectedLead.hasBiodata && (
+                  <div className="border-t pt-4">
+                    <h4 className="font-medium text-gray-900 mb-3">Biodata File</h4>
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium text-gray-900">
+                            {selectedLead.biodataFileName || 'biodata.pdf'}
+                          </p>
+                          {selectedLead.biodataFileSize && (
+                            <p className="text-sm text-gray-600">
+                              Size: {(selectedLead.biodataFileSize / 1024 / 1024).toFixed(2)} MB
+                            </p>
+                          )}
+                          {selectedLead.biodataUploadedAt && (
+                            <p className="text-sm text-gray-600">
+                              Uploaded: {new Date(selectedLead.biodataUploadedAt).toLocaleString()}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => downloadBiodataFile(selectedLead)}
+                            className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors flex items-center gap-1"
+                          >
+                            <Download className="h-4 w-4" />
+                            Download
+                          </button>
+                          <button
+                            onClick={() => viewBiodataFile(selectedLead)}
+                            className="px-3 py-1.5 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition-colors flex items-center gap-1"
+                          >
+                            <Eye className="h-4 w-4" />
+                            View
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   )
 }
 
