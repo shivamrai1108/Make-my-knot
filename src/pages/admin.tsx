@@ -3560,11 +3560,52 @@ function CRMLeadsTab() {
                 <div className="mb-6 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
                   <div className="flex items-center gap-2 text-yellow-800">
                     <AlertTriangle className="h-5 w-5" />
-                    <h4 className="font-semibold">No Assessment Data Available</h4>
+                    <h4 className="font-semibold">No Compatibility Assessment Yet</h4>
                   </div>
-                  <p className="text-yellow-700 text-sm mt-1">
-                    This lead has not completed the compatibility assessment yet.
+                  <p className="text-yellow-700 text-sm mt-2 mb-3">
+                    This lead has completed the initial questionnaire but hasn't taken the comprehensive compatibility assessment.
                   </p>
+                  
+                  <div className="bg-white p-3 rounded border border-yellow-300">
+                    <h5 className="font-medium text-yellow-900 mb-2">Next Steps:</h5>
+                    <ul className="text-sm text-yellow-800 space-y-1">
+                      <li>• The lead can access their assessment at: <code className="bg-yellow-100 px-1 rounded">/assessment?leadId={selectedLead.id}</code></li>
+                      <li>• Assessment includes 14 detailed compatibility questions</li>
+                      <li>• Once completed, detailed insights and PDF reports will be available here</li>
+                    </ul>
+                  </div>
+                  
+                  {/* Action Button */}
+                  <div className="mt-3 flex items-center gap-2">
+                    <button
+                      onClick={() => {
+                        const assessmentUrl = `/assessment?leadId=${selectedLead.id}&source=admin`
+                        window.open(assessmentUrl, '_blank')
+                      }}
+                      className="text-yellow-700 hover:text-yellow-900 bg-yellow-100 hover:bg-yellow-200 px-3 py-2 rounded border border-yellow-300 text-sm font-medium transition-colors flex items-center gap-2"
+                    >
+                      <Brain className="h-4 w-4" />
+                      Open Assessment Link
+                    </button>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(`${window.location.origin}/assessment?leadId=${selectedLead.id}&source=admin`)
+                        alert('Assessment link copied to clipboard!')
+                      }}
+                      className="text-gray-600 hover:text-gray-800 px-2 py-2 rounded border border-gray-300 text-sm transition-colors"
+                      title="Copy assessment link"
+                    >
+                      📋
+                    </button>
+                  </div>
+                  
+                  {/* Show basic lead info */}
+                  <div className="mt-3 p-2 bg-yellow-100 rounded">
+                    <p className="text-xs text-yellow-700">
+                      <strong>Lead Status:</strong> {selectedLead.status} • 
+                      <strong>Created:</strong> {new Date(selectedLead.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
                 </div>
               )}
 
