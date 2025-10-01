@@ -721,6 +721,7 @@ export default function Admin() {
   const [password, setPassword] = useState('')
   const [activeTab, setActiveTab] = useState<AdminTab>('dashboard')
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
@@ -814,8 +815,15 @@ export default function Admin() {
       </Head>
       
       <div className="min-h-screen bg-gray-50">
+        {/* Mobile sidebar overlay */}
+        {sidebarOpen && (
+          <div className="fixed inset-0 z-40 bg-black bg-opacity-50 md:hidden" onClick={() => setSidebarOpen(false)}></div>
+        )}
+        
         {/* Sidebar */}
-        <div className="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg border-r border-gray-200">
+        <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg border-r border-gray-200 transform transition-transform duration-300 ease-in-out md:translate-x-0 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        } md:relative md:z-0`}>
           {/* Logo */}
           <div className="flex items-center px-6 py-5 border-b border-gray-200">
             <div className="flex items-center">
@@ -837,7 +845,10 @@ export default function Admin() {
                 return (
                   <button
                     key={tab.id}
-                    onClick={() => setActiveTab(tab.id as AdminTab)}
+                    onClick={() => {
+                      setActiveTab(tab.id as AdminTab)
+                      setSidebarOpen(false)
+                    }}
                     className={`w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 group ${
                       activeTab === tab.id
                         ? 'bg-blue-50 text-blue-700 border border-blue-200'
@@ -882,18 +893,27 @@ export default function Admin() {
         </div>
 
         {/* Main Content */}
-        <div className="pl-64">
+        <div className="md:pl-64">
           {/* Top Header */}
           <header className="bg-white shadow-sm border-b border-gray-200">
             <div className="px-6 py-4">
               <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">
-                    {tabs.find(tab => tab.id === activeTab)?.label || 'Dashboard'}
-                  </h1>
-                  <p className="text-sm text-gray-600 mt-1">
-                    Welcome back! Here's what's happening with Make My Knot today.
-                  </p>
+                <div className="flex items-center">
+                  {/* Mobile menu button */}
+                  <button
+                    onClick={() => setSidebarOpen(true)}
+                    className="md:hidden mr-4 p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                  >
+                    <Settings className="h-6 w-6" />
+                  </button>
+                  <div>
+                    <h1 className="text-2xl font-bold text-gray-900">
+                      {tabs.find(tab => tab.id === activeTab)?.label || 'Dashboard'}
+                    </h1>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Welcome back! Here's what's happening with Make My Knot today.
+                    </p>
+                  </div>
                 </div>
                 <div className="flex items-center space-x-4">
                   <div className="hidden sm:flex items-center space-x-2">
@@ -1335,10 +1355,10 @@ function AssessmentsTab() {
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Completed</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Progress</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Completed</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -1353,21 +1373,58 @@ function AssessmentsTab() {
                           </span>
                         </div>
                       </div>
-                      <div className="ml-4">
+                      <div className="ml-4 flex-1">
                         <div className="text-sm font-medium text-gray-900">
                           {assessment.userInfo.name}
                         </div>
                         <div className="text-sm text-gray-500 capitalize">
                           {assessment.userInfo.type} • ID: {assessment.id.slice(-6)}
                         </div>
+                        {/* Mobile Status Indicator */}
+                        <div className="mt-1 sm:hidden">
+                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                            assessment.isComplete
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-yellow-100 text-yellow-800'
+                          }`}>
+                            {assessment.isComplete ? 'Complete' : 'In Progress'}
+                          </span>
+                        </div>
+                        {/* Mobile Action Buttons */}
+                        <div className="flex items-center gap-2 mt-2 sm:hidden">
+                          <button
+                            onClick={() => setSelectedAssessment(assessment)}
+                            className="text-primary-600 hover:text-primary-900 flex items-center gap-1 px-2 py-1 text-xs rounded border border-primary-200 hover:bg-primary-50"
+                            title="View Assessment"
+                          >
+                            <Eye className="h-3 w-3" />
+                            View
+                          </button>
+                          <button
+                            onClick={() => exportAssessmentToExcel(assessment)}
+                            className="text-green-700 hover:text-green-900 flex items-center gap-1 px-2 py-1 text-xs rounded border border-green-200 hover:bg-green-50"
+                            title="Download Excel Report"
+                          >
+                            <Download className="h-3 w-3" />
+                            Excel
+                          </button>
+                          <button
+                            onClick={() => handleDeleteAssessment(assessment.id)}
+                            className="text-red-600 hover:text-red-900 flex items-center gap-1 px-2 py-1 text-xs rounded border border-red-200 hover:bg-red-50"
+                            title="Delete Assessment"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                            Delete
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{assessment.userInfo.email}</div>
-                    <div className="text-sm text-gray-500">{assessment.userInfo.phone}</div>
+                  <td className="px-6 py-4 align-top">
+                    <div className="text-sm text-gray-900 break-all sm:break-normal sm:max-w-xs truncate">{assessment.userInfo.email}</div>
+                    <div className="text-sm text-gray-500 break-all sm:break-normal">{assessment.userInfo.phone}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                       assessment.isComplete
                         ? 'bg-green-100 text-green-800'
@@ -1376,7 +1433,7 @@ function AssessmentsTab() {
                       {assessment.isComplete ? 'Complete' : 'In Progress'}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4 whitespace-nowrap hidden md:table-cell">
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div 
                         className="bg-primary-600 h-2 rounded-full" 
@@ -1389,10 +1446,10 @@ function AssessmentsTab() {
                       {Object.keys(assessment.responses).length}/{essentialQuestions.length} questions
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
                     {assessment.completedAt ? new Date(assessment.completedAt).toLocaleDateString() : '—'}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium hidden sm:table-cell">
                     <div className="flex items-center justify-end gap-2">
                       <button
                         onClick={() => setSelectedAssessment(assessment)}
