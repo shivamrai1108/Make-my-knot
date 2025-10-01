@@ -173,7 +173,7 @@ export default function KnotCounsellor() {
     }
     
     if (message.includes('contact') || message.includes('support') || message.includes('help') || message.includes('phone')) {
-      return `I'm here to help, but for complex queries our human experts are amazing! 👥 Contact our relationship specialists at support@makemyknot.com or call +91-11-4567-8900. They're available Mon-Sat, 9 AM to 8 PM IST. For ${user?.name}, I can also schedule a personal consultation call - would you like that?`
+      return `I'm here to help, but for complex queries our human experts are amazing! 👥 Contact our relationship specialists at support@makemyknot.com, our CEO at moulik.goyal@makemyknot.com, or call +91-11-4567-8900. They're available Mon-Sat, 9 AM to 8 PM IST. For ${user?.name}, I can also schedule a personal consultation call - would you like that?`
     }
     
     // Contextual responses based on AI learning

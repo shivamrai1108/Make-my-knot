@@ -20,6 +20,7 @@ const questionnaireRoutes = require('./routes/questionnaires');
 const assessmentRoutes = require('./routes/assessments');
 const blogRoutes = require('./routes/blog');
 const migrationRoutes = require('./routes/migration');
+const nominationRoutes = require('./routes/nominations');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -144,6 +145,7 @@ app.use('/api/questionnaires', questionnaireRoutes);
 app.use('/api/assessments', assessmentRoutes);
 app.use('/api/blog', blogRoutes);
 app.use('/api/migration', migrationRoutes);
+app.use('/api/nominations', nominationRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

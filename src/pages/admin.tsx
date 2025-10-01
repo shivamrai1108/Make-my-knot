@@ -671,7 +671,7 @@ function exportLeadsToCSV(leads: EnhancedLead[]) {
 // Import LogIn icon
 import { LogIn } from 'lucide-react'
 
-type AdminTab = 'dashboard' | 'users' | 'leads' | 'nominations' | 'questionnaires' | 'assessments' | 'webinars' | 'matchmaking' | 'moderation' | 'payments' | 'analytics' | 'communication' | 'offers' | 'online-status'
+type AdminTab = 'dashboard' | 'users' | 'leads' | 'nominations' | 'questionnaires' | 'assessments' | 'webinars' | 'blogs' | 'matchmaking' | 'moderation' | 'payments' | 'analytics' | 'communication' | 'offers' | 'online-status'
 
 // Enhanced webinar interface
 interface Webinar {
@@ -800,6 +800,7 @@ export default function Admin() {
     { id: 'questionnaires', label: 'AI Questionnaires', icon: Brain },
     { id: 'assessments', label: 'Assessments', icon: FileText },
     { id: 'webinars', label: 'Webinars', icon: Video },
+    { id: 'blogs', label: 'Blog Management', icon: Edit },
     { id: 'offers', label: 'Offers', icon: Gift },
     { id: 'matchmaking', label: 'Matchmaking', icon: Shield },
     { id: 'moderation', label: 'Moderation', icon: Eye },
@@ -1030,6 +1031,7 @@ export default function Admin() {
           {activeTab === 'questionnaires' && <QuestionnairesTab />}
           {activeTab === 'assessments' && <AssessmentsTab />}
           {activeTab === 'webinars' && <WebinarsTab />}
+          {activeTab === 'blogs' && <BlogsTab />}
           {activeTab === 'offers' && <OffersTab />}
           {activeTab === 'matchmaking' && <MatchmakingTab />}
           {activeTab === 'moderation' && <ModerationTab />}
@@ -5077,614 +5079,6 @@ function WebinarsTab() {
   )
 }
 
-// Nominations Management Tab
-function NominationsTab() {
-  const [nominations, setNominations] = useState<any[]>([])
-  const [selectedNomination, setSelectedNomination] = useState<any>(null)
-  const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'contacted' | 'matched' | 'rejected'>('all')
-  const [searchTerm, setSearchTerm] = useState('')
-  const [showExportOptions, setShowExportOptions] = useState(false)
-  const [selectedForExport, setSelectedForExport] = useState<string[]>([])
-  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'status'>('newest')
-
-  // Load nominations from localStorage on component mount
-  useEffect(() => {
-    const savedNominations = localStorage.getItem('makemyknot_nominations')
-    if (savedNominations) {
-      try {
-        const parsed = JSON.parse(savedNominations)
-        setNominations(Array.isArray(parsed) ? parsed : [])
-      } catch (error) {
-        console.error('Error parsing nominations data:', error)
-        setNominations([])
-      }
-    } else {
-      // No sample data for live system
-      setNominations([])
-    }
-  }, [])
-
-  // Filter and sort nominations
-  const filteredNominations = nominations
-    .filter(nom => {
-      const matchesSearch = !searchTerm || 
-        nom.nominatorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        nom.nomineeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        nom.nominatorEmail.toLowerCase().includes(searchTerm.toLowerCase())
-      
-      const matchesFilter = filterStatus === 'all' || nom.status === filterStatus
-      
-      return matchesSearch && matchesFilter
-    })
-    .sort((a, b) => {
-      switch (sortBy) {
-        case 'newest':
-          return new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime()
-        case 'oldest':
-          return new Date(a.submittedAt).getTime() - new Date(b.submittedAt).getTime()
-        case 'status':
-          return a.status.localeCompare(b.status)
-        default:
-          return 0
-      }
-    })
-
-  // Update nomination status
-  const updateNominationStatus = (id: string, newStatus: string, notes: string = '') => {
-    const updated = nominations.map(nom => 
-      nom.id === id 
-        ? { ...nom, status: newStatus, notes, updatedAt: new Date().toISOString() }
-        : nom
-    )
-    setNominations(updated)
-    localStorage.setItem('makemyknot_nominations', JSON.stringify(updated))
-  }
-
-  // Delete nomination
-  const deleteNomination = (id: string) => {
-    if (confirm('Are you sure you want to delete this nomination?')) {
-      const filtered = nominations.filter(nom => nom.id !== id)
-      setNominations(filtered)
-      localStorage.setItem('makemyknot_nominations', JSON.stringify(filtered))
-    }
-  }
-
-  // Export nominations to CSV
-  const exportToCSV = () => {
-    const dataToExport = selectedForExport.length > 0 
-      ? nominations.filter(nom => selectedForExport.includes(nom.id))
-      : filteredNominations
-
-    const headers = [
-      'Nomination ID',
-      'Nominator Name',
-      'Nominator Email', 
-      'Nominator Phone',
-      'Nominee Name',
-      'Nominee Age',
-      'Nominee Location',
-      'Relationship',
-      'Reasons',
-      'Nominee Interests',
-      'Status',
-      'Submitted Date',
-      'Notes'
-    ]
-
-    const csvContent = [
-      headers.join(','),
-      ...dataToExport.map(nom => [
-        nom.id,
-        `"${nom.nominatorName}"`,
-        nom.nominatorEmail,
-        nom.nominatorPhone,
-        `"${nom.nomineeName}"`,
-        nom.nomineeAge,
-        `"${nom.nomineeLocation}"`,
-        `"${nom.relationship}"`,
-        `"${nom.reasons}"`,
-        `"${nom.nomineeInterests}"`,
-        nom.status,
-        new Date(nom.submittedAt).toLocaleDateString(),
-        `"${nom.notes || ''}"`
-      ].join(','))
-    ].join('\n')
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-    const link = document.createElement('a')
-    const url = URL.createObjectURL(blob)
-    link.setAttribute('href', url)
-    link.setAttribute('download', `makemyknot_nominations_${new Date().toISOString().split('T')[0]}.csv`)
-    link.style.visibility = 'hidden'
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    
-    setShowExportOptions(false)
-    setSelectedForExport([])
-  }
-
-  // Status color mapping
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pending': return 'bg-yellow-100 text-yellow-800'
-      case 'contacted': return 'bg-blue-100 text-blue-800'
-      case 'matched': return 'bg-green-100 text-green-800'
-      case 'rejected': return 'bg-red-100 text-red-800'
-      default: return 'bg-gray-100 text-gray-800'
-    }
-  }
-
-  // Statistics
-  const stats = {
-    total: nominations.length,
-    pending: nominations.filter(n => n.status === 'pending').length,
-    contacted: nominations.filter(n => n.status === 'contacted').length,
-    matched: nominations.filter(n => n.status === 'matched').length,
-    rejected: nominations.filter(n => n.status === 'rejected').length
-  }
-
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-white rounded-xl shadow-sm border p-6">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-              <UserPlus className="h-8 w-8 text-primary-600" />
-              Nominations Management
-            </h2>
-            <p className="text-gray-600 mt-2">Manage user nominations and referrals for potential matches</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setShowExportOptions(!showExportOptions)}
-              className="btn-secondary flex items-center gap-2"
-            >
-              <Download className="h-4 w-4" />
-              Export CSV
-            </button>
-            <button
-              onClick={() => window.location.reload()}
-              className="btn-primary flex items-center gap-2"
-            >
-              <Activity className="h-4 w-4" />
-              Refresh
-            </button>
-          </div>
-        </div>
-
-        {/* Statistics */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-          <div className="bg-blue-50 rounded-lg p-4">
-            <div className="flex items-center">
-              <UserPlus className="h-8 w-8 text-blue-600" />
-              <div className="ml-3">
-                <div className="text-2xl font-bold text-blue-900">{stats.total}</div>
-                <div className="text-sm text-blue-700">Total Nominations</div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-yellow-50 rounded-lg p-4">
-            <div className="flex items-center">
-              <Activity className="h-8 w-8 text-yellow-600" />
-              <div className="ml-3">
-                <div className="text-2xl font-bold text-yellow-900">{stats.pending}</div>
-                <div className="text-sm text-yellow-700">Pending Review</div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-blue-50 rounded-lg p-4">
-            <div className="flex items-center">
-              <Phone className="h-8 w-8 text-blue-600" />
-              <div className="ml-3">
-                <div className="text-2xl font-bold text-blue-900">{stats.contacted}</div>
-                <div className="text-sm text-blue-700">Contacted</div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-green-50 rounded-lg p-4">
-            <div className="flex items-center">
-              <CheckCircle2 className="h-8 w-8 text-green-600" />
-              <div className="ml-3">
-                <div className="text-2xl font-bold text-green-900">{stats.matched}</div>
-                <div className="text-sm text-green-700">Successfully Matched</div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-red-50 rounded-lg p-4">
-            <div className="flex items-center">
-              <XCircle className="h-8 w-8 text-red-600" />
-              <div className="ml-3">
-                <div className="text-2xl font-bold text-red-900">{stats.rejected}</div>
-                <div className="text-sm text-red-700">Not Suitable</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Filters */}
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search by nominator or nominee name, email..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              />
-            </div>
-          </div>
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value as any)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          >
-            <option value="all">All Status ({stats.total})</option>
-            <option value="pending">Pending ({stats.pending})</option>
-            <option value="contacted">Contacted ({stats.contacted})</option>
-            <option value="matched">Matched ({stats.matched})</option>
-            <option value="rejected">Rejected ({stats.rejected})</option>
-          </select>
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as any)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          >
-            <option value="newest">Newest First</option>
-            <option value="oldest">Oldest First</option>
-            <option value="status">Sort by Status</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Export Options Panel */}
-      {showExportOptions && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-medium text-blue-900">Export Options</h3>
-            <button
-              onClick={() => setShowExportOptions(false)}
-              className="text-blue-600 hover:text-blue-800"
-            >
-              <XCircle className="h-5 w-5" />
-            </button>
-          </div>
-          <div className="flex items-center gap-4">
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                onChange={(e) => {
-                  if (e.target.checked) {
-                    setSelectedForExport(filteredNominations.map(n => n.id))
-                  } else {
-                    setSelectedForExport([])
-                  }
-                }}
-                className="rounded border-gray-300"
-              />
-              <span className="ml-2 text-sm text-blue-800">
-                Export all filtered nominations ({filteredNominations.length})
-              </span>
-            </label>
-            <button
-              onClick={exportToCSV}
-              className="btn-primary flex items-center gap-2"
-            >
-              <Download className="h-4 w-4" />
-              Download CSV
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Nominations Table */}
-      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {showExportOptions && (
-                    <input
-                      type="checkbox"
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedForExport(filteredNominations.map(n => n.id))
-                        } else {
-                          setSelectedForExport([])
-                        }
-                      }}
-                      className="rounded border-gray-300 mr-2"
-                    />
-                  )}
-                  Nominator
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nominee Details</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Relationship</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Submitted</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredNominations.map((nomination) => (
-                <tr key={nomination.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      {showExportOptions && (
-                        <input
-                          type="checkbox"
-                          checked={selectedForExport.includes(nomination.id)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setSelectedForExport([...selectedForExport, nomination.id])
-                            } else {
-                              setSelectedForExport(selectedForExport.filter(id => id !== nomination.id))
-                            }
-                          }}
-                          className="rounded border-gray-300 mr-3"
-                        />
-                      )}
-                      <div className="flex-shrink-0">
-                        <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
-                          <span className="text-sm font-medium text-primary-700">
-                            {nomination.nominatorName.charAt(0).toUpperCase()}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">{nomination.nominatorName}</div>
-                        <div className="text-sm text-gray-500">{nomination.nominatorEmail}</div>
-                        <div className="text-sm text-gray-500">{nomination.nominatorPhone}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm font-medium text-gray-900">{nomination.nomineeName}</div>
-                    <div className="text-sm text-gray-500">Age: {nomination.nomineeAge} • {nomination.nomineeLocation}</div>
-                    <div className="text-sm text-gray-500 truncate max-w-xs" title={nomination.nomineeInterests}>
-                      Interests: {nomination.nomineeInterests}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{nomination.relationship}</div>
-                    <div className="text-sm text-gray-500 max-w-xs truncate" title={nomination.reasons}>
-                      {nomination.reasons}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(nomination.status)}`}>
-                      {nomination.status.charAt(0).toUpperCase() + nomination.status.slice(1)}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(nomination.submittedAt).toLocaleDateString()}
-                    <div className="text-xs text-gray-400">
-                      {new Date(nomination.submittedAt).toLocaleTimeString()}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="flex items-center justify-end gap-2">
-                      <button
-                        onClick={() => setSelectedNomination(nomination)}
-                        className="text-primary-600 hover:text-primary-900 flex items-center gap-1 px-3 py-1 rounded border border-primary-200 hover:bg-primary-50"
-                        title="View Details"
-                      >
-                        <Eye className="h-4 w-4" />
-                        View
-                      </button>
-                      <button
-                        onClick={() => deleteNomination(nomination.id)}
-                        className="text-red-600 hover:text-red-900 flex items-center gap-1 px-3 py-1 rounded border border-red-200 hover:bg-red-50"
-                        title="Delete Nomination"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                        Delete
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        
-        {filteredNominations.length === 0 && (
-          <div className="text-center py-12">
-            <UserPlus className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-            <h3 className="text-sm font-medium text-gray-900 mb-2">No nominations found</h3>
-            <p className="text-sm text-gray-500">
-              {searchTerm || filterStatus !== 'all' 
-                ? 'No nominations match your search criteria.' 
-                : 'No nominations have been submitted yet.'}
-            </p>
-          </div>
-        )}
-      </div>
-
-      {/* Nomination Detail Modal */}
-      {selectedNomination && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Nomination Details
-                  </h3>
-                  <p className="text-sm text-gray-600 mt-1">
-                    ID: {selectedNomination.id} • Submitted: {new Date(selectedNomination.submittedAt).toLocaleDateString()}
-                  </p>
-                </div>
-                <button
-                  onClick={() => setSelectedNomination(null)}
-                  className="text-gray-400 hover:text-gray-600 p-2"
-                >
-                  <XCircle className="h-6 w-6" />
-                </button>
-              </div>
-            </div>
-            
-            <div className="p-6">
-              {/* Nominator Information */}
-              <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-                <h4 className="font-semibold text-blue-900 mb-3">Nominator Information</h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                  <div>
-                    <span className="text-blue-700">Name:</span>
-                    <div className="font-medium text-blue-900">{selectedNomination.nominatorName}</div>
-                  </div>
-                  <div>
-                    <span className="text-blue-700">Email:</span>
-                    <div className="font-medium text-blue-900">{selectedNomination.nominatorEmail}</div>
-                  </div>
-                  <div>
-                    <span className="text-blue-700">Phone:</span>
-                    <div className="font-medium text-blue-900">{selectedNomination.nominatorPhone}</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Nominee Information */}
-              <div className="mb-6 p-4 bg-green-50 rounded-lg">
-                <h4 className="font-semibold text-green-900 mb-3">Nominee Information</h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm mb-4">
-                  <div>
-                    <span className="text-green-700">Name:</span>
-                    <div className="font-medium text-green-900">{selectedNomination.nomineeName}</div>
-                  </div>
-                  <div>
-                    <span className="text-green-700">Age:</span>
-                    <div className="font-medium text-green-900">{selectedNomination.nomineeAge} years</div>
-                  </div>
-                  <div>
-                    <span className="text-green-700">Location:</span>
-                    <div className="font-medium text-green-900">{selectedNomination.nomineeLocation}</div>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <div>
-                    <span className="text-green-700 text-sm">Interests & Hobbies:</span>
-                    <div className="font-medium text-green-900">{selectedNomination.nomineeInterests}</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Nomination Details */}
-              <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-                <h4 className="font-semibold text-gray-900 mb-3">Nomination Details</h4>
-                <div className="space-y-3">
-                  <div>
-                    <span className="text-gray-700 text-sm">Relationship to Nominee:</span>
-                    <div className="font-medium text-gray-900">{selectedNomination.relationship}</div>
-                  </div>
-                  <div>
-                    <span className="text-gray-700 text-sm">Reasons for Nomination:</span>
-                    <div className="font-medium text-gray-900">{selectedNomination.reasons}</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Status Management */}
-              <div className="mb-6 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-                <h4 className="font-semibold text-yellow-900 mb-3">Status Management</h4>
-                <div className="flex items-center gap-4 mb-3">
-                  <span className="text-sm text-yellow-700">Current Status:</span>
-                  <span className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(selectedNomination.status)}`}>
-                    {selectedNomination.status.charAt(0).toUpperCase() + selectedNomination.status.slice(1)}
-                  </span>
-                </div>
-                
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {['pending', 'contacted', 'matched', 'rejected'].map(status => (
-                    <button
-                      key={status}
-                      onClick={() => {
-                        const notes = prompt(`Update status to "${status}"? Add notes (optional):`)
-                        if (notes !== null) {
-                          updateNominationStatus(selectedNomination.id, status, notes)
-                          setSelectedNomination({...selectedNomination, status, notes})
-                        }
-                      }}
-                      className={`px-3 py-1 text-sm rounded-lg border transition-colors ${
-                        selectedNomination.status === status
-                          ? 'bg-primary-100 text-primary-800 border-primary-300'
-                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                      }`}
-                    >
-                      Mark as {status.charAt(0).toUpperCase() + status.slice(1)}
-                    </button>
-                  ))}
-                </div>
-                
-                {selectedNomination.notes && (
-                  <div>
-                    <span className="text-sm text-yellow-700">Admin Notes:</span>
-                    <div className="font-medium text-yellow-900 bg-white p-2 rounded border mt-1">
-                      {selectedNomination.notes}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Actions */}
-              <div className="flex items-center gap-3 pt-4 border-t border-gray-200">
-                <button
-                  onClick={() => {
-                    // Generate mailto link with pre-filled content
-                    const subject = encodeURIComponent('Regarding your nomination to Make My Knot')
-                    const body = encodeURIComponent(
-                      `Dear ${selectedNomination.nominatorName},\n\nThank you for nominating ${selectedNomination.nomineeName} to Make My Knot.\n\nWe have reviewed your nomination and...\n\nBest regards,\nMake My Knot Team`
-                    )
-                    window.open(`mailto:${selectedNomination.nominatorEmail}?subject=${subject}&body=${body}`)
-                  }}
-                  className="btn-primary flex items-center gap-2"
-                >
-                  <Mail className="h-4 w-4" />
-                  Email Nominator
-                </button>
-                <button
-                  onClick={() => {
-                    // Generate telephone link
-                    window.open(`tel:${selectedNomination.nominatorPhone}`)
-                  }}
-                  className="btn-secondary flex items-center gap-2"
-                >
-                  <Phone className="h-4 w-4" />
-                  Call Nominator
-                </button>
-                <button
-                  onClick={() => {
-                    deleteNomination(selectedNomination.id)
-                    setSelectedNomination(null)
-                  }}
-                  className="text-red-600 hover:text-red-800 px-4 py-2 border border-red-300 rounded-lg hover:bg-red-50 flex items-center gap-2"
-                >
-                  <Trash2 className="h-4 w-4" />
-                  Delete
-                </button>
-                <button
-                  onClick={() => setSelectedNomination(null)}
-                  className="text-gray-600 hover:text-gray-800 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
-
 // Offers Management Tab
 function OffersTab() {
   const [offers, setOffers] = useState<Offer[]>(mockOffers)
@@ -6079,6 +5473,1335 @@ function OffersTab() {
                 className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
               >
                 Update Offer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// Nominations Management Tab
+function NominationsTab() {
+  const [nominations, setNominations] = useState<any[]>([])
+  const [selectedNomination, setSelectedNomination] = useState<any>(null)
+  const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'reviewed' | 'contacted' | 'rejected'>('all')
+  const [searchTerm, setSearchTerm] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [adminNotes, setAdminNotes] = useState('')
+
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://make-my-knot-production.up.railway.app/api'
+
+  // Load nominations from backend
+  const loadNominations = async () => {
+    try {
+      setLoading(true)
+      const response = await fetch(`${API_URL}/nominations/admin`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        setNominations(data.data?.nominations || [])
+      } else {
+        throw new Error('Failed to load nominations')
+      }
+    } catch (error) {
+      console.error('Error loading nominations:', error)
+      setError('Failed to load nominations. Please try again.')
+      setNominations([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadNominations()
+  }, [])
+
+  // Update nomination status
+  const updateNominationStatus = async (id: string, status: string, notes?: string) => {
+    try {
+      const response = await fetch(`${API_URL}/nominations/admin/${id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status, adminNotes: notes })
+      })
+      
+      if (response.ok) {
+        await loadNominations() // Refresh the list
+        setSelectedNomination(null)
+      } else {
+        throw new Error('Failed to update nomination status')
+      }
+    } catch (error) {
+      console.error('Error updating nomination:', error)
+      alert('Failed to update nomination status. Please try again.')
+    }
+  }
+
+  // Mark nomination as contacted
+  const markAsContacted = async (id: string) => {
+    try {
+      const response = await fetch(`${API_URL}/nominations/admin/${id}/contact`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' }
+      })
+      
+      if (response.ok) {
+        await loadNominations()
+      }
+    } catch (error) {
+      console.error('Error marking as contacted:', error)
+      alert('Failed to mark as contacted. Please try again.')
+    }
+  }
+
+  // Delete nomination
+  const deleteNomination = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this nomination?')) return
+    
+    try {
+      const response = await fetch(`${API_URL}/nominations/admin/${id}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' }
+      })
+      
+      if (response.ok) {
+        await loadNominations()
+        setSelectedNomination(null)
+      } else {
+        throw new Error('Failed to delete nomination')
+      }
+    } catch (error) {
+      console.error('Error deleting nomination:', error)
+      alert('Failed to delete nomination. Please try again.')
+    }
+  }
+
+  // Export nominations to CSV
+  const exportNominations = () => {
+    const headers = [
+      'ID', 'Nominator Name', 'Nominator Email', 'Nominator Phone',
+      'Nominee Name', 'Nominee Email', 'Nominee Phone', 'Relationship',
+      'Reason', 'Status', 'Created At', 'Admin Notes'
+    ]
+    
+    const rows = nominations.map(nom => [
+      nom._id,
+      nom.nominatorInfo.name,
+      nom.nominatorInfo.email,
+      nom.nominatorInfo.phone,
+      nom.nomineeInfo.name,
+      nom.nomineeInfo.email,
+      nom.nomineeInfo.phone,
+      nom.relationship,
+      nom.reason,
+      nom.status,
+      new Date(nom.createdAt).toLocaleDateString(),
+      nom.adminNotes || ''
+    ])
+    
+    const csvContent = [headers, ...rows]
+      .map(row => row.map(cell => `"${cell}"`).join(','))
+      .join('\n')
+      
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    link.setAttribute('href', url)
+    link.setAttribute('download', `nominations_export_${new Date().toISOString().split('T')[0]}.csv`)
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
+  // Filter nominations
+  const filteredNominations = nominations.filter(nom => {
+    const matchesSearch = !searchTerm || 
+      nom.nominatorInfo.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      nom.nominatorInfo.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      nom.nomineeInfo.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      nom.nomineeInfo.email.toLowerCase().includes(searchTerm.toLowerCase())
+    
+    const matchesFilter = filterStatus === 'all' || nom.status === filterStatus
+    
+    return matchesSearch && matchesFilter
+  })
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending': return 'bg-yellow-100 text-yellow-800'
+      case 'reviewed': return 'bg-blue-100 text-blue-800'
+      case 'contacted': return 'bg-green-100 text-green-800'
+      case 'rejected': return 'bg-red-100 text-red-800'
+      default: return 'bg-gray-100 text-gray-800'
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+          <span className="ml-3 text-gray-600">Loading nominations...</span>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="text-center py-12">
+          <div className="text-red-600 mb-4">
+            <AlertTriangle className="h-12 w-12 mx-auto mb-2" />
+            <p className="text-lg font-semibold">Error Loading Nominations</p>
+            <p className="text-sm mt-1">{error}</p>
+          </div>
+          <button 
+            onClick={loadNominations}
+            className="btn-primary"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="bg-white rounded-xl shadow-sm border p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+              <UserPlus className="h-8 w-8 text-primary-600" />
+              Nominations Management
+            </h2>
+            <p className="text-gray-600 mt-2">Manage user nominations and referrals</p>
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={exportNominations}
+              className="btn-secondary flex items-center gap-2"
+              disabled={nominations.length === 0}
+            >
+              <Download className="h-4 w-4" />
+              Export CSV
+            </button>
+            <button
+              onClick={loadNominations}
+              className="btn-primary flex items-center gap-2"
+            >
+              <Clock className="h-4 w-4" />
+              Refresh
+            </button>
+          </div>
+        </div>
+        
+        {/* Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+          <div className="bg-gray-50 rounded-lg p-4">
+            <div className="text-2xl font-bold text-gray-900">{nominations.length}</div>
+            <div className="text-sm text-gray-600">Total Nominations</div>
+          </div>
+          <div className="bg-yellow-50 rounded-lg p-4">
+            <div className="text-2xl font-bold text-yellow-600">{nominations.filter(n => n.status === 'pending').length}</div>
+            <div className="text-sm text-gray-600">Pending Review</div>
+          </div>
+          <div className="bg-blue-50 rounded-lg p-4">
+            <div className="text-2xl font-bold text-blue-600">{nominations.filter(n => n.status === 'reviewed').length}</div>
+            <div className="text-sm text-gray-600">Reviewed</div>
+          </div>
+          <div className="bg-green-50 rounded-lg p-4">
+            <div className="text-2xl font-bold text-green-600">{nominations.filter(n => n.status === 'contacted').length}</div>
+            <div className="text-sm text-gray-600">Contacted</div>
+          </div>
+          <div className="bg-red-50 rounded-lg p-4">
+            <div className="text-2xl font-bold text-red-600">{nominations.filter(n => n.status === 'rejected').length}</div>
+            <div className="text-sm text-gray-600">Rejected</div>
+          </div>
+        </div>
+        
+        {/* Filters */}
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex-1">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+              <input
+                type="text"
+                placeholder="Search nominations..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+          <div className="sm:w-48">
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value as any)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            >
+              <option value="all">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="reviewed">Reviewed</option>
+              <option value="contacted">Contacted</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Nominations Table */}
+      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nominator</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nominee</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Relationship</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredNominations.map((nomination) => (
+                <tr key={nomination._id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4">
+                    <div className="text-sm font-medium text-gray-900">{nomination.nominatorInfo.name}</div>
+                    <div className="text-sm text-gray-500">{nomination.nominatorInfo.email}</div>
+                    <div className="text-sm text-gray-500">{nomination.nominatorInfo.phone}</div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="text-sm font-medium text-gray-900">{nomination.nomineeInfo.name}</div>
+                    <div className="text-sm text-gray-500">{nomination.nomineeInfo.email}</div>
+                    <div className="text-sm text-gray-500">{nomination.nomineeInfo.phone}</div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="text-sm text-gray-900">{nomination.relationship}</div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(nomination.status)}`}>
+                      {nomination.status.charAt(0).toUpperCase() + nomination.status.slice(1)}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-500">
+                    {new Date(nomination.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="px-6 py-4 text-right text-sm font-medium">
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => setSelectedNomination(nomination)}
+                        className="text-primary-600 hover:text-primary-900 flex items-center gap-1 px-3 py-1 rounded border border-primary-200 hover:bg-primary-50"
+                        title="View Details"
+                      >
+                        <Eye className="h-4 w-4" />
+                        View
+                      </button>
+                      {nomination.status !== 'contacted' && (
+                        <button
+                          onClick={() => markAsContacted(nomination._id)}
+                          className="text-green-600 hover:text-green-900 flex items-center gap-1 px-3 py-1 rounded border border-green-200 hover:bg-green-50"
+                          title="Mark as Contacted"
+                        >
+                          <CheckCircle2 className="h-4 w-4" />
+                          Contact
+                        </button>
+                      )}
+                      <button
+                        onClick={() => deleteNomination(nomination._id)}
+                        className="text-red-600 hover:text-red-900 flex items-center gap-1 px-3 py-1 rounded border border-red-200 hover:bg-red-50"
+                        title="Delete Nomination"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        
+        {filteredNominations.length === 0 && (
+          <div className="text-center py-12">
+            <UserPlus className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+            <h3 className="text-sm font-medium text-gray-900 mb-2">No nominations found</h3>
+            <p className="text-sm text-gray-500">
+              No nominations match the current filter criteria.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Nomination Detail Modal */}
+      {selectedNomination && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Nomination Details - ID: {selectedNomination._id.slice(-8)}
+                  </h3>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Submitted on {new Date(selectedNomination.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setSelectedNomination(null)}
+                  className="text-gray-400 hover:text-gray-600 p-2"
+                >
+                  <XCircle className="h-6 w-6" />
+                </button>
+              </div>
+            </div>
+            
+            <div className="p-6">
+              {/* Nominator Info */}
+              <div className="mb-6 p-4 bg-blue-50 rounded-lg">
+                <h4 className="font-semibold text-blue-900 mb-3">Nominator Information</h4>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                  <div>
+                    <span className="text-blue-700">Name:</span>
+                    <div className="font-medium text-gray-900">{selectedNomination.nominatorInfo.name}</div>
+                  </div>
+                  <div>
+                    <span className="text-blue-700">Email:</span>
+                    <div className="font-medium text-gray-900">{selectedNomination.nominatorInfo.email}</div>
+                  </div>
+                  <div>
+                    <span className="text-blue-700">Phone:</span>
+                    <div className="font-medium text-gray-900">{selectedNomination.nominatorInfo.phone}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Nominee Info */}
+              <div className="mb-6 p-4 bg-green-50 rounded-lg">
+                <h4 className="font-semibold text-green-900 mb-3">Nominee Information</h4>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                  <div>
+                    <span className="text-green-700">Name:</span>
+                    <div className="font-medium text-gray-900">{selectedNomination.nomineeInfo.name}</div>
+                  </div>
+                  <div>
+                    <span className="text-green-700">Email:</span>
+                    <div className="font-medium text-gray-900">{selectedNomination.nomineeInfo.email}</div>
+                  </div>
+                  <div>
+                    <span className="text-green-700">Phone:</span>
+                    <div className="font-medium text-gray-900">{selectedNomination.nomineeInfo.phone}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Nomination Details */}
+              <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h4 className="font-semibold text-gray-900 mb-3">Nomination Details</h4>
+                <div className="space-y-3">
+                  <div>
+                    <span className="text-gray-700 font-medium">Relationship:</span>
+                    <div className="text-gray-900">{selectedNomination.relationship}</div>
+                  </div>
+                  <div>
+                    <span className="text-gray-700 font-medium">Reason for Nomination:</span>
+                    <div className="text-gray-900 mt-1">{selectedNomination.reason}</div>
+                  </div>
+                  <div>
+                    <span className="text-gray-700 font-medium">Current Status:</span>
+                    <span className={`ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(selectedNomination.status)}`}>
+                      {selectedNomination.status.charAt(0).toUpperCase() + selectedNomination.status.slice(1)}
+                    </span>
+                  </div>
+                  {selectedNomination.contactedAt && (
+                    <div>
+                      <span className="text-gray-700 font-medium">Contacted At:</span>
+                      <div className="text-gray-900">{new Date(selectedNomination.contactedAt).toLocaleDateString()}</div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Admin Notes */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Admin Notes</label>
+                <textarea
+                  value={adminNotes || selectedNomination.adminNotes || ''}
+                  onChange={(e) => setAdminNotes(e.target.value)}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="Add internal notes about this nomination..."
+                />
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center gap-3 pt-4 border-t border-gray-200">
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Update Status</label>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => updateNominationStatus(selectedNomination._id, 'reviewed', adminNotes)}
+                      className="btn-secondary text-sm"
+                      disabled={selectedNomination.status === 'reviewed'}
+                    >
+                      Mark as Reviewed
+                    </button>
+                    <button
+                      onClick={() => updateNominationStatus(selectedNomination._id, 'contacted', adminNotes)}
+                      className="btn-primary text-sm"
+                      disabled={selectedNomination.status === 'contacted'}
+                    >
+                      Mark as Contacted
+                    </button>
+                    <button
+                      onClick={() => updateNominationStatus(selectedNomination._id, 'rejected', adminNotes)}
+                      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm"
+                      disabled={selectedNomination.status === 'rejected'}
+                    >
+                      Reject
+                    </button>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setSelectedNomination(null)}
+                  className="text-gray-600 hover:text-gray-800 px-4 py-2 border border-gray-300 rounded-lg"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// Blog Management Tab with Templates
+function BlogsTab() {
+  const [blogs, setBlogs] = useState<any[]>([])
+  const [selectedBlog, setSelectedBlog] = useState<any>(null)
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [showTemplateModal, setShowTemplateModal] = useState(false)
+  const [selectedTemplate, setSelectedTemplate] = useState<any>(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filterStatus, setFilterStatus] = useState<'all' | 'draft' | 'published' | 'archived'>('all')
+
+  // Blog templates for different types of content
+  const blogTemplates = [
+    {
+      id: 'relationship-tips',
+      title: 'Relationship Tips & Advice',
+      category: 'Advice',
+      description: 'Template for relationship guidance and tips',
+      template: `# [Catchy Title About Relationship Topic]
+
+## Introduction
+Start with a relatable scenario or question that your readers might face in their relationships.
+
+## The Challenge
+Describe the common relationship challenge or issue.
+
+## Expert Insights
+### Tip 1: [Specific Advice]
+Explain the first piece of advice with examples.
+
+### Tip 2: [Specific Advice]
+Provide the second tip with practical applications.
+
+### Tip 3: [Specific Advice]
+Share the third insight with real-world scenarios.
+
+## Real-Life Examples
+Share success stories or case studies (anonymized).
+
+## Action Steps
+1. Step one for readers to implement
+2. Step two for practical application
+3. Step three for long-term success
+
+## Conclusion
+Summarize the key takeaways and encourage reader engagement.
+
+---
+*Looking for personalized relationship advice? Connect with our expert counselors at Make My Knot.*`
+    },
+    {
+      id: 'success-stories',
+      title: 'Success Stories & Testimonials',
+      category: 'Stories',
+      description: 'Template for client success stories and testimonials',
+      template: `# [Couple Names] Found Love Through Make My Knot
+
+## Their Journey Begins
+**Background:** Introduce the couple, their backgrounds, and what they were looking for.
+
+**The Challenge:** What difficulties were they facing in finding the right partner?
+
+## The Make My Knot Experience
+**Initial Consultation:** Describe their first interaction with our service.
+
+**The Matching Process:** Explain how our AI and counselors worked to find their perfect match.
+
+**Key Moments:** Highlight important milestones in their journey.
+
+## The Perfect Match
+**First Meeting:** Describe their first encounter and initial impressions.
+
+**Growing Connection:** How their relationship developed over time.
+
+**Special Moments:** Share touching or memorable moments from their journey.
+
+## Their Message to Others
+> "[Direct quote from the couple about their experience]"
+
+## The Celebration
+**[Event Description]:** Wedding, engagement, or other milestone celebration.
+
+## What Made the Difference
+- Personalized matching process
+- Expert guidance from counselors
+- AI-powered compatibility analysis
+- Ongoing support throughout the journey
+
+---
+*Ready to write your own success story? Start your journey with Make My Knot today.*`
+    },
+    {
+      id: 'wedding-planning',
+      title: 'Wedding Planning & Preparation',
+      category: 'Planning',
+      description: 'Template for wedding planning guides and tips',
+      template: `# [Wedding Planning Topic]: Your Complete Guide
+
+## Planning Overview
+Brief introduction to the wedding planning aspect being covered.
+
+## Timeline & Checklist
+### 12+ Months Before
+- [ ] Key task 1
+- [ ] Key task 2
+- [ ] Key task 3
+
+### 6-12 Months Before
+- [ ] Important milestone 1
+- [ ] Important milestone 2
+- [ ] Important milestone 3
+
+### 1-6 Months Before
+- [ ] Final preparations 1
+- [ ] Final preparations 2
+- [ ] Final preparations 3
+
+### 1 Month Before
+- [ ] Last-minute details
+- [ ] Confirmations needed
+- [ ] Final touches
+
+## Budget Considerations
+**Estimated Costs:**
+- Item 1: ₹[Amount Range]
+- Item 2: ₹[Amount Range]
+- Item 3: ₹[Amount Range]
+
+**Money-Saving Tips:**
+1. Practical tip for budget management
+2. Alternative options to consider
+3. Negotiation strategies
+
+## Expert Recommendations
+### Vendor Selection
+Criteria for choosing the right vendors.
+
+### Common Mistakes to Avoid
+Pitfalls to watch out for during planning.
+
+### Pro Tips
+Insider advice from wedding professionals.
+
+## Cultural Considerations
+Important traditions and customs to incorporate.
+
+## Conclusion
+Summarize key points and encourage readers to start planning.
+
+---
+*Need help planning your dream wedding? Our relationship counselors can guide you through every step.*`
+    },
+    {
+      id: 'modern-dating',
+      title: 'Modern Dating & Technology',
+      category: 'Dating',
+      description: 'Template for articles about modern dating trends and technology',
+      template: `# [Modern Dating Topic]: Navigating [Specific Aspect]
+
+## The Modern Dating Landscape
+Set the context for how dating has evolved in the digital age.
+
+## Current Trends
+### Trend 1: [Specific Trend]
+Explain the trend and its impact on relationships.
+
+### Trend 2: [Specific Trend]
+Describe another important trend in modern dating.
+
+### Trend 3: [Specific Trend]
+Discuss a third significant trend.
+
+## Technology's Role
+**Benefits:**
+- How technology helps in finding compatible partners
+- Improved communication tools
+- Better matching algorithms
+
+**Challenges:**
+- Potential drawbacks of digital dating
+- How to maintain authentic connections
+- Balancing online and offline interactions
+
+## Best Practices
+### For Online Dating
+1. Creating an authentic profile
+2. Effective communication strategies
+3. Safety considerations
+
+### For Building Real Connections
+1. Moving from online to offline
+2. Maintaining meaningful conversations
+3. Building trust and intimacy
+
+## The Make My Knot Advantage
+How our platform addresses modern dating challenges:
+- AI-powered compatibility matching
+- Expert counselor guidance
+- Safe, verified environment
+- Focus on long-term relationships
+
+## Looking Ahead
+Future trends and what they mean for relationships.
+
+## Conclusion
+Key takeaways for navigating modern dating successfully.
+
+---
+*Experience the future of matchmaking with Make My Knot's AI-powered platform.*`
+    },
+    {
+      id: 'cultural-traditions',
+      title: 'Cultural Traditions & Values',
+      category: 'Culture',
+      description: 'Template for articles about cultural aspects of marriage and relationships',
+      template: `# [Cultural Topic]: Honoring Traditions in Modern Relationships
+
+## Cultural Heritage
+Introduce the cultural tradition or value being discussed.
+
+## Historical Context
+**Origins:** Where and how this tradition began.
+
+**Evolution:** How it has changed over time.
+
+**Modern Relevance:** Why it remains important today.
+
+## Traditional Practices
+### Practice 1: [Specific Tradition]
+Detailed explanation of the tradition and its significance.
+
+### Practice 2: [Specific Tradition]
+Another important cultural practice.
+
+### Practice 3: [Specific Tradition]
+Additional tradition worth preserving.
+
+## Modern Adaptations
+**Balancing Tradition and Modernity:**
+- How couples today incorporate traditions
+- Adapting practices for contemporary life
+- Respecting elders while making personal choices
+
+## Regional Variations
+How the tradition differs across different regions or communities.
+
+## Interfaith and Intercultural Considerations
+**When Partners Have Different Backgrounds:**
+- Finding common ground
+- Respecting both traditions
+- Creating new blended traditions
+
+## Practical Implementation
+### In Courtship
+How traditions apply during the dating process.
+
+### In Wedding Planning
+Incorporating traditions into modern weddings.
+
+### In Married Life
+Maintaining cultural values in daily life.
+
+## Expert Perspectives
+Insights from cultural experts, elders, and counselors.
+
+## Conclusion
+The importance of cultural traditions in building strong relationships.
+
+---
+*Discover partners who share your values and cultural background through Make My Knot.*`
+    },
+    {
+      id: 'relationship-counseling',
+      title: 'Relationship Counseling & Therapy',
+      category: 'Counseling',
+      description: 'Template for articles about professional relationship guidance',
+      template: `# [Counseling Topic]: Professional Guidance for [Specific Issue]
+
+## Understanding the Issue
+Define the relationship challenge being addressed.
+
+## Signs You Might Need Help
+**Common Indicators:**
+- Warning sign 1
+- Warning sign 2
+- Warning sign 3
+
+**When to Seek Professional Help:**
+Guidance on recognizing when professional intervention is needed.
+
+## Types of Relationship Support
+### Individual Counseling
+How personal therapy can improve relationships.
+
+### Couples Therapy
+Benefits of working together with a professional.
+
+### Group Support
+Value of peer support and group sessions.
+
+### Pre-marital Counseling
+Prevention-focused approach for engaged couples.
+
+## What to Expect
+**First Session:**
+- Initial assessment process
+- Setting goals and expectations
+- Building rapport with your counselor
+
+**Ongoing Sessions:**
+- Typical session structure
+- Homework and exercises
+- Measuring progress
+
+## Therapeutic Approaches
+### Approach 1: [Specific Method]
+Explanation of therapeutic technique and its benefits.
+
+### Approach 2: [Specific Method]
+Another effective counseling method.
+
+### Approach 3: [Specific Method]
+Additional therapeutic approach.
+
+## Success Stories
+Anonymized examples of couples who benefited from counseling.
+
+## Finding the Right Counselor
+**Important Qualifications:**
+- Professional credentials to look for
+- Experience and specializations
+- Cultural competency
+
+**Questions to Ask:**
+1. Important question about approach
+2. Question about experience
+3. Question about success rates
+
+## Making the Most of Counseling
+**Do's:**
+- Be honest and open
+- Complete assigned exercises
+- Practice new skills
+
+**Don'ts:**
+- Avoid blame and defensiveness
+- Don't skip sessions
+- Don't expect overnight changes
+
+## Conclusion
+The value of professional support in building healthy relationships.
+
+---
+*Connect with our certified relationship counselors through Make My Knot's comprehensive support program.*`
+    }
+  ]
+
+  const [newBlog, setNewBlog] = useState({
+    title: '',
+    content: '',
+    category: '',
+    status: 'draft' as 'draft' | 'published' | 'archived',
+    tags: [] as string[],
+    author: 'Admin',
+    publishDate: new Date().toISOString().split('T')[0]
+  })
+
+  // Load blogs from localStorage (in production, this would be from a database)
+  useEffect(() => {
+    const savedBlogs = JSON.parse(localStorage.getItem('makemyknot_blogs') || '[]')
+    setBlogs(savedBlogs)
+  }, [])
+
+  // Save blog
+  const saveBlog = (blog: any) => {
+    const updatedBlogs = blog.id 
+      ? blogs.map(b => b.id === blog.id ? blog : b)
+      : [...blogs, { ...blog, id: crypto.randomUUID(), createdAt: new Date().toISOString() }]
+    
+    setBlogs(updatedBlogs)
+    localStorage.setItem('makemyknot_blogs', JSON.stringify(updatedBlogs))
+  }
+
+  // Delete blog
+  const deleteBlog = (id: string) => {
+    if (!confirm('Are you sure you want to delete this blog?')) return
+    
+    const updatedBlogs = blogs.filter(b => b.id !== id)
+    setBlogs(updatedBlogs)
+    localStorage.setItem('makemyknot_blogs', JSON.stringify(updatedBlogs))
+  }
+
+  // Create blog from template
+  const createFromTemplate = (template: any) => {
+    setNewBlog({
+      ...newBlog,
+      title: '',
+      content: template.template,
+      category: template.category,
+      tags: [template.category.toLowerCase()]
+    })
+    setShowTemplateModal(false)
+    setShowCreateModal(true)
+  }
+
+  // Handle create blog
+  const handleCreateBlog = () => {
+    if (!newBlog.title.trim()) {
+      alert('Please enter a blog title')
+      return
+    }
+    
+    saveBlog({
+      ...newBlog,
+      updatedAt: new Date().toISOString()
+    })
+    
+    setNewBlog({
+      title: '',
+      content: '',
+      category: '',
+      status: 'draft' as const,
+      tags: [],
+      author: 'Admin',
+      publishDate: new Date().toISOString().split('T')[0]
+    })
+    setShowCreateModal(false)
+  }
+
+  // Export blog content
+  const exportBlog = (blog: any) => {
+    const content = `# ${blog.title}\n\n${blog.content}\n\n---\n\nCategory: ${blog.category}\nStatus: ${blog.status}\nAuthor: ${blog.author}\nCreated: ${new Date(blog.createdAt).toLocaleDateString()}`
+    
+    const blob = new Blob([content], { type: 'text/markdown;charset=utf-8;' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    link.setAttribute('href', url)
+    link.setAttribute('download', `${blog.title.replace(/[^a-zA-Z0-9]/g, '-')}.md`)
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
+  // Filter blogs
+  const filteredBlogs = blogs.filter(blog => {
+    const matchesSearch = !searchTerm || 
+      blog.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      blog.category.toLowerCase().includes(searchTerm.toLowerCase())
+    
+    const matchesFilter = filterStatus === 'all' || blog.status === filterStatus
+    
+    return matchesSearch && matchesFilter
+  })
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'draft': return 'bg-yellow-100 text-yellow-800'
+      case 'published': return 'bg-green-100 text-green-800'
+      case 'archived': return 'bg-gray-100 text-gray-800'
+      default: return 'bg-gray-100 text-gray-800'
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="bg-white rounded-xl shadow-sm border p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+              <Edit className="h-8 w-8 text-primary-600" />
+              Blog Management
+            </h2>
+            <p className="text-gray-600 mt-2">Create and manage blog content with professional templates</p>
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={() => setShowTemplateModal(true)}
+              className="btn-secondary flex items-center gap-2"
+            >
+              <FileText className="h-4 w-4" />
+              Use Template
+            </button>
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="btn-primary flex items-center gap-2"
+            >
+              <Edit className="h-4 w-4" />
+              New Blog
+            </button>
+          </div>
+        </div>
+        
+        {/* Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-gray-50 rounded-lg p-4">
+            <div className="text-2xl font-bold text-gray-900">{blogs.length}</div>
+            <div className="text-sm text-gray-600">Total Blogs</div>
+          </div>
+          <div className="bg-yellow-50 rounded-lg p-4">
+            <div className="text-2xl font-bold text-yellow-600">{blogs.filter(b => b.status === 'draft').length}</div>
+            <div className="text-sm text-gray-600">Drafts</div>
+          </div>
+          <div className="bg-green-50 rounded-lg p-4">
+            <div className="text-2xl font-bold text-green-600">{blogs.filter(b => b.status === 'published').length}</div>
+            <div className="text-sm text-gray-600">Published</div>
+          </div>
+          <div className="bg-blue-50 rounded-lg p-4">
+            <div className="text-2xl font-bold text-blue-600">{blogTemplates.length}</div>
+            <div className="text-sm text-gray-600">Templates</div>
+          </div>
+        </div>
+        
+        {/* Filters */}
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex-1">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+              <input
+                type="text"
+                placeholder="Search blogs..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+          <div className="sm:w-48">
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value as any)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            >
+              <option value="all">All Status</option>
+              <option value="draft">Drafts</option>
+              <option value="published">Published</option>
+              <option value="archived">Archived</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Blogs Table */}
+      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredBlogs.map((blog) => (
+                <tr key={blog.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4">
+                    <div className="text-sm font-medium text-gray-900">{blog.title}</div>
+                    <div className="text-sm text-gray-500">Tags: {blog.tags?.join(', ') || 'None'}</div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="text-sm text-gray-900">{blog.category}</div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(blog.status)}`}>
+                      {blog.status.charAt(0).toUpperCase() + blog.status.slice(1)}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="text-sm text-gray-900">{blog.author}</div>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-500">
+                    {new Date(blog.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="px-6 py-4 text-right text-sm font-medium">
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => setSelectedBlog(blog)}
+                        className="text-primary-600 hover:text-primary-900 flex items-center gap-1 px-3 py-1 rounded border border-primary-200 hover:bg-primary-50"
+                        title="Edit Blog"
+                      >
+                        <Edit className="h-4 w-4" />
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => exportBlog(blog)}
+                        className="text-blue-600 hover:text-blue-900 flex items-center gap-1 px-3 py-1 rounded border border-blue-200 hover:bg-blue-50"
+                        title="Export Blog"
+                      >
+                        <Download className="h-4 w-4" />
+                        Export
+                      </button>
+                      <button
+                        onClick={() => deleteBlog(blog.id)}
+                        className="text-red-600 hover:text-red-900 flex items-center gap-1 px-3 py-1 rounded border border-red-200 hover:bg-red-50"
+                        title="Delete Blog"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        
+        {filteredBlogs.length === 0 && (
+          <div className="text-center py-12">
+            <Edit className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+            <h3 className="text-sm font-medium text-gray-900 mb-2">No blogs found</h3>
+            <p className="text-sm text-gray-500">
+              No blogs match the current filter criteria. Create your first blog using our templates!
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Template Selection Modal */}
+      {showTemplateModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-900">Choose a Blog Template</h3>
+                <button
+                  onClick={() => setShowTemplateModal(false)}
+                  className="text-gray-400 hover:text-gray-600 p-2"
+                >
+                  <XCircle className="h-6 w-6" />
+                </button>
+              </div>
+            </div>
+            
+            <div className="p-6">
+              <div className="grid md:grid-cols-2 gap-4">
+                {blogTemplates.map((template) => (
+                  <div key={template.id} className="border border-gray-200 rounded-lg p-4 hover:border-primary-300 transition-colors cursor-pointer" onClick={() => createFromTemplate(template)}>
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <h4 className="font-semibold text-gray-900">{template.title}</h4>
+                        <span className="text-xs bg-primary-100 text-primary-700 px-2 py-1 rounded-full">{template.category}</span>
+                      </div>
+                      <FileText className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <p className="text-sm text-gray-600 mb-3">{template.description}</p>
+                    <div className="text-xs text-gray-500">Click to use this template</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create/Edit Blog Modal */}
+      {(showCreateModal || selectedBlog) && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {selectedBlog ? 'Edit Blog' : 'Create New Blog'}
+                </h3>
+                <button
+                  onClick={() => {
+                    setShowCreateModal(false)
+                    setSelectedBlog(null)
+                  }}
+                  className="text-gray-400 hover:text-gray-600 p-2"
+                >
+                  <XCircle className="h-6 w-6" />
+                </button>
+              </div>
+            </div>
+            
+            <div className="p-6 space-y-6">
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Blog Title</label>
+                  <input
+                    type="text"
+                    value={selectedBlog ? selectedBlog.title : newBlog.title}
+                    onChange={(e) => {
+                      if (selectedBlog) {
+                        setSelectedBlog({...selectedBlog, title: e.target.value})
+                      } else {
+                        setNewBlog({...newBlog, title: e.target.value})
+                      }
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    placeholder="Enter blog title..."
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                  <select
+                    value={selectedBlog ? selectedBlog.category : newBlog.category}
+                    onChange={(e) => {
+                      if (selectedBlog) {
+                        setSelectedBlog({...selectedBlog, category: e.target.value})
+                      } else {
+                        setNewBlog({...newBlog, category: e.target.value})
+                      }
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  >
+                    <option value="">Select Category</option>
+                    <option value="Advice">Advice</option>
+                    <option value="Stories">Stories</option>
+                    <option value="Planning">Planning</option>
+                    <option value="Dating">Dating</option>
+                    <option value="Culture">Culture</option>
+                    <option value="Counseling">Counseling</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Content</label>
+                <textarea
+                  value={selectedBlog ? selectedBlog.content : newBlog.content}
+                  onChange={(e) => {
+                    if (selectedBlog) {
+                      setSelectedBlog({...selectedBlog, content: e.target.value})
+                    } else {
+                      setNewBlog({...newBlog, content: e.target.value})
+                    }
+                  }}
+                  rows={20}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent font-mono text-sm"
+                  placeholder="Write your blog content here... (Supports Markdown)"
+                />
+              </div>
+              
+              <div className="grid md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                  <select
+                    value={selectedBlog ? selectedBlog.status : newBlog.status}
+                    onChange={(e) => {
+                      if (selectedBlog) {
+                        setSelectedBlog({...selectedBlog, status: e.target.value as any})
+                      } else {
+                        setNewBlog({...newBlog, status: e.target.value as any})
+                      }
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  >
+                    <option value="draft">Draft</option>
+                    <option value="published">Published</option>
+                    <option value="archived">Archived</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Author</label>
+                  <input
+                    type="text"
+                    value={selectedBlog ? selectedBlog.author : newBlog.author}
+                    onChange={(e) => {
+                      if (selectedBlog) {
+                        setSelectedBlog({...selectedBlog, author: e.target.value})
+                      } else {
+                        setNewBlog({...newBlog, author: e.target.value})
+                      }
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    placeholder="Author name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Publish Date</label>
+                  <input
+                    type="date"
+                    value={selectedBlog ? selectedBlog.publishDate : newBlog.publishDate}
+                    onChange={(e) => {
+                      if (selectedBlog) {
+                        setSelectedBlog({...selectedBlog, publishDate: e.target.value})
+                      } else {
+                        setNewBlog({...newBlog, publishDate: e.target.value})
+                      }
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div className="p-6 border-t flex gap-3">
+              <button
+                onClick={() => {
+                  setShowCreateModal(false)
+                  setSelectedBlog(null)
+                }}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  if (selectedBlog) {
+                    saveBlog({...selectedBlog, updatedAt: new Date().toISOString()})
+                    setSelectedBlog(null)
+                  } else {
+                    handleCreateBlog()
+                  }
+                }}
+                className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+              >
+                {selectedBlog ? 'Update Blog' : 'Create Blog'}
               </button>
             </div>
           </div>

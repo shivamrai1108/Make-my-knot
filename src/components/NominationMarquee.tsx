@@ -23,24 +23,23 @@ export default function NominationMarquee() {
     setIsSubmitting(true)
     
     try {
-      // Create nomination object
-      const nomination = {
-        id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-        ...formData,
-        status: 'new',
-        submittedAt: new Date().toISOString(),
-        contacted: false,
-        notes: ''
+      // Submit to backend API
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://make-my-knot-production.up.railway.app/api'
+      const response = await fetch(`${API_URL}/nominations/submit`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      })
+      
+      const data = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to submit nomination')
       }
       
-      // Save to localStorage (will be replaced with API later)
-      const existingNominations = JSON.parse(localStorage.getItem('makemyknot_nominations') || '[]')
-      existingNominations.push(nomination)
-      localStorage.setItem('makemyknot_nominations', JSON.stringify(existingNominations))
-      
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1500))
-      
+      console.log('✅ Nomination submitted successfully:', data)
       setIsSubmitting(false)
       setSubmitted(true)
       
