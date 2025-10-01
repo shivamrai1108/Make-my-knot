@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { 
   essentialQuestions, 
-  saveQuestionnaireResponse, 
   QuestionnaireResponse,
   getQuestionnaireResponseByUser,
   getQuestionnaireResponseByLead
@@ -222,11 +221,43 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
       isComplete: true
     }
 
-    // Save to localStorage and backend API
+    // Save to localStorage and backend API using Assessment API directly
     setSubmissionProgress(50) // Saving data
     try {
-      await saveQuestionnaireResponse(response)
-      console.log('✅ Assessment saved successfully!')
+      // Save directly to Assessment API
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://make-my-knot-production.up.railway.app/api'
+      const assessmentData = {
+        name: userName,
+        email: userEmail,
+        phone: userPhone,
+        responses: finalResponses,
+        leadId: leadId,
+        userId: userId,
+        completionTime,
+        source: source || (leadId ? 'lead_assessment' : 'user_assessment')
+      }
+      
+      console.log('🔄 Submitting assessment to backend API:', {
+        email: userEmail,
+        answeredQuestions: Object.keys(finalResponses).length,
+        source: assessmentData.source
+      })
+      
+      const response_api = await fetch(`${API_URL}/assessments/public`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(assessmentData)
+      })
+      
+      if (!response_api.ok) {
+        const errorData = await response_api.text()
+        throw new Error(`Assessment API Error: ${response_api.status} - ${errorData}`)
+      }
+      
+      const result = await response_api.json()
+      console.log('✅ Assessment saved successfully to backend!', result.data.assessment.id)
       setSubmissionProgress(75) // Data saved
     } catch (error) {
       console.error('❌ Error saving assessment:', error)
