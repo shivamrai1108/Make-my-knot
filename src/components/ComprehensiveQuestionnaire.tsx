@@ -33,8 +33,8 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
   const [lastSaveTime, setLastSaveTime] = useState<number>(0)
   const [isSaving, setIsSaving] = useState(false)
   
-  // Email confirmation state
-  const [showEmailConfirm, setShowEmailConfirm] = useState(true)
+  // Email confirmation state - REMOVED
+  const [showEmailConfirm, setShowEmailConfirm] = useState(false)
   const [confirmedEmail, setConfirmedEmail] = useState('')
   const [confirmedName, setConfirmedName] = useState('')
   const [confirmedPhone, setConfirmedPhone] = useState('')
@@ -128,12 +128,12 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
       }
     }
     
-    // Pre-populate the confirmation fields
+    // Pre-populate the confirmed fields for backend submission (no confirmation screen shown)
     setConfirmedEmail(userEmail)
     setConfirmedName(userName)
     setConfirmedPhone(userPhone)
     
-    console.log('📧 Final pre-populated email confirmation:', { 
+    console.log('📧 Pre-populated user data for assessment submission:', { 
       email: userEmail, 
       name: userName, 
       phone: userPhone,
@@ -643,137 +643,7 @@ export default function ComprehensiveQuestionnaire({ userId, leadId, onComplete,
     )
   }
 
-  // Email confirmation screen
-  if (showEmailConfirm) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-primary-50 to-purple-50 flex items-center justify-center p-4">
-        <div className="max-w-2xl w-full bg-white rounded-3xl shadow-2xl p-8">
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl">📧</span>
-            </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Confirm Your Information
-            </h2>
-            <p className="text-lg text-gray-600">
-              Please confirm your details to ensure we save your assessment correctly.
-            </p>
-            {(confirmedName || confirmedEmail || confirmedPhone) && (
-              <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-sm text-green-700">
-                  ✅ <strong>Good news!</strong> We found your information and pre-filled the form below.
-                </p>
-              </div>
-            )}
-          </div>
-
-          <div className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Your Name *
-              </label>
-              <input
-                type="text"
-                value={confirmedName}
-                onChange={(e) => setConfirmedName(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="Enter your full name"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address *
-              </label>
-              <input
-                type="email"
-                value={confirmedEmail}
-                onChange={(e) => setConfirmedEmail(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="Enter your email address"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Phone Number *
-              </label>
-              <input
-                type="tel"
-                value={confirmedPhone}
-                onChange={(e) => setConfirmedPhone(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="Enter your phone number"
-                required
-              />
-            </div>
-          </div>
-
-          <div className="bg-primary-50 rounded-lg p-4 mt-6">
-            <p className="text-sm text-primary-800">
-              <strong>Privacy Note:</strong> This information is used to save your assessment and notify you of matches. We never share your data with third parties.
-            </p>
-          </div>
-
-          <div className="flex justify-between items-center mt-8">
-            <button
-              onClick={() => setShowWelcome(true)}
-              className="flex items-center px-6 py-3 text-gray-600 hover:text-gray-900"
-            >
-              <ChevronLeft className="w-5 h-5 mr-2" />
-              Back
-            </button>
-
-            <button
-              onClick={() => {
-                // Enhanced validation with better error messages
-                if (!confirmedName.trim()) {
-                  alert('Please enter your full name.');
-                  return;
-                }
-                if (!confirmedEmail.trim()) {
-                  alert('Please enter your email address.');
-                  return;
-                }
-                if (!confirmedPhone.trim()) {
-                  alert('Please enter your phone number.');
-                  return;
-                }
-                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(confirmedEmail)) {
-                  alert('Please enter a valid email address (e.g., john@example.com).');
-                  return;
-                }
-                
-                // Basic phone validation (at least 10 digits)
-                const phoneDigits = confirmedPhone.replace(/\D/g, '')
-                if (phoneDigits.length < 10) {
-                  alert('Please enter a valid phone number with at least 10 digits.');
-                  return;
-                }
-                
-                console.log('✅ Email confirmation completed successfully:', { 
-                  name: confirmedName.trim(), 
-                  email: confirmedEmail.trim(), 
-                  phone: confirmedPhone.trim(),
-                  leadId: leadId || 'none',
-                  userId: userId || 'none'
-                });
-                
-                setShowEmailConfirm(false);
-              }}
-              disabled={!confirmedName.trim() || !confirmedEmail.trim() || !confirmedPhone.trim()}
-              className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Continue to Assessment
-              <ChevronRight className="w-5 h-5 ml-2" />
-            </button>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  // Email confirmation screen - REMOVED (assessments and leads are saving correctly without it)
 
   // Animated congratulations screen
   if (showCongrats) {
