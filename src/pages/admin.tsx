@@ -815,16 +815,16 @@ export default function Admin() {
         <title>Admin Dashboard - Make My Knot</title>
       </Head>
       
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 flex">
         {/* Mobile sidebar overlay */}
         {sidebarOpen && (
           <div className="fixed inset-0 z-40 bg-black bg-opacity-50 md:hidden" onClick={() => setSidebarOpen(false)}></div>
         )}
         
         {/* Sidebar */}
-        <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg border-r border-gray-200 transform transition-transform duration-300 ease-in-out md:translate-x-0 ${
+        <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg border-r border-gray-200 transform transition-transform duration-300 ease-in-out ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } md:relative md:z-0`}>
+        } md:relative md:translate-x-0 md:flex-shrink-0`}>
           {/* Logo */}
           <div className="flex items-center px-6 py-5 border-b border-gray-200">
             <div className="flex items-center">
@@ -894,9 +894,9 @@ export default function Admin() {
         </div>
 
         {/* Main Content */}
-        <div className="md:pl-64">
+        <div className="flex-1 flex flex-col min-w-0">
           {/* Top Header */}
-          <header className="bg-white shadow-sm border-b border-gray-200">
+          <header className="bg-white shadow-sm border-b border-gray-200 flex-shrink-0">
             <div className="px-6 py-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
@@ -935,8 +935,8 @@ export default function Admin() {
           </header>
 
           {/* Content Area */}
-          <main className="p-6">
-            <div className="max-w-7xl mx-auto">
+          <main className="flex-1 p-6 overflow-y-auto">
+            <div className="max-w-none">
               {/* Quick Stats Bar */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
                 <div className="bg-white rounded-lg border border-gray-200 p-4">
