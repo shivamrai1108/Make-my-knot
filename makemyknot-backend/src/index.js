@@ -149,14 +149,14 @@ app.use('/api/nominations', nominationRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.json({
+  console.log('💓 Healthcheck hit from', req.ip || req.headers['x-forwarded-for'] || 'unknown');
+  return res.status(200).json({
     status: 'OK',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV,
+    environment: process.env.NODE_ENV || 'development',
     version: '1.0.0'
   });
 });
-
 // Assessment collection initialization endpoint
 app.post('/api/init/assessment', async (req, res) => {
   try {
