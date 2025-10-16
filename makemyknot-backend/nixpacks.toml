@@ -1,6 +1,9 @@
 [variables]
 NIXPACKS_NODEJS_VERSION = "18"
 
+# Top-level providers array (required)
+providers = ["node"]
+
 [phases.install]
 cmd = "npm ci --only=production"
 
@@ -9,7 +12,3 @@ cmd = "echo 'Backend build complete'"
 
 [phases.start]
 cmd = "bash start.sh"
-
-[providers.node]
-packageManager = "npm"
-packageFilePath = "./package.json"
