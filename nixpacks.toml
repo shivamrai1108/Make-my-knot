@@ -1,7 +1,7 @@
 [variables]
 NIXPACKS_NODEJS_VERSION = "18"
 
-# Declare providers as an array
+# top-level providers array (correct place)
 providers = ["node"]
 
 [phases.install]
@@ -12,9 +12,3 @@ cmd = "echo 'Backend build complete'"
 
 [phases.start]
 cmd = "bash start.sh"
-
-# Move provider-specific configuration into phases or environment vars if needed
-# Nixpacks automatically detects npm/package.json, so you can remove this:
-# [providers.node]
-# packageManager = "npm"
-# packageFilePath = "./package.json"
