@@ -1,8 +1,6 @@
 [variables]
 NIXPACKS_NODEJS_VERSION = "18"
-
-# top-level providers array (correct place)
-providers = ["node"]
+providers = "node"   # string, not an array
 
 [phases.install]
 cmd = "npm ci --only=production"
