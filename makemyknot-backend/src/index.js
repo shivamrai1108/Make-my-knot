@@ -39,6 +39,15 @@ app.use(helmet());
 app.use(compression());
 app.use(morgan('combined'));
 
+app.use((req, res, next) => {
+  // For quick debug: mark health probe in logs
+  if (req.path === '/api/health') {
+    console.log(`[PROBE] ${req.method} ${req.path} from ${req.ip || req.headers['x-forwarded-for'] || 'unknown'}`);
+  }
+  next();
+});
+
+
 // CORS configuration for public access
 app.use(cors({
   origin: function (origin, callback) {
@@ -58,6 +67,7 @@ app.use(cors({
       /^https:\/\/.*\.netlify\.app$/, // Netlify deployments
       /^http:\/\/192\.168\.[0-9]+\.[0-9]+:3000$/, // Allow all local network IPs
     ];
+
     
     // Check if origin is allowed
     const isAllowed = allowedOrigins.some(allowedOrigin => {
@@ -82,11 +92,16 @@ app.use(cors({
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutes
+  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
   max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
-  message: 'Too many requests from this IP, please try again later.'
+  message: 'Too many requests from this IP, please try again later.',
+  skip: (req, res) => {
+    // Skip health probe
+    return req.path === '/api/health' || req.path === '/api/health/';
+  }
 });
 app.use('/api/', limiter);
+
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
@@ -149,13 +164,20 @@ app.use('/api/nominations', nominationRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  console.log('💓 Healthcheck hit from', req.ip || req.headers['x-forwarded-for'] || 'unknown');
-  return res.status(200).json({
-    status: 'OK',
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development',
-    version: '1.0.0'
+  // quick log to confirm the platform probe reaches the app
+  console.log('💓 Healthcheck probe', {
+    ip: req.ip || req.headers['x-forwarded-for'] || 'unknown',
+    path: req.originalUrl,
+    method: req.method,
+    headers: {
+      host: req.headers.host,
+      origin: req.headers.origin,
+      'user-agent': req.headers['user-agent']
+    }
   });
+
+  // Always return plain 200 quickly — keep this tiny to avoid DB/auth interference
+  return res.status(200).json({ status: 'ok', time: new Date().toISOString() });
 });
 // Assessment collection initialization endpoint
 app.post('/api/init/assessment', async (req, res) => {
